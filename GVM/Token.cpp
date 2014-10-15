@@ -27,6 +27,7 @@ Token<T>::Token(const Token &obj)
 	dat = *obj.data;
 }
 
+/*
 // setters and getters for the class fields
 
 template <class T>
@@ -52,3 +53,4 @@ Tag Token<T>::getTag(void)
 {
 	return tag;
 }
+*/

@@ -20,17 +20,17 @@
 template<class T>
 class Token
 {
-	private:
-		T *data;
-		Tag tag;
-
 	public:
 		Token(T *dat, Tag tg);
 		~Token(void);
 		Token (const Token &obj);
+		T *data;
+		Tag tag;
+		/*
 		void setData(T *dat);
 		void setTag(Tag tg);
 		Tag getTag(void);
 		T* getData(void);
+		*/
 };
 

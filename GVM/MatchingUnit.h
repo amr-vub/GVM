@@ -6,7 +6,10 @@
 */
 
 #pragma once
+#include <map>
+using namespace std;
 
+class Core;
 /*
 * This class encapsulate the functionality of the matching unit.
 * The matching unit is resposible for:
@@ -21,5 +24,15 @@ class MatchingUnit
 public:
 	MatchingUnit(void);
 	~MatchingUnit(void);
+
+	void executeOrUpdateTable(Token<int> tok);
+
+	//fields
+
+	// the core that this matching unit is associated with
+	Core* core;
+	// The local tokens table that reflects the existing tokens
+	// in the matching units that are waiting for thier pairs
+	map<pair<Context, int*>, Token<int>> tokenTable;
 };
 

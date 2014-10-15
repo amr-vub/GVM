@@ -4,6 +4,7 @@
 * GVM
 */
 #pragma once
+#include "Context.h"
 /**
 * Tag is the token identifier, it has three fields
 * \param 
@@ -16,19 +17,21 @@
 */
 class Tag
 {
-private:
-	int conx;
+public:
+	Context conx;
 	short port;
-	int inst;
+	int instAdd[2];
 
 public:
-	Tag(int cx, short port, int ins);
+	Tag(Context cx, short port);
 	~Tag(void);
+	/*
 	void setConx(int cx);
 	void setPort(short prt);
 	void setInst(int ins);
 	int getConx(void);
 	short getPort(void);
 	int getInst(void);
+	*/
 };
 

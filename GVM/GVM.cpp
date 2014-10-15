@@ -7,11 +7,13 @@
 //
 
 #include "stdafx.h"
-#include "Token.h"
+#include "Core.h"
 
 
 int _tmain(int argc, _TCHAR* argv[])
 {	
+
+	// core1;
 	return 0;
 }
 

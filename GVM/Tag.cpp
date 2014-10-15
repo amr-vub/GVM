@@ -8,11 +8,10 @@
 #include "Tag.h"
 
 // constructor
-Tag::Tag(int cx, short prt, int ins)
+Tag::Tag(Context cx, short prt)
 {
 	conx = cx;
 	port = prt;
-	inst = ins;
 }
 
 // destructor
@@ -20,6 +19,7 @@ Tag::~Tag(void)
 {
 }
 
+/*
 // setters and getters
 
 void Tag::setConx(int cx)
@@ -46,3 +46,4 @@ int Tag::getInst(void)
 {
 	return inst;
 }
+*/
