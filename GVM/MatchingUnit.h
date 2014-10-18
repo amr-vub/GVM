@@ -7,9 +7,11 @@
 
 #pragma once
 #include <map>
+#include "Core.h"
+#include "Token.h"
+
 using namespace std;
 
-class Core;
 /*
 * This class encapsulate the functionality of the matching unit.
 * The matching unit is resposible for:
@@ -22,7 +24,7 @@ class Core;
 class MatchingUnit
 {
 public:
-	MatchingUnit(void);
+	MatchingUnit(Core &core);
 	~MatchingUnit(void);
 
 	void executeOrUpdateTable(Token<int> tok);
@@ -30,9 +32,9 @@ public:
 	//fields
 
 	// the core that this matching unit is associated with
-	Core* core;
+	Core core;
 	// The local tokens table that reflects the existing tokens
 	// in the matching units that are waiting for thier pairs
-	map<pair<Context, int*>, Token<int>> tokenTable;
+	map<pair<long, long>, Token<int>> tokenTable;
 };
 

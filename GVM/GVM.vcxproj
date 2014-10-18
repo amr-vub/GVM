@@ -84,6 +84,7 @@
     <ClInclude Include="IMemory.h" />
     <ClInclude Include="Instruction.h" />
     <ClInclude Include="MatchingUnit.h" />
+    <ClInclude Include="Natives.h" />
     <ClInclude Include="PE.h" />
     <ClInclude Include="Scheduler.h" />
     <ClInclude Include="stdafx.h" />
@@ -100,6 +101,7 @@
     <ClCompile Include="IMemory.cpp" />
     <ClCompile Include="Instruction.cpp" />
     <ClCompile Include="MatchingUnit.cpp" />
+    <ClCompile Include="Natives.cpp" />
     <ClCompile Include="Scheduler.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

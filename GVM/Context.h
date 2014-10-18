@@ -20,12 +20,20 @@ public:
 	Context();
 	~Context(void);
 
+	void generateUniqueConx();
+
 	/*	fields	*/
+	// counter for the number of context created 
+	static int conxCounter;
 	// The Id of the core that conext is attached to
 	short coreId;
 
 	// the actual value of the context
 	int conx;
+
+	// The unique context index, that will be generating by the function
+	// generateUniqueConx
+	long conxId;
 
 };
 

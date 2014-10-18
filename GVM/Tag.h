@@ -21,10 +21,15 @@ public:
 	Context conx;
 	short port;
 	int instAdd[2];
+	// unique mix of chunk and memory location
+	long instIdx;
 
 public:
-	Tag(Context cx, short port);
+	Tag(Context &cx, short prt, int *instAdd);
+	Tag(void);
 	~Tag(void);
+	//generate unique mix of  instAdd {chunk and mem add}
+	void generateUniqeMix();
 	/*
 	void setConx(int cx);
 	void setPort(short prt);

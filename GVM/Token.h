@@ -21,10 +21,11 @@ template<class T>
 class Token
 {
 	public:
-		Token(T *dat, Tag tg);
-		~Token(void);
-		Token (const Token &obj);
-		T *data;
+		Token(T dat, Tag tg);
+		Token(void);
+		~Token(void);		
+
+		T data;
 		Tag tag;
 		/*
 		void setData(T *dat);
@@ -33,4 +34,23 @@ class Token
 		T* getData(void);
 		*/
 };
+
+template <class T>
+Token<T>::Token(T dataInput, Tag tagInput)
+{
+	data = dataInput;
+	tag = tagInput;
+}
+
+template <class T>
+Token<T>::Token(void)
+{
+
+}
+
+template <class T>
+Token<T>::~Token(void)
+{
+	//delete data;
+}
 

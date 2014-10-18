@@ -6,19 +6,8 @@
 #include "stdafx.h"
 #include "Token.h"
 
-template <class T>
-Token<T>::Token(T *dataInput, Tag tagInput)
-{
-	data = dataInput;
-	tag = tagInput;
-}
 
-template <class T>
-Token<T>::~Token(void)
-{
-	delete data;
-}
-
+/*
 // copy constructor
 template <class T>
 Token<T>::Token(const Token &obj)
@@ -26,6 +15,7 @@ Token<T>::Token(const Token &obj)
 	T *dat = new T;
 	dat = *obj.data;
 }
+*/
 
 /*
 // setters and getters for the class fields

@@ -6,6 +6,12 @@
 
 #pragma once
 
+#include <vector>
+#include "Context.h"
+#include "Core.h"
+
+using namespace std;
+
 /*
 * This class defines the Tokenizer.
 * The tokenizer is responsible for:
@@ -16,7 +22,12 @@
 class Tokenizer
 {
 public:
-	Tokenizer(void);
+	Tokenizer(Core &core);
 	~Tokenizer(void);	
+	// create a new token and send it to the token queue
+	void wrapAndSend(vector<tuple<int*,short>> &distList, int &res, Context &cx);
+
+	/*	fields	*/
+	Core core;
 };
 

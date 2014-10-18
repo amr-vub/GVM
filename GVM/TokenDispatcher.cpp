@@ -10,8 +10,9 @@
 #include "IMemory.h"
 #include "Instruction.h"
 #include "MatchingUnit.h"
+#include "Scheduler.h"
 
-TokenDispatcher::TokenDispatcher(Core cr)
+TokenDispatcher::TokenDispatcher(Core &cr)
 {
 	core = cr;
 }
@@ -25,7 +26,7 @@ TokenDispatcher::~TokenDispatcher(void)
 * \param 
 		tok : the fetched token from the token queue
 */
-void TokenDispatcher::dispatch(Token<int> tok)
+void TokenDispatcher::dispatch(Token<int> &tok)
 {
 	// getting instruction address
 	int *instIdx = tok.tag.instAdd;
@@ -34,10 +35,10 @@ void TokenDispatcher::dispatch(Token<int> tok)
 	// Instruction stord in chunk 1 -> dyatic
 	if(instIdx[0] == 0)
 		// call the schedual directly
-			;
+			this->core.sch->execute(tok);
 	else
 		// call the matching unit
-		core.matchUnit->executeOrUpdateTable(tok);
+		this->core.matchUnit->executeOrUpdateTable(tok);
 	;
 	//core.coreID;
 }

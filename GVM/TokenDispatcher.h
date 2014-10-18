@@ -16,10 +16,10 @@ class TokenDispatcher
 {
 
 public:
-	TokenDispatcher(Core cr);
+	TokenDispatcher(Core &cr);
 	~TokenDispatcher(void);	
 
-	void dispatch(Token<int> tok);
+	void dispatch(Token<int> &tok);
 
 	// fields part
 	Core core;
