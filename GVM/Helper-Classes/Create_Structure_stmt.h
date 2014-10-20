@@ -29,5 +29,8 @@ public:
 
 	// Create a sink instruction and store it in the IMemory
 	static void createSink(vector<string> &strTokns);
+
+	// Create a constant instruction and store it in the IMemory
+	static void createConstant(vector<string> &strTokns);
 };
 

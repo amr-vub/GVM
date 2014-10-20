@@ -95,7 +95,7 @@ void parser::parseInst(vector<string> &stmtToks)
 	else if(stmtToks[1].compare("CNS") == 0)
 	{
 		// Constant inst
-		// TODO
+		Create_Structure_stmt::createConstant(stmtToks);
 	}
 }
 

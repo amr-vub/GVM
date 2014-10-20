@@ -70,7 +70,6 @@ void Create_Structure_stmt::createSwitch(vector<string> &strTokns)
 
 }
 
-/*
 /* Create a sink instruction and store it in the IMemory
 	\param: 
 		strToknd: vector of strings. 
@@ -86,6 +85,25 @@ void Create_Structure_stmt::createSink(vector<string> &strTokns)
 
 	// add to the memory
 	putInMemory(0, indx[1], sink);
+}
+
+/* Create a constant instruction and store it in the IMemory
+	\param: 
+		strToknd: vector of strings. 
+			e.g. ['INST' 'CNS' '<idx>' '<=' '<value>']
+*/
+void Create_Structure_stmt::createConstant(vector<string> &strTokns)
+{
+	// get the idx
+	int indx[2] = {0, atoi(strTokns[2].c_str())};
+	int value = atoi(strTokns[4].c_str());
+	short ch = 0;
+
+	// create the sink inst
+	Constant<int> *constant = new Constant<int>(ch, indx, value);
+
+	// add to the memory
+	putInMemory(0, indx[1], constant);
 }
 
 /* save instruction in the IMemory

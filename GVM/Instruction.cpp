@@ -7,7 +7,6 @@
 #include "stdafx.h"
 #include "Instruction.h"
 #include "Natives.h"
-#include "Tokenizer.h"
 
 Instruction::Instruction(short &ch, int idx[2])
 {
@@ -143,34 +142,3 @@ void Switch::execute(Token<int> *tokens, Core &core)
 	}	
 }
 
-/*********************** Constant Inst Part ******************************/
-
-template<class T>
-Constant<T>::Constant()
-{
-}
-
-template<class T>
-Constant<T>::Constant(short ch, int* indx) : Instruction(ch, indx)
-{
-}
-
-template<class T>
-Constant<T>::~Constant()
-{
-}
-/*
-	Constant istruction has the following formate:
-		INST CNS <idx> <= <value>
-	It redirects the value to all of it's destination once
-	it recieves an input at port 0
-*/
-template<class T>
-void Constant<T>::execute(Token<int> *tokens, Core &core)
-{
-	short port = tokens[0].tag.port;
-	Context cx = tokens[0].tag.conx;
-
-	if(0 == port)
-		core.tokenizer->wrapAndSend(this->distList, this->value, cx);
-}

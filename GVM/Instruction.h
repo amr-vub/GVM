@@ -10,6 +10,7 @@
 #include <tuple>
 #include "Core.h"
 #include "Token.h"
+#include "Tokenizer.h"
 #include "PE.h"
 
 using namespace std;
@@ -136,7 +137,7 @@ class Constant : public Instruction
 {
 public:
 	Constant();
-	Constant(short ch, int* indx);
+	Constant(short &ch, int* indx, T &value);
 	~Constant();
 	// overriding the super method
 	void execute(Token<int> *tokens, Core &core);
@@ -144,6 +145,38 @@ public:
 	/*	fields	*/
 
 	// The recieved value
-	T* value;
+	T value;
 
 };
+
+template<class T>
+Constant<T>::Constant()
+{
+}
+
+template<class T>
+Constant<T>::Constant(short &ch, int* indx, T &value) : Instruction(ch, indx)
+{
+	this->value = value;
+}
+
+template<class T>
+Constant<T>::~Constant()
+{
+}
+
+/*
+	Constant istruction has the following formate:
+		INST CNS <idx> <= <value>
+	It redirects the value to all of it's destination once
+	it recieves an input at port 0
+*/
+template<class T>
+void Constant<T>::execute(Token<int> *tokens, Core &core)
+{
+	short port = tokens[0].tag.port;
+	Context cx = tokens[0].tag.conx;
+
+	if(0 == port)
+		core.tokenizer->wrapAndSend(this->distList, this->value, cx);
+}
