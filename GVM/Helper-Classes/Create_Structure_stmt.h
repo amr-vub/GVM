@@ -23,5 +23,7 @@ public:
 
 	// Create an operation object and store it in the IMemory
 	static void createOperation(vector<string> &strTokns);
+
+
 };
 

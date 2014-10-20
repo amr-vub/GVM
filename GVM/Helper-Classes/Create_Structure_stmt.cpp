@@ -38,3 +38,4 @@ void Create_Structure_stmt::createOperation(vector<string> &strTokns)
 	IMemory::put(ch, indx[1], ints);
 	
 }
+

@@ -10,12 +10,11 @@
 #include <tuple>
 #include "Core.h"
 #include "Token.h"
+#include "PE.h"
 
 using namespace std;
 
 typedef int (*MyFuncPtrType)(int, int);
-
-typedef vector<tuple<int*,short> > Tuple_vector;
 
 /*
 * This class defines the base structure of instructions that Imemory
@@ -83,4 +82,44 @@ public:
 
 	// total number of inputs
 	short inputs;
+};
+
+/*
+* Sink instruction.
+* Forwards the input to thier destination.
+* Format : INST SNK <idx>
+*/
+class Sink : public Instruction
+{
+public:
+	Sink(short ch, int *idx);
+	~Sink();
+	
+	// overriding the super method
+	void execute(Token<int> *tokens, Core &core);
+
+	/*	fields	*/
+
+
+	//
+};
+
+
+/*
+* Switch instruction
+* Switche instruction redirects of data based on a condition.
+* Format : INST SWI <idx> <destination list>
+*/
+class Switch : public Instruction
+{
+public:
+	Switch();
+	~Switch();
+
+	// overriding the super method
+	void execute(Token<int> *tokens, Core &core);
+
+	/*	fields	*/	
+	//int *destinationList;
+
 };

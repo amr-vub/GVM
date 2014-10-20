@@ -21,7 +21,6 @@ Instruction::Instruction(short &ch, int idx[2])
 
 Instruction::~Instruction(void)
 {
-	delete idx;
 }
 
 Instruction::Instruction(void)
@@ -40,8 +39,7 @@ void Instruction::generateUniqueIdx()
 	this->InstInx |= temp;
 }
 
-// Operation instruction part
-
+/*********************** Operation Part ******************************/
 
 Operation::Operation()
 {
@@ -68,4 +66,75 @@ void Operation::execute(Token<int> *tokens, Core &core)
 
 	// send the res to tokenizer
 	core.tokenizer->wrapAndSend((this->distList), res, tokens[0].tag.conx);
+}
+
+
+/*********************** SINK Inst Part ******************************/
+
+
+Sink::Sink(short ch, int *idx) : Instruction(ch, idx)
+{
+	
+}
+
+Sink::~Sink()
+{
+}
+
+/*
+	Sink instruction simply forwad it's inputs to thier dest
+*/
+void Sink::execute(Token<int> *tokens, Core &core)
+{
+	// send the res to tokenizer
+	core.tokenizer->wrapAndSend((this->distList), tokens[0].data, tokens[0].tag.conx);
+}
+
+/*********************** SWITCH Inst Part ******************************/
+
+Switch::Switch()
+{
+}
+
+Switch::~Switch()
+{	
+}
+/*
+	Switch instruction execution
+	- The switch instruction has list of destination, and a condition input.
+	- It recieves the condition input on it's port 0.
+	- This condition token's data value determins the index of the chosen dest
+	- All tokens recieved before the condition var are stored
+*/
+void Switch::execute(Token<int> *tokens, Core &core)
+{
+	short port = tokens[0].tag.port;
+	if(port == 0)
+	{
+		// the condition token has arrived
+		// use it to index the destination list
+		// and send all stored tokens recieved before
+		// with the same context
+
+		// first get all of the stored tokens
+		long cx = tokens[0].tag.conx.conxId;
+		vector<Token<int>> toksV = core.tokenizer->swicther->getAllElement(cx);
+
+		// then determine thier dest based on the recieved token's data
+		int destIdx = tokens[0].data;
+		Tuple_vector dest;
+
+		// valide index
+		if(this->distList.size() > destIdx)
+		{
+			dest.push_back(this->distList[destIdx]);
+			if(!toksV.empty()) //at least one token exists
+				core.tokenizer->swicther->sendToTokinzer(dest, toksV);
+		}
+	}
+	else
+	{
+		// store this token till we recieve the condition token to specify it's dest
+		core.tokenizer->swicther->addSwitchStorageElement(tokens[0]);
+	}	
 }
