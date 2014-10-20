@@ -92,8 +92,12 @@ void Sink::execute(Token<int> *tokens, Core &core)
 
 /*********************** SWITCH Inst Part ******************************/
 
+Switch::Switch(short ch, int* idx) : Instruction(ch, idx)
+{	
+}
+
 Switch::Switch()
-{
+{	
 }
 
 Switch::~Switch()
@@ -137,4 +141,36 @@ void Switch::execute(Token<int> *tokens, Core &core)
 		// store this token till we recieve the condition token to specify it's dest
 		core.tokenizer->swicther->addSwitchStorageElement(tokens[0]);
 	}	
+}
+
+/*********************** Constant Inst Part ******************************/
+
+template<class T>
+Constant<T>::Constant()
+{
+}
+
+template<class T>
+Constant<T>::Constant(short ch, int* indx) : Instruction(ch, indx)
+{
+}
+
+template<class T>
+Constant<T>::~Constant()
+{
+}
+/*
+	Constant istruction has the following formate:
+		INST CNS <idx> <= <value>
+	It redirects the value to all of it's destination once
+	it recieves an input at port 0
+*/
+template<class T>
+void Constant<T>::execute(Token<int> *tokens, Core &core)
+{
+	short port = tokens[0].tag.port;
+	Context cx = tokens[0].tag.conx;
+
+	if(0 == port)
+		core.tokenizer->wrapAndSend(this->distList, this->value, cx);
 }

@@ -70,7 +70,7 @@ void parser::parseInst(vector<string> &stmtToks)
 	else if(stmtToks[1].compare("SWI") == 0)
 	{
 		// SWITCH inst
-		// TODO
+		Create_Structure_stmt::createSwitch(stmtToks);
 	}
 	else if(stmtToks[1].compare("SNK") == 0)
 	{
@@ -97,6 +97,30 @@ void parser::parseInst(vector<string> &stmtToks)
 		// Constant inst
 		// TODO
 	}
+}
+
+/*
+	Parse the link instruction
+	e.g. : LINK chunk idx port -> chunk idx port
+*/
+void parser:: parseLink(vector<string> &stmtToks)
+{
+	// collecting info from the instruction
+	short chunk1 = atoi(stmtToks[1].c_str());
+	short chunk2 = atoi(stmtToks[4].c_str());
+
+	int idx1 = atoi(stmtToks[2].c_str());
+	int idx2 = atoi(stmtToks[5].c_str());
+
+	short port1 = atoi(stmtToks[3].c_str());
+	short port2 = atoi(stmtToks[6].c_str());
+
+	int add1[2] = {chunk1, idx1};
+	int add2[2] = {chunk2, idx2};
+
+	// query the memory for the source instruction to add destination address to it
+	Instruction *inst= IMemory::get(add1);
+	inst->distList.push_back(make_tuple(add2,port2));
 }
 
 // function to redirect the input stmt the correct parser
@@ -140,27 +164,4 @@ void parser::parserMain(string &line)
 	}
 }
 
-/*
-	Parse the link instruction
-	e.g. : LINK chunk idx port -> chunk idx port
-*/
-void parser:: parseLink(vector<string> &stmtToks)
-{
-	// collecting info from the instruction
-	short chunk1 = atoi(stmtToks[1].c_str());
-	short chunk2 = atoi(stmtToks[4].c_str());
-
-	int idx1 = atoi(stmtToks[2].c_str());
-	int idx2 = atoi(stmtToks[5].c_str());
-
-	short port1 = atoi(stmtToks[3].c_str());
-	short port2 = atoi(stmtToks[6].c_str());
-
-	int add1[2] = {chunk1, idx1};
-	int add2[2] = {chunk2, idx2};
-
-	// query the memory for the source instruction to add destination address to it
-	Instruction *inst= IMemory::get(add1);
-	inst->distList.push_back(make_tuple(add2,port2));
-}
 

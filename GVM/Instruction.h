@@ -114,6 +114,7 @@ class Switch : public Instruction
 {
 public:
 	Switch();
+	Switch(short ch, int* idx);
 	~Switch();
 
 	// overriding the super method
@@ -121,5 +122,28 @@ public:
 
 	/*	fields	*/	
 	//int *destinationList;
+
+};
+
+/*
+* Constant Instruction
+* Forwards the recieved value to all of it's destination when triggered
+* by a input reception in port 0
+* Format : INST CNS <idx> <= <value>
+*/
+template<class T>
+class Constant : public Instruction
+{
+public:
+	Constant();
+	Constant(short ch, int* indx);
+	~Constant();
+	// overriding the super method
+	void execute(Token<int> *tokens, Core &core);
+
+	/*	fields	*/
+
+	// The recieved value
+	T* value;
 
 };

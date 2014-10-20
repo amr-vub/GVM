@@ -24,6 +24,10 @@ public:
 	// Create an operation object and store it in the IMemory
 	static void createOperation(vector<string> &strTokns);
 
+	// Create a switch instruction and store it in the IMemory
+	static void createSwitch(vector<string> &strTokns);
 
+	// Create a sink instruction and store it in the IMemory
+	static void createSink(vector<string> &strTokns);
 };
 
