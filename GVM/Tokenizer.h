@@ -6,7 +6,7 @@
 
 #pragma once
 
-//#include <vector>
+#include <tuple>
 #include <map>
 #include "Context.h"
 #include "Core.h"
@@ -14,9 +14,27 @@
 
 using namespace std;
 
+struct RestoreArgs;
 typedef vector<Token<int>> Vector_token;
+typedef map<long, RestoreArgs> RestorMapType;
+typedef map<long, tuple<short, Context*>> ContextMapType;
 
 class Switcher;
+class ContextManager;
+
+// data structure to hold the restored info
+struct RestoreArgs{	
+	// det chunk 
+	short chunk;
+	// dest instruction address
+	int idx;
+	// dest port number
+	short port;
+	// old context
+	Context *cx;
+	// number of expected return values
+	short restores;
+};
 
 /*
 * This class defines the Tokenizer.
@@ -38,6 +56,7 @@ public:
 	Core core;
 
 	Switcher *swicther;
+	ContextManager *contextManager;
 };
 
 /*
@@ -63,4 +82,33 @@ public:
 
 	/*	fields	*/
 	Tokenizer tokenizer;
+};
+
+/*
+ Class ContextManager That manages the context change and restore
+*/
+class ContextManager
+{
+public:
+	ContextManager();
+	~ContextManager();
+
+	// 
+	void bind_save(Token<int> &tok, int* destAdd, int* retAdd, short &binds, short &rest);
+
+	/*	fields	*/
+
+	// A map to store the return address and the old context for
+	// the new created context. The key will be the old context
+	RestorMapType restoreMap; 
+
+	// A map to store the new created context in case of multiple <binds>
+	// i.e. when we have to send multiple arguments to the same function
+	// The key here is the Old conxId
+	ContextMapType contextMap;
+
+	Tokenizer tokenizer;
+
+private:
+	void bind_send(Token<int> &tok, int* destAdd, int* retAdd, short &rest, Context* cx);	
 };

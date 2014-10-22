@@ -85,7 +85,7 @@ void parser::parseInst(vector<string> &stmtToks)
 	else if(stmtToks[1].compare("CHN") == 0)
 	{
 		// contextChange inst
-		// TODO
+		Create_Structure_stmt::createContextChange(stmtToks);
 	}
 	else if(stmtToks[1].compare("RST") == 0)
 	{

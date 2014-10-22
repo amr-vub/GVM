@@ -9,13 +9,12 @@
 
 
 //intializing the static var
-int Context::conxCounter = -1;
+//int Context::conxCounter = -1;
 
-Context::Context(short coID)
+Context::Context(short &coID, int &conxCounter)
 {
 	this->coreId = coID;	
-	this->conxId = 0;
-	conxCounter += 1;
+	this->conxId = 0;	
 	this->conx = conxCounter;
 	generateUniqueConx();
 }
@@ -45,4 +44,32 @@ void Context::generateUniqueConx()
 	long temp = 0;
 	temp = conx;
 	this->conxId |= temp;
+}
+
+/*	ContextCreater	*/
+ContextCreater::ContextCreater()
+{
+	conxCounter = 0;
+}
+
+ContextCreater::~ContextCreater()
+{
+	//TODO
+	// loop through avaliable to delete pointers
+}
+
+// return a unique context
+Context* ContextCreater::getUniqueCx(short &corId)
+{
+	// if there exist a free already created context, return it
+	if(!this->cxPool.empty())
+		return this->cxPool.back();	
+	else
+		new Context(corId, ++this->conxCounter);
+}
+
+// free an already created context and add it to the avaliable vector
+void ContextCreater::freeContext(Context *cx)
+{
+	this->cxPool.push_back(cx);
 }

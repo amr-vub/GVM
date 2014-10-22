@@ -5,6 +5,10 @@
 */
 
 #pragma once
+#include <vector>
+
+using namespace std;
+
 /*
 * This class define the context
 * The tag that is associated with each token has dynamic and static parts.
@@ -16,15 +20,13 @@
 class Context
 {
 public:
-	Context(short coID);
+	Context(short &coID, int &conxCounter);
 	Context();
 	~Context(void);
 
 	void generateUniqueConx();
 
 	/*	fields	*/
-	// counter for the number of context created 
-	static int conxCounter;
 	// The Id of the core that conext is attached to
 	short coreId;
 
@@ -37,3 +39,29 @@ public:
 
 };
 
+/*
+ Handels the context creation and keeps a pool of already
+ created free contexts
+*/
+class ContextCreater
+{
+public:
+	ContextCreater();
+	~ContextCreater();
+
+	// return a unique context
+	Context* getUniqueCx(short &corId);
+
+	void freeContext(Context* cx);
+
+	/*	fields	*/
+
+	// counter for the number of context created 
+	int conxCounter;
+
+	// holds the already used context, but free now 
+	// in order not to keep generating context, we use
+	// existing resources
+	vector<Context*> cxPool;
+
+};

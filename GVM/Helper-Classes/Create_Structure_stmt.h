@@ -32,5 +32,8 @@ public:
 
 	// Create a constant instruction and store it in the IMemory
 	static void createConstant(vector<string> &strTokns);
+
+	// Create a context change instruction and store it in the IMemory
+	static void createContextChange(vector<string> &strTokns);
 };
 

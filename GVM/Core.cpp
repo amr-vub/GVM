@@ -20,6 +20,7 @@ Core::Core(IMemory* mem, int corid)
 	memory = mem;
 	tokenizer = new Tokenizer(*this);	
 	coreID = corid;
+	this->conxObj = ContextCreater();
 }
 
 Core::Core(void)
@@ -34,7 +35,7 @@ Core::~Core(void)
 	delete sch;
 	delete memory;
 	delete tokenizer;
-	delete conxObj;
+	//delete conxObj;
 }
 
 //copy constructor

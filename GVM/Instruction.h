@@ -127,6 +127,32 @@ public:
 };
 
 /*
+* ContextChange instruction
+* Format :  INST CHN <idx> <binds> <restores> <to> <ret>
+*	- <binds> how many argumet will be sent to the redirected address <to>
+	- <restores> TODO
+	- <to> Redirect the data to.
+	- <ret> the return address after the cotext restore
+*/
+class ContextChange : public Instruction
+{
+public:
+	ContextChange(short &bds, short &rstors, int* to, int* ret);
+	~ContextChange();
+
+	// overriding the super method
+	void execute(Token<int> *tokens, Core &core);
+
+	/*	fields	*/	
+	short binds;
+	short restores;
+	int* todest;
+	int* retDest;
+
+
+};
+
+/*
 * Constant Instruction
 * Forwards the recieved value to all of it's destination when triggered
 * by a input reception in port 0

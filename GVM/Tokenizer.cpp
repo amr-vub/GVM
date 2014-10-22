@@ -88,3 +88,89 @@ void Switcher::sendToTokinzer(Tuple_vector &dest,Vector_token &tokV)
 		this->tokenizer.wrapAndSend(dest, (*it).data, (*it).tag.conx);
 	}
 }
+
+/*	ContextManager	*/
+
+ContextManager::ContextManager()
+{
+}
+
+ContextManager::~ContextManager()
+{
+}
+/*	
+	This function handels the context change in case of multiple binds i.e. <binds> > 1
+	
+	\param: tok
+		the recieved token to change it's context
+	\param: retAdd
+		The add to return to when we context is restored
+	\param: binds
+		how many argument I expect to attach the same context to
+	\param: rest
+		how many return arguments I expect from this call	
+*/
+void ContextManager::bind_save(Token<int> &tok, int* destAdd, int* retAdd, short &binds, short &rest)
+{
+	Context old_cx = tok.tag.conx;
+	Context *new_cx = NULL;
+	short bds;
+	// check if we need to store the new generated cx for other incoming toks
+	if(binds > 1)
+	{
+		// if no element already exists for that tok. i.e the first argument to arrive
+		if(this->contextMap.find(old_cx.conxId) == contextMap.end())
+		{
+			// generate new context
+			new_cx = this->tokenizer.core.conxObj.getUniqueCx(this->tokenizer.core.coreID);
+			// update the context map, cause we have still binds-1 toks to come
+			this->contextMap[old_cx.conxId] = make_tuple(--binds, new_cx);			
+
+		}
+		else
+		{
+			// then no need to create a new context, just get the already created on
+			// for the same old context Id
+			new_cx = get<1>(this->contextMap[old_cx.conxId]);
+			bds = get<0>(this->contextMap[old_cx.conxId]);
+			// check if the stored binds is == 1. i.e. all of the expected toks have arrived
+			if(bds == 1)
+				// delete the entry from the context map
+				this->contextMap.erase(old_cx.conxId);
+		}
+		// bind and send the recieved tok
+		bind_send(tok, retAdd, destAdd,  rest, new_cx);
+	}
+	else
+	{
+		// generate new context
+		new_cx = this->tokenizer.core.conxObj.getUniqueCx(this->tokenizer.core.coreID);
+		// just changing the cx of one token, no further to come
+		bind_send(tok, retAdd, destAdd, rest, new_cx);
+	}
+}
+
+/* 
+	In case of single bind. <binds> == 1
+	- Chenge the cx of the recieved token
+	- Save the old cx together with the retAdd, chunk, port & restores
+	- Delegate it to the tokenizer
+*/
+void ContextManager::bind_send(Token<int> &tok, int* destAdd, int* retAdd, short &rest, Context* new_cx)
+{
+	// store all of the req info to restore the cx in the restore map
+	RestoreArgs restArgs =  
+	{
+		retAdd[0],	// det chunk 	
+		retAdd[1],	// dest instruction address
+		tok.tag.port,// dest port number
+		new_cx, 	// old context	
+		rest,		// number of expected return values
+	};
+	restoreMap[new_cx->conxId] = restArgs;	
+	
+	// send the tok to the tokenizer
+	Tuple_vector temp;
+	temp.push_back(make_tuple(destAdd, tok.tag.port));
+	this->tokenizer.wrapAndSend(temp ,tok.data, *new_cx);
+}

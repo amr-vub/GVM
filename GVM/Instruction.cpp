@@ -73,7 +73,7 @@ void Operation::execute(Token<int> *tokens, Core &core)
 
 Sink::Sink(short ch, int *idx) : Instruction(ch, idx)
 {
-	
+
 }
 
 Sink::~Sink()
@@ -81,7 +81,7 @@ Sink::~Sink()
 }
 
 /*
-	Sink instruction simply forwad it's inputs to thier dest
+Sink instruction simply forwad it's inputs to thier dest
 */
 void Sink::execute(Token<int> *tokens, Core &core)
 {
@@ -103,11 +103,11 @@ Switch::~Switch()
 {	
 }
 /*
-	Switch instruction execution
-	- The switch instruction has list of destination, and a condition input.
-	- It recieves the condition input on it's port 0.
-	- This condition token's data value determins the index of the chosen dest
-	- All tokens recieved before the condition var are stored
+Switch instruction execution
+- The switch instruction has list of destination, and a condition input.
+- It recieves the condition input on it's port 0.
+- This condition token's data value determins the index of the chosen dest
+- All tokens recieved before the condition var are stored
 */
 void Switch::execute(Token<int> *tokens, Core &core)
 {
@@ -142,3 +142,26 @@ void Switch::execute(Token<int> *tokens, Core &core)
 	}	
 }
 
+/*********************** ContextChange Inst Part ******************************/
+
+ContextChange::ContextChange(short &bds, short &rstors, int* to, int* ret)
+{
+	binds = bds;
+	restores = rstors;
+	todest  = to;
+	retDest = ret;
+}
+
+ContextChange::~ContextChange()
+{
+}
+/*
+	ContextChange instruction execution
+	- Change the context of the recieved tok
+	- save the old cx to be restored when a context restore inst is executed
+*/
+void ContextChange::execute(Token<int> *tokens, Core &core)
+{
+	// delegate to the context manger onj to handel the context execution details
+	core.tokenizer->contextManager->bind_save(tokens[0], this->todest, this->retDest, this->binds, this->restores);
+}

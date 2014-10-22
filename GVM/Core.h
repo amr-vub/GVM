@@ -5,8 +5,9 @@
 */
 
 #pragma once
-#include <vector>
+//#include <vector>
 #include "Token.h"
+#include "Context.h"
 
 class TokenDispatcher;
 class MatchingUnit;
@@ -14,7 +15,6 @@ class Scheduler;
 class MatchingUnit;
 class IMemory;
 class Tokenizer;
-class Context;
 /** 
 * This class defines the Core.
 * A core is the basic building block of the GVM.
@@ -44,10 +44,10 @@ public:
 
 	Tokenizer* tokenizer;
 
-	Context* conxObj;
+	ContextCreater conxObj;
 
 	// core id
-	int coreID;
+	short coreID;
 
 	// Token queue
 	//vector<Token<int>> inbox;

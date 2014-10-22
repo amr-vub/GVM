@@ -106,6 +106,26 @@ void Create_Structure_stmt::createConstant(vector<string> &strTokns)
 	putInMemory(0, indx[1], constant);
 }
 
+/* Create a constant instruction and store it in the IMemory
+	\param: 
+		strToknd: vector of strings. 
+			e.g. ['INST' 'CHN' '<idx>' '<binds>' '<restores>' '<to>' '<ret>']
+*/
+void Create_Structure_stmt::createContextChange(vector<string> &strTokns)
+{
+	int indx[2] = {0, atoi(strTokns[2].c_str())};
+	short binds = atoi(strTokns[3].c_str());
+	short restores = atoi(strTokns[4].c_str());
+	int toAdd[2] = {atoi(strTokns[5].c_str()), atoi(strTokns[6].c_str())};
+	int retAdd[2] = {atoi(strTokns[7].c_str()), atoi(strTokns[8].c_str())};
+
+	// create the inst
+	ContextChange* contextChange = new ContextChange(binds, restores, toAdd, retAdd);
+
+	// add to the memory
+	putInMemory(0, indx[1], contextChange);
+}
+
 /* save instruction in the IMemory
 	\param:
 		inst: Abstract Instrucion pointer
