@@ -47,15 +47,22 @@ void Context::generateUniqueConx()
 }
 
 /*	ContextCreater	*/
+
+int ContextCreater::conxCounter = 0;
+
 ContextCreater::ContextCreater()
-{
-	conxCounter = 0;
+{	
 }
 
 ContextCreater::~ContextCreater()
 {
 	//TODO
 	// loop through avaliable to delete pointers
+	while (!this->cxPool.empty()){
+		Context* temp = this->cxPool.back();
+        this->cxPool.pop_back();
+        delete temp;
+    }	
 }
 
 // return a unique context

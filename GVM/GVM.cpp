@@ -17,6 +17,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstdio>
+#include <ctime>
 
 short globalNum_ips;
 
@@ -26,6 +28,9 @@ bool isLegalLine(string &line);
 
 int _tmain(int argc, _TCHAR* argv[])
 {	
+	clock_t start;
+    double duration;
+
 	int data;	
 
 	//Core core = Core();
@@ -46,8 +51,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			parser::parserMain(line);
 		}
 	}
-		
-
+			
 	Core core = Core(0);
 	/*
 	TokenDispatcher* dispatcher = new TokenDispatcher(core);
@@ -72,7 +76,10 @@ int _tmain(int argc, _TCHAR* argv[])
 		core.inbox.push_back(tok);
 	}
 
+	start = std::clock();
 	core.start();
+	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+    std::cout<<"Total time: "<< duration <<'\n';
 
 	// when it returns from start, the token that resides in the inbox
 	// will be the program result

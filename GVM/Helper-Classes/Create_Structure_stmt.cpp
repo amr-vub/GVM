@@ -62,7 +62,9 @@ void Create_Structure_stmt::createSwitch(vector<string> &strTokns)
 		it++;
 		// get the inst indx
 		idx = atoi((*it).c_str());
-		int indx[2] = {ch, idx};
+		int *indx = new int[2];
+		indx[0] = ch;
+		indx[1] = idx;
 		// add to the inst dest list
 		swi->distList.push_back(make_tuple(indx, 0));
 	}

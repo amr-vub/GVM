@@ -101,7 +101,13 @@ void Switcher::sendToTokinzer(Tuple_vector &dest,Vector_token &tokV)
 	for(Vector_token::iterator it = tokV.begin(); it!=tokV.end(); ++it)
 	{
 		this->tokenizer.wrapAndSend(dest, (*it)->data, (*it)->tag->conx);
+		// freeing memory							
+		delete *it;
+		tokV.erase(it);
+		if(tokV.empty())
+			break;
 	}
+	
 }
 
 /*	ContextManager	*/
@@ -179,7 +185,7 @@ void ContextManager::bind_send(Token<int> &tok, int* destAdd, int* retAdd, short
 		retAdd[0],	// det chunk 	
 		retAdd[1],	// dest instruction address
 		tok.tag->port,// dest port number
-		new_cx, 	// old context	
+		&tok.tag->conx, 	// old context	
 		rest,		// number of expected return values
 	};
 	restoreMap[new_cx->conxId] = restArgs;	

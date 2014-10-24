@@ -150,7 +150,7 @@ void parser::parseLit(vector<string> &stmtToks)
 	// query the memory for the source instruction to add literals to it
 	Instruction *inst= IMemory::get(idx);
 
-	inst->addLiterals(port, idx[1]);
+	inst->addLiterals(port, value);
 
 	IMemory::put(idx[0], idx[1], inst);
 }

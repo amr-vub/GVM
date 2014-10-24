@@ -43,7 +43,7 @@ void MatchingUnit::executeOrUpdateTable(Token<int> *tok)
 	if(tokenIt != tokenTable.end()){
 		// there is a match for the recieved token, then
 		// fetch both and send them to the schedualer
-		Token<int> *tokens[2] = {tokenIt->second, tok};
+		Token<int> tokens[2] = {*tokenIt->second, *tok};
 		core.sch->executeTwo(tokens);
 		tokenTable.erase(tokenIt);		
 	}
@@ -51,9 +51,9 @@ void MatchingUnit::executeOrUpdateTable(Token<int> *tok)
 	{
 		// check first if the dest inst has literals
 		Operation* inst = (Operation*) IMemory::get(tok->tag->instAdd);
-		if(inst->tokenInputs == inst->inputs == 1)
+		if(inst->tokenInputs == inst->inputs && inst->inputs == 1)
 			//send it to the sch
-			this->core.sch->executeTwo(&tok);
+			this->core.sch->executeTwo(tok);
 		else if(inst->literals.empty())
 			// save the token in the token table, and wait for it's pair
 			tokenTable[make_pair(cx.conxId, instIdx)] = tok;
@@ -70,7 +70,9 @@ void MatchingUnit::executeOrUpdateTable(Token<int> *tok)
 			toksPacket[tok->tag->port] = tok;
 			toksPacket[port] = tok2;
 			//send it to the sch
-			this->core.sch->executeTwo(toksPacket);
+			this->core.sch->executeTwo(*toksPacket);
+			// delete here
+			delete tok2;
 		}
 	}
 }

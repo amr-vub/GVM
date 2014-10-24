@@ -57,7 +57,7 @@ public:
 	/*	fields	*/
 
 	// counter for the number of context created 
-	int conxCounter;
+	static int conxCounter;
 
 	// holds the already used context, but free now 
 	// in order not to keep generating context, we use
