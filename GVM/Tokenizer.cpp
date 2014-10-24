@@ -6,16 +6,24 @@
 
 #include "stdafx.h"
 #include "Tokenizer.h"
-
-Tokenizer::Tokenizer(Core &core)
+/*
+Tokenizer::Tokenizer(Core &core) :core(core)
 {
-	this->core = core;
+	//this->core = core;
 	this->swicther = new Switcher(*this);
 }
+*/
 
-Tokenizer::Tokenizer(void)
+Tokenizer::Tokenizer() 
+	/*: swicther(new Switcher()), contextManager(new ContextManager())
+	*/
 {
+	//swicther = new Switcher();
+	//this->contextManager = new ContextManager();
+	//this->swicther->tokenizer = *this;
+	//contextManager->tokenizer = *this;
 }
+
 
 Tokenizer::~Tokenizer(void)
 {
@@ -41,20 +49,27 @@ void Tokenizer::wrapAndSend(Tuple_vector &distList, int &res, Context &cx)
 		short port = get<1>(*it);
 
 		// construct the new Token
-		Tag newTag = Tag(cx, port, instAdd);
-		Token<int> newTok = Token<int>(res, newTag);
+		Tag *newTag = new Tag(cx, port, instAdd);
+		Token<int>* newTok = new Token<int>(res, newTag);
 		
 		// TODO, send to the queue
-		//this->core.inbox.push_back(newTok);
+		this->core.inbox.push_back(newTok);
 	}	
 }
 
-
+// 
+void Tokenizer::sendStop(Token<int> *tok)
+{
+	this->core.inbox.push_back(tok);
+	this->core.active = false;
+}
+/*
 Switcher::Switcher()
 {
 }
+*/
 
-Switcher::Switcher(Tokenizer &tokenizer)
+Switcher::Switcher()
 {
 }
 
@@ -63,9 +78,9 @@ Switcher::~Switcher()
 {
 }
 // add an element to the map
-void Switcher::addSwitchStorageElement(Token<int> &tok)
+void Switcher::addSwitchStorageElement(Token<int>* tok)
 {
-	long cx = tok.tag.conx.conxId;	
+	long cx = tok->tag->conx.conxId;	
 	this->switchStorage[cx].push_back(tok);
 }
 
@@ -85,15 +100,15 @@ void Switcher::sendToTokinzer(Tuple_vector &dest,Vector_token &tokV)
 {
 	for(Vector_token::iterator it = tokV.begin(); it!=tokV.end(); ++it)
 	{
-		this->tokenizer.wrapAndSend(dest, (*it).data, (*it).tag.conx);
+		this->tokenizer.wrapAndSend(dest, (*it)->data, (*it)->tag->conx);
 	}
 }
 
 /*	ContextManager	*/
-
 ContextManager::ContextManager()
 {
 }
+
 
 ContextManager::~ContextManager()
 {
@@ -112,7 +127,7 @@ ContextManager::~ContextManager()
 */
 void ContextManager::bind_save(Token<int> &tok, int* destAdd, int* retAdd, short &binds, short &rest)
 {
-	Context old_cx = tok.tag.conx;
+	Context old_cx = tok.tag->conx;
 	Context *new_cx = NULL;
 	short bds;
 	// check if we need to store the new generated cx for other incoming toks
@@ -146,7 +161,7 @@ void ContextManager::bind_save(Token<int> &tok, int* destAdd, int* retAdd, short
 		// generate new context
 		new_cx = this->tokenizer.core.conxObj.getUniqueCx(this->tokenizer.core.coreID);
 		// just changing the cx of one token, no further to come
-		bind_send(tok, retAdd, destAdd, rest, new_cx);
+		bind_send(tok, destAdd, retAdd, rest, new_cx);
 	}
 }
 
@@ -163,7 +178,7 @@ void ContextManager::bind_send(Token<int> &tok, int* destAdd, int* retAdd, short
 	{
 		retAdd[0],	// det chunk 	
 		retAdd[1],	// dest instruction address
-		tok.tag.port,// dest port number
+		tok.tag->port,// dest port number
 		new_cx, 	// old context	
 		rest,		// number of expected return values
 	};
@@ -171,6 +186,48 @@ void ContextManager::bind_send(Token<int> &tok, int* destAdd, int* retAdd, short
 	
 	// send the tok to the tokenizer
 	Tuple_vector temp;
-	temp.push_back(make_tuple(destAdd, tok.tag.port));
+	temp.push_back(make_tuple(destAdd, tok.tag->port));
 	this->tokenizer.wrapAndSend(temp ,tok.data, *new_cx);
+}
+
+/*
+	Restore the cx for the recieved tok
+	\param: tok
+		the recieved token to restore it's cx
+*/
+void ContextManager::restore(Token<int> tok)
+{
+	// query the restore map by the  to get the resArgs
+	/*
+		struct RestoreArgs{	
+			short chunk;
+			int idx;
+			short port;
+			Context *cx;
+			short restores;
+		};
+	*/	
+	long conxId = tok.tag->conx.conxId;
+	RestoreArgs resArgs = restoreMap[conxId];
+	Context old_cx = *resArgs.cx;
+
+	// send the tok to the tokenizer
+	Tuple_vector temp;
+	int index[2] = {resArgs.chunk, resArgs.idx};
+	temp.push_back(make_tuple(index, resArgs.port));
+	this->tokenizer.wrapAndSend(temp, tok.data, old_cx);
+
+	// if restore value is one, then we no longer need to save this entry
+	if(resArgs.restores <= 1)
+	{
+		// append the cx to the avaliable cx pool
+		this->tokenizer.core.conxObj.freeContext(resArgs.cx);
+		// erase the entry in the restore map
+		restoreMap.erase(conxId);
+	}
+	else
+	{
+		resArgs.restores--;
+		restoreMap[conxId] = resArgs;
+	}
 }

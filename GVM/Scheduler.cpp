@@ -8,11 +8,12 @@
 #include "Scheduler.h"
 #include "IMemory.h"
 #include "Instruction.h"
+#include <iostream>
 
 
-Scheduler::Scheduler(Core &core)
+Scheduler::Scheduler()
 {
-	this->core = core;
+	//this->core = core;
 }
 
 
@@ -25,18 +26,22 @@ Scheduler::~Scheduler(void)
 // then call the next element in GVM pipeline
 // "Tokenizer"
 // \param: the token array
-void Scheduler::execute(Token<int> *toks)
+void Scheduler::executeTwo(Token<int> *toks[2])
 {
 	//getting the tokens from 
-	Token<int> tok1 = toks[0];
-	Token<int> tok2 = toks[1];
+	//Token<int>* tok1 = toks[0];
+	//Token<int>* tok2 = toks[1];
 
 	// getting the dest inst add
-	int *instAdd = tok1.tag.instAdd;	
+	int *instAdd = toks[0]->tag->instAdd;	
 
 	Instruction* inst = this->core.memory->get(instAdd);
 
-	inst->execute(toks, this->core);
+	inst->execute(*toks, this->core);
+
+	//free the memory
+	//delete toks[0];
+	//delete tok2;
 }
 
 // This function is resposible for executing 
@@ -44,7 +49,17 @@ void Scheduler::execute(Token<int> *toks)
 // then call the next element in GVM pipeline
 // "Tokenizer"
 // \param: the token to be executed upon
-void Scheduler::execute(Token<int> &toks)
+void Scheduler::execute(Token<int> &tok)
 {
-	
+	// getting the dest inst add
+	int *instAdd = tok.tag->instAdd;	
+
+	Instruction* inst = this->core.memory->get(instAdd);
+	/*
+	vector<tuple<int*,short>> temp;
+	this->core.tokenizer->wrapAndSend(temp, tok.data, tok.tag->conx);
+	*/
+//	cout<<this->core.active;
+	inst->execute(&tok, this->core);
+	//delete &tok;
 }

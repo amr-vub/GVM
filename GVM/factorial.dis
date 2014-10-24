@@ -45,7 +45,7 @@ INST OPR 1 int 1
 	$ Leaving subgraph 1
 	
 	$ Starting subgraph 2
-	INST OPR 2 add 2
+	INST OPR 2 sub 2
 	INST OPR 3 mul 2
 	
 	LINK 1 2 0 -> 0 8 0

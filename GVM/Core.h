@@ -29,10 +29,13 @@ class Tokenizer;
 class Core
 {
 public:
-	Core(IMemory* mem, int corid);
+	Core(int corid);
 	Core(void);
 	~Core(void);
-	Core(const Core &obj);
+	Core(Core &obj);
+
+	void start();
+
 	// fields part (for simplicity, I will make them public)
 	TokenDispatcher* dispatcher;
 
@@ -49,8 +52,10 @@ public:
 	// core id
 	short coreID;
 
+	static bool active;
+
 	// Token queue
-	//vector<Token<int>> inbox;
+	static vector<Token<int>*> inbox;
 
 };
 

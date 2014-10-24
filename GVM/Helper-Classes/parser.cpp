@@ -10,6 +10,8 @@
 #include "IMemory.h"
 #include "Instruction.h"
 
+extern short globalNum_ips;
+
 parser::parser(void)
 {
 }
@@ -55,12 +57,13 @@ void parser::parseInst(vector<string> &stmtToks)
 	if(stmtToks[1].compare("BGN") == 0)
 	{
 		// start inst		
-		// TODO
+		globalNum_ips = atoi(stmtToks[3].c_str());
+		Create_Structure_stmt::createSink(stmtToks);
 	}
 	else if(stmtToks[1].compare("STP") == 0)
 	{
 		// stop inst
-		// TODO
+		Create_Structure_stmt::createStop(stmtToks);
 	}
 	else if(stmtToks[1].compare("OPR") == 0)
 	{
@@ -75,7 +78,7 @@ void parser::parseInst(vector<string> &stmtToks)
 	else if(stmtToks[1].compare("SNK") == 0)
 	{
 		// sink inst
-		// TODO
+		Create_Structure_stmt::createSink(stmtToks);
 	}
 	else if(stmtToks[1].compare("SPL") == 0)
 	{
@@ -90,7 +93,7 @@ void parser::parseInst(vector<string> &stmtToks)
 	else if(stmtToks[1].compare("RST") == 0)
 	{
 		// Context resotre inst
-		// TODO
+		Create_Structure_stmt::createContextRestore(stmtToks);
 	}
 	else if(stmtToks[1].compare("CNS") == 0)
 	{
@@ -107,20 +110,49 @@ void parser:: parseLink(vector<string> &stmtToks)
 {
 	// collecting info from the instruction
 	short chunk1 = atoi(stmtToks[1].c_str());
-	short chunk2 = atoi(stmtToks[4].c_str());
+	short chunk2 = atoi(stmtToks[5].c_str());
 
 	int idx1 = atoi(stmtToks[2].c_str());
-	int idx2 = atoi(stmtToks[5].c_str());
+	int idx2 = atoi(stmtToks[6].c_str());
 
 	short port1 = atoi(stmtToks[3].c_str());
-	short port2 = atoi(stmtToks[6].c_str());
+	short port2 = atoi(stmtToks[7].c_str());
 
 	int add1[2] = {chunk1, idx1};
-	int add2[2] = {chunk2, idx2};
+	int *add2 = new int[2];
+	add2[0] = chunk2;
+	add2[1] = idx2;
 
 	// query the memory for the source instruction to add destination address to it
 	Instruction *inst= IMemory::get(add1);
 	inst->distList.push_back(make_tuple(add2,port2));
+	IMemory::put(add1[0], add1[1], inst);
+}
+
+void parser::parseChunk(vector<string> &stmtToks)
+{
+	// just fake for now a memory insertion
+
+}
+
+/*
+	Parse LIT stmt
+
+	LITR <inst> <port> <= <value>
+*/
+void parser::parseLit(vector<string> &stmtToks)
+{
+	int idx[2] = {1,  atoi(stmtToks[1].c_str())};
+	short port = atoi(stmtToks[2].c_str());
+
+	int value = atoi(stmtToks[4].c_str());
+
+	// query the memory for the source instruction to add literals to it
+	Instruction *inst= IMemory::get(idx);
+
+	inst->addLiterals(port, idx[1]);
+
+	IMemory::put(idx[0], idx[1], inst);
 }
 
 // function to redirect the input stmt the correct parser
@@ -146,17 +178,19 @@ void parser::parserMain(string &line)
 	else if(comp.compare("CHUNK") == 0)
 	{
 		// CHUNK statment
-		//parseChunk(strToks);
+		// TODO
+		parseChunk(strToks);		
 	}
 	else if(comp.compare("LINK") == 0)
 	{
 		// LINK statment
 		// TODO
-		//parseLink(strToks);
+		parseLink(strToks);
 	}
-	else if(comp.compare("LIT") == 0)
+	else if(comp.compare("LITR") == 0)
 	{
 		// literal statment		
+		parseLit(strToks);
 	}
 	else if(comp.compare("TRIV") == 0)
 	{

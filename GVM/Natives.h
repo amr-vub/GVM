@@ -8,10 +8,11 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 using namespace std;
 
-typedef int (*MyFuncPtrType)(int, int);
+typedef int (*MyFuncPtrType)(vector<int>);
 
 /*
 * Natives class
@@ -27,7 +28,19 @@ public:
 	static map<string, MyFuncPtrType> generateMap();
 
 	// Add 2 arguments and returns the output
-	static int addNative(int v1, int v2);
+	static int addNative(vector<int> args);
+
+	// Sub 2 arguments and returns the output
+	static int subNative(vector<int> args);
+
+	// Mul 2 arguments and returns the output
+	static int mulNative(vector<int> args);
+
+	// Return true if thefirst input is greater than right input.
+	static int moreNative(vector<int> args);
+
+	// Return the input as an int
+	static int intNative(vector<int> args);
 
 	/*	fields	*/
 	// global map as a table for native ops function pointers

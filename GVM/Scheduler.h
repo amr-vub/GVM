@@ -16,13 +16,13 @@
 class Scheduler
 {
 public:
-	Scheduler(Core &core);
+	Scheduler();
 	~Scheduler(void);
 	// This function is resposible for executing 
 	// the dest instruction on the recieved tokens,
 	// then call the next element in GVM pipeline
 	// "Tokenizer"
-	void execute(Token<int> *it);
+	void executeTwo(Token<int> *toks[2]);
 
 	void execute(Token<int> &it);
 

@@ -24,10 +24,10 @@ using namespace std;
 class MatchingUnit
 {
 public:
-	MatchingUnit(Core &core);
+	MatchingUnit();
 	~MatchingUnit(void);
 
-	void executeOrUpdateTable(Token<int> tok);
+	void executeOrUpdateTable(Token<int> *tok);
 
 	//fields
 
@@ -35,6 +35,6 @@ public:
 	Core core;
 	// The local tokens table that reflects the existing tokens
 	// in the matching units that are waiting for thier pairs
-	map<pair<long, long>, Token<int>> tokenTable;
+	map<pair<long, long>, Token<int>*> tokenTable;
 };
 

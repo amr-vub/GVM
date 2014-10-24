@@ -15,7 +15,7 @@
 
 using namespace std;
 
-typedef int (*MyFuncPtrType)(int, int);
+typedef int (*MyFuncPtrType)(vector<int>);
 
 /*
 * This class defines the base structure of instructions that Imemory
@@ -38,8 +38,12 @@ public:
 	Instruction(short &ch, int idx[2]);
 	~Instruction();
 	// Abstract function that has to be implemeted by all subtypes
-	// TODO : add virtual
 	virtual void execute(Token<int> *tokens, Core &core) = 0;
+
+	//virtual void execute2(Token<int> *tokens, Core *core);
+
+	// TODO
+	virtual void addLiterals(short &port, int &value);
 
 	//generate unique instIdx
 	void generateUniqueIdx();
@@ -47,6 +51,7 @@ public:
 	/*	fields	*/
 
 	// which chunk of memory this instruction is stored
+	// TODO
 	short chunk;
 
 	// The index of the instruction
@@ -58,6 +63,10 @@ public:
 	// List of destination nodes that the result 
 	// of executing this instruction should be forwarded to
 	Tuple_vector distList;
+
+	// vectors of literals
+	// Only for Context change and Operation Instructions
+	vector<tuple<short, int>> literals;
 };
 
 /*
@@ -75,6 +84,12 @@ public:
 
 	// overriding the super method
 	void execute(Token<int> *tokens, Core &core);
+
+	// preparing the args list
+	vector<int> createArgsList(Token<int>* toks);
+
+	// add literals to this inst
+	void addLiterals(short &port, int &value);
 	
 	/*	fields	*/
 
@@ -83,6 +98,9 @@ public:
 
 	// total number of inputs
 	short inputs;
+
+	// total numbers of expected tokens
+	short tokenInputs;
 };
 
 /*
@@ -96,6 +114,7 @@ public:
 	Sink(short ch, int *idx);
 	~Sink();
 	
+	void execute2(Token<int> *tokens, Core *core);
 	// overriding the super method
 	void execute(Token<int> *tokens, Core &core);
 
@@ -137,7 +156,7 @@ public:
 class ContextChange : public Instruction
 {
 public:
-	ContextChange(short &bds, short &rstors, int* to, int* ret);
+	ContextChange(short chunk, int* indx, short &bds, short &rstors, int* to, int* ret);
 	~ContextChange();
 
 	// overriding the super method
@@ -151,6 +170,34 @@ public:
 
 
 };
+
+/*
+* ContextRestore instruction
+* Restore a prevoiusly changed context. e.g. a function return
+* Format : INST RST <idx>
+*/
+class ContextRestore : public Instruction
+{
+public:
+	ContextRestore(short &ch, int* ind);
+	~ContextRestore();
+	// overriding the super method
+	void execute(Token<int> *tokens, Core &core);
+
+};
+
+/*
+	Stop Instruction
+*/
+class Stop : public Instruction
+{
+public:
+	Stop(short &ch, int idx[2]);
+	~Stop();
+	// overriding the super method
+	void execute(Token<int> *tokens, Core &core);
+};
+
 
 /*
 * Constant Instruction
@@ -200,8 +247,8 @@ Constant<T>::~Constant()
 template<class T>
 void Constant<T>::execute(Token<int> *tokens, Core &core)
 {
-	short port = tokens[0].tag.port;
-	Context cx = tokens[0].tag.conx;
+	short port = tokens[0].tag->port;
+	Context cx = tokens[0].tag->conx;
 
 	if(0 == port)
 		core.tokenizer->wrapAndSend(this->distList, this->value, cx);

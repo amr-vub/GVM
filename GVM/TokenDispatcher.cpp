@@ -12,9 +12,9 @@
 #include "MatchingUnit.h"
 #include "Scheduler.h"
 
-TokenDispatcher::TokenDispatcher(Core &cr)
+TokenDispatcher::TokenDispatcher()
 {
-	core = cr;
+	//core = cr;
 }
 
 TokenDispatcher::~TokenDispatcher(void)
@@ -26,16 +26,22 @@ TokenDispatcher::~TokenDispatcher(void)
 * \param 
 		tok : the fetched token from the token queue
 */
-void TokenDispatcher::dispatch(Token<int> &tok)
+void TokenDispatcher::dispatch(Token<int> *tok)
 {
 	// getting instruction address
-	int *instIdx = tok.tag.instAdd;
+	int *instIdx = tok->tag->instAdd;
 	// check if the token belongs to an dyatic instruction or monadic one
 	// Instruction stord in chunk 0 -> monadic
 	// Instruction stord in chunk 1 -> dyatic
 	if(instIdx[0] == 0)
+	{
+		/*
+		vector<tuple<int*,short>> temp;
+		this->core.tokenizer->wrapAndSend(temp, tok->data, tok->tag->conx);
+		*/
 		// call the schedual directly
-			this->core.sch->execute(tok);
+			this->core.sch->execute(*tok);
+	}
 	else
 		// call the matching unit
 		this->core.matchUnit->executeOrUpdateTable(tok);

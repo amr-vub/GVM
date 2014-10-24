@@ -35,5 +35,11 @@ public:
 
 	// Create a context change instruction and store it in the IMemory
 	static void createContextChange(vector<string> &strTokns);
+	
+	// Create a context change instruction and store it in the IMemory
+	static void createContextRestore(vector<string> &strTokns);
+
+	// Create a stop instruction and store it in the IMemory
+	static void createStop(vector<string> &strTokns);
 };
 

@@ -30,7 +30,7 @@ void Create_Structure_stmt::createOperation(vector<string> &strTokns)
 {
 	string opCode = strTokns[3];
 	short inputs = atoi(strTokns[4].c_str());
-	short ch = 0;
+	short ch = 1;
 	int indx[2] = {ch, atoi(strTokns[2].c_str())};	
 
 	//create operation object
@@ -54,7 +54,7 @@ void Create_Structure_stmt::createSwitch(vector<string> &strTokns)
 	short ch;
 	int idx;
 	// loop through the <destination list>
-	for(vector<string>::iterator it = (strTokns.begin()+2); it!=strTokns.end(); ++it)
+	for(vector<string>::iterator it = (strTokns.begin()+3); it!=strTokns.end(); ++it)
 	{
 		// get the chunk		
 		ch = atoi((*it).c_str());
@@ -106,7 +106,7 @@ void Create_Structure_stmt::createConstant(vector<string> &strTokns)
 	putInMemory(0, indx[1], constant);
 }
 
-/* Create a constant instruction and store it in the IMemory
+/* Create a ContextChange instruction and store it in the IMemory
 	\param: 
 		strToknd: vector of strings. 
 			e.g. ['INST' 'CHN' '<idx>' '<binds>' '<restores>' '<to>' '<ret>']
@@ -116,14 +116,54 @@ void Create_Structure_stmt::createContextChange(vector<string> &strTokns)
 	int indx[2] = {0, atoi(strTokns[2].c_str())};
 	short binds = atoi(strTokns[3].c_str());
 	short restores = atoi(strTokns[4].c_str());
-	int toAdd[2] = {atoi(strTokns[5].c_str()), atoi(strTokns[6].c_str())};
-	int retAdd[2] = {atoi(strTokns[7].c_str()), atoi(strTokns[8].c_str())};
+	int* toAdd =  new int[];
+	toAdd[0] = atoi(strTokns[5].c_str());
+	toAdd[1] = atoi(strTokns[6].c_str());
+
+	int* retAdd =  new int[];
+	retAdd[0] = atoi(strTokns[7].c_str());
+	retAdd[1] = atoi(strTokns[8].c_str());
 
 	// create the inst
-	ContextChange* contextChange = new ContextChange(binds, restores, toAdd, retAdd);
+	ContextChange* contextChange = new ContextChange(0, indx, binds, restores, toAdd, retAdd);
 
 	// add to the memory
 	putInMemory(0, indx[1], contextChange);
+}
+
+/* Create a ContextRestore instruction and store it in the IMemory
+	\param: 
+		strToknd: vector of strings. 
+			e.g. ['INST' 'RST' '<idx>']
+*/
+void Create_Structure_stmt::createContextRestore(vector<string> &strTokns)
+{
+	int indx[2] = {0, atoi(strTokns[2].c_str())};
+	short ch = indx[0];
+
+	// create the inst
+	ContextRestore* contextRestore = new ContextRestore(ch, indx);
+
+	// add to the memory
+	putInMemory(0, indx[1], contextRestore);
+}
+
+/* Create a ContextRestore instruction and store it in the IMemory
+	\param: 
+		strToknd: vector of strings. 
+			e.g. ['INST' 'STP' '<idx>']
+*/
+void Create_Structure_stmt::createStop(vector<string> &strTokns)
+{
+	int indx[2] = {0, atoi(strTokns[2].c_str())};
+	short ch = indx[0];
+
+	// create the inst
+	Stop* stop = new Stop(ch, indx);
+
+	// add to the memory
+	putInMemory(0, indx[1], stop);
+
 }
 
 /* save instruction in the IMemory

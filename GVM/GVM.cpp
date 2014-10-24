@@ -10,10 +10,15 @@
 #include "Core.h"
 #include "parser.h"
 #include "IMemory.h"
+#include "MatchingUnit.h"
+#include "TokenDispatcher.h"
+#include "Scheduler.h"
 
 #include <iostream>
 #include <fstream>
 #include <string>
+
+short globalNum_ips;
 
 using namespace std;
 
@@ -21,6 +26,9 @@ bool isLegalLine(string &line);
 
 int _tmain(int argc, _TCHAR* argv[])
 {	
+	int data;	
+
+	//Core core = Core();
 
 	// open the instrucion file to parse
 	fstream instFile;
@@ -38,6 +46,39 @@ int _tmain(int argc, _TCHAR* argv[])
 			parser::parserMain(line);
 		}
 	}
+		
+
+	Core core = Core(0);
+	/*
+	TokenDispatcher* dispatcher = new TokenDispatcher(core);
+	MatchingUnit *matchUnit = new MatchingUnit(core);
+	Scheduler *sch = new Scheduler(core);	
+	Tokenizer* tokenizer = new Tokenizer(core);	
+
+	core.dispatcher = dispatcher;
+	core.matchUnit = matchUnit;
+	core.sch = sch;
+	core.tokenizer = tokenizer;
+	*/
+	int indxStrAdd[2] = {0,0};
+
+	Context *firstCx = core.conxObj.getUniqueCx(core.coreID);
+
+	for(int i=0;i<globalNum_ips;i++)
+	{
+		cin >> data;
+		Tag * tag = new Tag(*firstCx, 0, indxStrAdd);
+		Token<int> *tok = new Token<int>(data, tag);
+		core.inbox.push_back(tok);
+	}
+
+	core.start();
+
+	// when it returns from start, the token that resides in the inbox
+	// will be the program result
+	cout<< "the result is : \n";
+	cout<< core.inbox.front()->data;
+
 	/*
 	// just for trials
 	int idx[2] = {0,2};

@@ -35,11 +35,10 @@ public:
 
 	//function to parse the input in case of CHUNK
 	// TODO
-	 //static void parseChunk(vector<string> &stmtToks);
+	 static void parseChunk(vector<string> &stmtToks);
 
-	 //function to parse the input in case of LIT
-	 // TODO
-	 //static void parseLit(vector<string> &stmtToks);
+	 //function to parse the input in case of LIT	 
+	 static void parseLit(vector<string> &stmtToks);
 
 	 //function to parse the input in case of LINK
 	 static void parseLink(vector<string> &stmtToks);

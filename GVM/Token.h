@@ -21,12 +21,12 @@ template<class T>
 class Token
 {
 	public:
-		Token(T dat, Tag tg);
+		Token(T &dat, Tag *tg);
 		Token(void);
 		~Token(void);		
 
 		T data;
-		Tag tag;
+		Tag *tag;
 		/*
 		void setData(T *dat);
 		void setTag(Tag tg);
@@ -36,7 +36,7 @@ class Token
 };
 
 template <class T>
-Token<T>::Token(T dataInput, Tag tagInput)
+Token<T>::Token(T &dataInput, Tag *tagInput)
 {
 	data = dataInput;
 	tag = tagInput;
@@ -51,6 +51,6 @@ Token<T>::Token(void)
 template <class T>
 Token<T>::~Token(void)
 {
-	//delete data;
+	delete tag;
 }
 

@@ -15,7 +15,7 @@
 using namespace std;
 
 struct RestoreArgs;
-typedef vector<Token<int>> Vector_token;
+typedef vector<Token<int>*> Vector_token;
 typedef map<long, RestoreArgs> RestorMapType;
 typedef map<long, tuple<short, Context*>> ContextMapType;
 
@@ -46,11 +46,14 @@ struct RestoreArgs{
 class Tokenizer
 {
 public:
-	Tokenizer(Core &core);
-	Tokenizer(void);
+	Tokenizer();
+	//Tokenizer(void);
 	~Tokenizer(void);	
 	// create a new token and send it to the token queue
 	void wrapAndSend(Tuple_vector &distList, int &res, Context &cx);
+
+	//
+	void sendStop(Token<int> *tok);
 
 	/*	fields	*/
 	Core core;
@@ -66,11 +69,11 @@ class Switcher
 {
 public:
 	Switcher();
-	Switcher(Tokenizer &tokenizer);
+	//Switcher(Tokenizer &tokenizer);
 	~Switcher();
 
 	// add an element to the map
-	void addSwitchStorageElement(Token<int> &tok);
+	void addSwitchStorageElement(Token<int> *tok);
 
 	Vector_token getAllElement(long &cx);
 
@@ -90,11 +93,15 @@ public:
 class ContextManager
 {
 public:
+	//ContextManager(Tokenizer &tokenizer);
 	ContextManager();
 	~ContextManager();
 
 	// 
 	void bind_save(Token<int> &tok, int* destAdd, int* retAdd, short &binds, short &rest);
+
+	// restore the cx for the recieved tok
+	void restore(Token<int> tok);
 
 	/*	fields	*/
 
