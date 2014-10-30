@@ -7,6 +7,7 @@
 #include "MatchingUnit.h"
 #include "Scheduler.h"
 #include "IMemory.h"
+#include "Core.h"
 //#include 
 
 // constructor
@@ -44,7 +45,7 @@ void MatchingUnit::executeOrUpdateTable(Token<int> *tok)
 		// there is a match for the recieved token, then
 		// fetch both and send them to the schedualer
 		Token<int> tokens[2] = {*tokenIt->second, *tok};
-		core.sch->executeTwo(tokens);
+		core->sch.executeTwo(tokens);
 		tokenTable.erase(tokenIt);		
 	}
 	else
@@ -53,7 +54,7 @@ void MatchingUnit::executeOrUpdateTable(Token<int> *tok)
 		Operation* inst = (Operation*) IMemory::get(tok->tag->instAdd);
 		if(inst->tokenInputs == inst->inputs && inst->inputs == 1)
 			//send it to the sch
-			this->core.sch->executeTwo(tok);
+			this->core->sch.executeTwo(tok);
 		else if(inst->literals.empty())
 			// save the token in the token table, and wait for it's pair
 			tokenTable[make_pair(cx.conxId, instIdx)] = tok;
@@ -70,7 +71,7 @@ void MatchingUnit::executeOrUpdateTable(Token<int> *tok)
 			toksPacket[tok->tag->port] = tok;
 			toksPacket[port] = tok2;
 			//send it to the sch
-			this->core.sch->executeTwo(*toksPacket);
+			this->core->sch.executeTwo(*toksPacket);
 			// delete here
 			delete tok2;
 		}
