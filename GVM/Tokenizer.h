@@ -8,18 +8,20 @@
 
 #include <tuple>
 #include <map>
+#include "Token.h"
 #include "Context.h"
 #include "PE.h"
 
 using namespace std;
+
+class Core;
 
 struct RestoreArgs;
 typedef vector<Token<int>*> Vector_token;
 typedef map<long, RestoreArgs> RestorMapType;
 typedef map<long, tuple<short, Context*>> ContextMapType;
 
-class Switcher;
-class ContextManager;
+
 
 // data structure to hold the restored info
 struct RestoreArgs{	
@@ -33,32 +35,6 @@ struct RestoreArgs{
 	Context *cx;
 	// number of expected return values
 	short restores;
-};
-
-/*
-* This class defines the Tokenizer.
-* The tokenizer is responsible for:
- - collecting the result out of an execution of an execution packet.
- - Wrap this result in a token.
- - Send it to the token queue for furthure processing.
-*/
-class Tokenizer
-{
-public:
-	Tokenizer();
-	//Tokenizer(void);
-	~Tokenizer(void);	
-	// create a new token and send it to the token queue
-	void wrapAndSend(Tuple_vector &distList, int &res, Context &cx);
-
-	//
-	void sendStop(Token<int> *tok);
-
-	/*	fields	*/
-	Core *core;
-
-	Switcher *swicther;
-	ContextManager *contextManager;
 };
 
 /*
@@ -83,7 +59,7 @@ public:
 	void sendToTokinzer(Tuple_vector &dest, Vector_token &tokV);
 
 	/*	fields	*/
-	Tokenizer tokenizer;
+	Tokenizer *tokenizer;
 };
 
 /*
@@ -113,8 +89,35 @@ public:
 	// The key here is the Old conxId
 	ContextMapType contextMap;
 
-	Tokenizer tokenizer;
+	Tokenizer *tokenizer;
 
 private:
 	void bind_send(Token<int> &tok, int* destAdd, int* retAdd, short &rest, Context* cx);	
+};
+
+
+/*
+* This class defines the Tokenizer.
+* The tokenizer is responsible for:
+ - collecting the result out of an execution of an execution packet.
+ - Wrap this result in a token.
+ - Send it to the token queue for furthure processing.
+*/
+class Tokenizer
+{
+public:
+	Tokenizer();
+	//Tokenizer(void);
+	~Tokenizer(void);	
+	// create a new token and send it to the token queue
+	void wrapAndSend(Tuple_vector &distList, int &res, Context &cx);
+
+	//
+	void sendStop(Token<int> *tok);
+
+	/*	fields	*/
+	Core *core;
+
+	Switcher swicther;
+	ContextManager contextManager;
 };

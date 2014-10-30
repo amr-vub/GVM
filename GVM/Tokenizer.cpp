@@ -6,6 +6,7 @@
 
 #include "stdafx.h"
 #include "Tokenizer.h"
+#include "Core.h"
 /*
 Tokenizer::Tokenizer(Core &core) :core(core)
 {
@@ -18,16 +19,16 @@ Tokenizer::Tokenizer()
 	/*: swicther(new Switcher()), contextManager(new ContextManager())
 	*/
 {
-	//swicther = new Switcher();
-	//this->contextManager = new ContextManager();
-	//this->swicther->tokenizer = *this;
-	//contextManager->tokenizer = *this;
+	this->swicther =  Switcher();
+	this->contextManager = ContextManager();
+
+	this->swicther.tokenizer = this;
+	contextManager.tokenizer = this;
 }
 
 
 Tokenizer::~Tokenizer(void)
 {
-	delete this->swicther;
 }
 /*
 * wrapAndSend Function
@@ -53,15 +54,15 @@ void Tokenizer::wrapAndSend(Tuple_vector &distList, int &res, Context &cx)
 		Token<int>* newTok = new Token<int>(res, newTag);
 		
 		// TODO, send to the queue
-		this->core.inbox.push_back(newTok);
+		this->core->inbox.push_back(newTok);
 	}	
 }
 
 // 
 void Tokenizer::sendStop(Token<int> *tok)
 {
-	this->core.inbox.push_back(tok);
-	this->core.active = false;
+	this->core->inbox.push_back(tok);
+	this->core->active = false;
 }
 /*
 Switcher::Switcher()
@@ -100,7 +101,7 @@ void Switcher::sendToTokinzer(Tuple_vector &dest,Vector_token &tokV)
 {
 	for(Vector_token::iterator it = tokV.begin(); it!=tokV.end(); ++it)
 	{
-		this->tokenizer.wrapAndSend(dest, (*it)->data, (*it)->tag->conx);
+		this->tokenizer->wrapAndSend(dest, (*it)->data, (*it)->tag->conx);
 		// freeing memory							
 		delete *it;
 		tokV.erase(it);
@@ -143,7 +144,7 @@ void ContextManager::bind_save(Token<int> &tok, int* destAdd, int* retAdd, short
 		if(this->contextMap.find(old_cx.conxId) == contextMap.end())
 		{
 			// generate new context
-			new_cx = this->tokenizer.core.conxObj.getUniqueCx(this->tokenizer.core.coreID);
+			new_cx = this->tokenizer->core->conxObj.getUniqueCx(this->tokenizer->core->coreID);
 			// update the context map, cause we have still binds-1 toks to come
 			this->contextMap[old_cx.conxId] = make_tuple(--binds, new_cx);			
 
@@ -165,7 +166,7 @@ void ContextManager::bind_save(Token<int> &tok, int* destAdd, int* retAdd, short
 	else
 	{
 		// generate new context
-		new_cx = this->tokenizer.core.conxObj.getUniqueCx(this->tokenizer.core.coreID);
+		new_cx = this->tokenizer->core->conxObj.getUniqueCx(this->tokenizer->core->coreID);
 		// just changing the cx of one token, no further to come
 		bind_send(tok, destAdd, retAdd, rest, new_cx);
 	}
@@ -193,7 +194,7 @@ void ContextManager::bind_send(Token<int> &tok, int* destAdd, int* retAdd, short
 	// send the tok to the tokenizer
 	Tuple_vector temp;
 	temp.push_back(make_tuple(destAdd, tok.tag->port));
-	this->tokenizer.wrapAndSend(temp ,tok.data, *new_cx);
+	this->tokenizer->wrapAndSend(temp ,tok.data, *new_cx);
 }
 
 /*
@@ -221,13 +222,13 @@ void ContextManager::restore(Token<int> tok)
 	Tuple_vector temp;
 	int index[2] = {resArgs.chunk, resArgs.idx};
 	temp.push_back(make_tuple(index, resArgs.port));
-	this->tokenizer.wrapAndSend(temp, tok.data, old_cx);
+	this->tokenizer->wrapAndSend(temp, tok.data, old_cx);
 
 	// if restore value is one, then we no longer need to save this entry
 	if(resArgs.restores <= 1)
 	{
 		// append the cx to the avaliable cx pool
-		this->tokenizer.core.conxObj.freeContext(resArgs.cx);
+		this->tokenizer->core->conxObj.freeContext(resArgs.cx);
 		// erase the entry in the restore map
 		restoreMap.erase(conxId);
 	}
