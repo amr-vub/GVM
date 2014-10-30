@@ -15,6 +15,7 @@
 using namespace std;
 
 class Core;
+class Tokenizer;
 
 struct RestoreArgs;
 typedef vector<Token<int>*> Vector_token;
@@ -107,7 +108,6 @@ class Tokenizer
 {
 public:
 	Tokenizer();
-	//Tokenizer(void);
 	~Tokenizer(void);	
 	// create a new token and send it to the token queue
 	void wrapAndSend(Tuple_vector &distList, int &res, Context &cx);

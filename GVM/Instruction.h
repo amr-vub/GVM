@@ -8,10 +8,9 @@
 #include <string>
 #include <vector>
 #include <tuple>
-#include "Core.h"
 #include "Token.h"
-#include "Tokenizer.h"
 #include "PE.h"
+#include "Core.h"
 
 using namespace std;
 
@@ -251,5 +250,5 @@ void Constant<T>::execute(Token<int> *tokens, Core *core)
 	Context cx = tokens[0].tag->conx;
 
 	if(0 == port)
-		core.tokenizer->wrapAndSend(this->distList, this->value, cx);
+		core->tokenizer.wrapAndSend(this->distList, this->value, cx);
 }

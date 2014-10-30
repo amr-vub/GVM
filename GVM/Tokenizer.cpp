@@ -7,17 +7,8 @@
 #include "stdafx.h"
 #include "Tokenizer.h"
 #include "Core.h"
-/*
-Tokenizer::Tokenizer(Core &core) :core(core)
-{
-	//this->core = core;
-	this->swicther = new Switcher(*this);
-}
-*/
 
 Tokenizer::Tokenizer() 
-	/*: swicther(new Switcher()), contextManager(new ContextManager())
-	*/
 {
 	this->swicther =  Switcher();
 	this->contextManager = ContextManager();
@@ -64,11 +55,6 @@ void Tokenizer::sendStop(Token<int> *tok)
 	this->core->inbox.push_back(tok);
 	this->core->active = false;
 }
-/*
-Switcher::Switcher()
-{
-}
-*/
 
 Switcher::Switcher()
 {

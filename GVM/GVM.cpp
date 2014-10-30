@@ -31,9 +31,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	clock_t start;
     double duration;
 
-	int data;	
-
-	//Core core = Core();
+	int data;		
 
 	// open the instrucion file to parse
 	fstream instFile;
@@ -53,17 +51,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 			
 	Core core = Core(0);
-	/*
-	TokenDispatcher* dispatcher = new TokenDispatcher(core);
-	MatchingUnit *matchUnit = new MatchingUnit(core);
-	Scheduler *sch = new Scheduler(core);	
-	Tokenizer* tokenizer = new Tokenizer(core);	
 
-	core.dispatcher = dispatcher;
-	core.matchUnit = matchUnit;
-	core.sch = sch;
-	core.tokenizer = tokenizer;
-	*/
 	int indxStrAdd[2] = {0,0};
 
 	Context *firstCx = core.conxObj.getUniqueCx(core.coreID);
@@ -85,21 +73,6 @@ int _tmain(int argc, _TCHAR* argv[])
 	// will be the program result
 	cout<< "the result is : \n";
 	cout<< core.inbox.front()->data;
-
-	/*
-	// just for trials
-	int idx[2] = {0,2};
-
-	Instruction *inst = IMemory::get(idx);
-
-	Context cx = Context(0);
-	Token<int> tok1 = Token<int>(2,Tag(cx,0, idx));
-	Token<int> tok2 = Token<int>(3,Tag(cx,1, idx));
-	Token<int> toks[] = {tok1, tok2};
-
-	inst->execute(toks, Core());
-	// end of trial part
-	*/
 
 	return 0;
 }

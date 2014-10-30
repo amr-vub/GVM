@@ -8,7 +8,6 @@
 #include "Instruction.h"
 #include "Natives.h"
 
-//#include "IMemory.h"
 #include <iostream>
 
 Instruction::Instruction(short &ch, int idx[2])
@@ -119,7 +118,7 @@ void Operation::addLiterals(short &port, int &value)
 	this->tokenInputs--;
 }
 
-void Operation::execute(Token<int> *tokens, Core &core)
+void Operation::execute(Token<int> *tokens, Core *core)
 {
 	// get the conceret function to be implemented based on the opcode of this objs
 	MyFuncPtrType op_func_pointer = Natives::opcodes_pointers[this->opCode];
@@ -132,7 +131,7 @@ void Operation::execute(Token<int> *tokens, Core &core)
 
 
 	// send the res to tokenizer
-	core.tokenizer->wrapAndSend((this->distList), res, tokens[0].tag->conx);
+	core->tokenizer.wrapAndSend((this->distList), res, tokens[0].tag->conx);
 }
 
 
@@ -151,11 +150,11 @@ Sink::~Sink()
 /*
 Sink instruction simply forwad it's inputs to thier dest
 */
-void Sink::execute(Token<int> *tokens, Core& core)
+void Sink::execute(Token<int> *tokens, Core *core)
 {
 	//std::cout<< core.dispatcher;
 	// send the res to tokenizer
-	core.tokenizer->wrapAndSend((this->distList), tokens[0].data, tokens[0].tag->conx);
+	core->tokenizer.wrapAndSend((this->distList), tokens[0].data, tokens[0].tag->conx);
 }
 
 /*
@@ -185,7 +184,7 @@ Switch instruction execution
 - This condition token's data value determins the index of the chosen dest
 - All tokens recieved before the condition var are stored
 */
-void Switch::execute(Token<int> *tokens, Core &core)
+void Switch::execute(Token<int> *tokens, Core *core)
 {
 	short port = tokens[0].tag->port;
 	if(port == 0)
@@ -197,7 +196,7 @@ void Switch::execute(Token<int> *tokens, Core &core)
 
 		// first get all of the stored tokens
 		long cx = tokens[0].tag->conx.conxId;
-		vector<Token<int>*> toksV = core.tokenizer->swicther->getAllElement(cx);
+		vector<Token<int>*> toksV = core->tokenizer.swicther.getAllElement(cx);
 
 		// then determine thier dest based on the recieved token's data
 		int destIdx = tokens[0].data;
@@ -208,13 +207,13 @@ void Switch::execute(Token<int> *tokens, Core &core)
 		{
 			dest.push_back(this->distList[destIdx]);
 			if(!toksV.empty()) //at least one token exists
-				core.tokenizer->swicther->sendToTokinzer(dest, toksV);
+				core->tokenizer.swicther.sendToTokinzer(dest, toksV);
 		}
 	}
 	else
 	{
 		// store this token till we recieve the condition token to specify it's dest
-		core.tokenizer->swicther->addSwitchStorageElement(tokens);
+		core->tokenizer.swicther.addSwitchStorageElement(tokens);
 	}	
 }
 
@@ -250,10 +249,10 @@ ContextChange::~ContextChange()
 	- Change the context of the recieved tok
 	- save the old cx to be restored when a context restore inst is executed
 */
-void ContextChange::execute(Token<int> *tokens, Core &core)
+void ContextChange::execute(Token<int> *tokens, Core *core)
 {
 	// delegate to the context manger obj to handel the context change execution details
-	core.tokenizer->contextManager->bind_save(tokens[0], this->todest, this->retDest, this->binds, this->restores);
+	core->tokenizer.contextManager.bind_save(tokens[0], this->todest, this->retDest, this->binds, this->restores);
 }
 
 /*********************** ContextRestore Inst Part ******************************/
@@ -269,10 +268,10 @@ ContextRestore::~ContextRestore()
 	ContextRestore instruction execution
 	- Restore the context of the recieved tok
 */
-void ContextRestore::execute(Token<int> *tokens, Core &core)
+void ContextRestore::execute(Token<int> *tokens, Core *core)
 {
 	// delegate to the context manger obj to handel the context restore execution details
-	core.tokenizer->contextManager->restore(tokens[0]);
+	core->tokenizer.contextManager.restore(tokens[0]);
 }
 
 /*********************** Stop Inst Part ******************************/
@@ -284,7 +283,7 @@ Stop::~Stop()
 {
 }
 
-void Stop::execute(Token<int> *tokens, Core &core)
+void Stop::execute(Token<int> *tokens, Core *core)
 {
-	core.tokenizer->sendStop(tokens);
+	core->tokenizer.sendStop(tokens);
 }

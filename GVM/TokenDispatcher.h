@@ -4,6 +4,7 @@
 * GVM
 */
 #pragma once
+#include "Token.h"
 
 class Core;
 /*

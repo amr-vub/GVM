@@ -27,12 +27,6 @@ class Token
 
 		T data;
 		Tag *tag;
-		/*
-		void setData(T *dat);
-		void setTag(Tag tg);
-		Tag getTag(void);
-		T* getData(void);
-		*/
 };
 
 template <class T>

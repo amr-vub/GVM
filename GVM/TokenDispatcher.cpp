@@ -5,12 +5,7 @@
 */
 
 #include "stdafx.h"
-#include "TokenDispatcher.h"
-#include "Token.h"
-#include "IMemory.h"
-#include "Instruction.h"
-#include "MatchingUnit.h"
-#include "Scheduler.h"
+#include "Core.h"
 
 TokenDispatcher::TokenDispatcher()
 {
@@ -24,7 +19,7 @@ TokenDispatcher::~TokenDispatcher(void)
 * Takes a token from the token queue and dispatch it to the apporpriate 
 * element in the GVM pipeline
 * \param 
-		tok : the fetched token from the token queue
+tok : the fetched token from the token queue
 */
 void TokenDispatcher::dispatch(Token<int> *tok)
 {
@@ -35,16 +30,12 @@ void TokenDispatcher::dispatch(Token<int> *tok)
 	// Instruction stord in chunk 1 -> dyatic
 	if(instIdx[0] == 0)
 	{
-		/*
-		vector<tuple<int*,short>> temp;
-		this->core.tokenizer->wrapAndSend(temp, tok->data, tok->tag->conx);
-		*/
 		// call the schedual directly
-			this->core.sch->execute(*tok);
+		this->core->sch.execute(*tok);
 	}
 	else
 		// call the matching unit
-		this->core.matchUnit->executeOrUpdateTable(tok);
+		this->core->matchUnit.executeOrUpdateTable(tok);
 	;
 	//core.coreID;
 }

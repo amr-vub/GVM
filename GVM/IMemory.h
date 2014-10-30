@@ -6,7 +6,9 @@
 
 #pragma once
 #include <map>
-#include "Instruction.h"
+
+
+class Instruction;
 
 using namespace std;
 

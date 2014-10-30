@@ -5,15 +5,13 @@
 */
 
 #pragma once
-//#include <vector>
-#include "Token.h"
 #include "Context.h"
 #include "TokenDispatcher.h"
 #include "MatchingUnit.h"
 #include "Scheduler.h"
 #include "IMemory.h"
-
 #include "Tokenizer.h"
+
 /** 
 * This class defines the Core.
 * A core is the basic building block of the GVM.
@@ -51,10 +49,10 @@ public:
 	// core id
 	short coreID;
 
-	static bool active;
+	bool active;
 
 	// Token queue
-	static vector<Token<int>*> inbox;
+	vector<Token<int>*> inbox;
 
 };
 

@@ -6,6 +6,7 @@
 
 #include "stdafx.h"
 #include "IMemory.h"
+#include "Instruction.h"
 
 ImemoryMapTyp IMemory::Imemory[2];
 

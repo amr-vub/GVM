@@ -30,13 +30,5 @@ public:
 	~Tag(void);
 	//generate unique mix of  instAdd {chunk and mem add}
 	void generateUniqeMix();
-	/*
-	void setConx(int cx);
-	void setPort(short prt);
-	void setInst(int ins);
-	int getConx(void);
-	short getPort(void);
-	int getInst(void);
-	*/
 };
 
