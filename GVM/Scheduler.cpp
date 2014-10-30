@@ -8,6 +8,7 @@
 #include "Scheduler.h"
 #include "IMemory.h"
 #include "Instruction.h"
+#include "Core.h"
 #include <iostream>
 
 
@@ -35,7 +36,7 @@ void Scheduler::executeTwo(Token<int> toks[2])
 	// getting the dest inst add
 	int *instAdd = toks[0].tag->instAdd;	
 
-	Instruction* inst = this->core.memory->get(instAdd);
+	Instruction* inst = this->core->memory.get(instAdd);
 
 	inst->execute(toks, this->core);
 
@@ -54,7 +55,7 @@ void Scheduler::execute(Token<int> &tok)
 	// getting the dest inst add
 	int *instAdd = tok.tag->instAdd;	
 
-	Instruction* inst = this->core.memory->get(instAdd);
+	Instruction* inst = this->core->memory.get(instAdd);
 	/*
 	vector<tuple<int*,short>> temp;
 	this->core.tokenizer->wrapAndSend(temp, tok.data, tok.tag->conx);

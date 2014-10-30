@@ -38,7 +38,7 @@ public:
 	Instruction(short &ch, int idx[2]);
 	~Instruction();
 	// Abstract function that has to be implemeted by all subtypes
-	virtual void execute(Token<int> *tokens, Core &core) = 0;
+	virtual void execute(Token<int> *tokens, Core *core) = 0;
 
 	//virtual void execute2(Token<int> *tokens, Core *core);
 
@@ -83,7 +83,7 @@ public:
 	~Operation();
 
 	// overriding the super method
-	void execute(Token<int> *tokens, Core &core);
+	void execute(Token<int> *tokens, Core *core);
 
 	// preparing the args list
 	vector<int> createArgsList(Token<int>* toks);
@@ -116,7 +116,7 @@ public:
 	
 	void execute2(Token<int> *tokens, Core *core);
 	// overriding the super method
-	void execute(Token<int> *tokens, Core &core);
+	void execute(Token<int> *tokens, Core *core);
 
 	/*	fields	*/
 
@@ -138,7 +138,7 @@ public:
 	~Switch();
 
 	// overriding the super method
-	void execute(Token<int> *tokens, Core &core);
+	void execute(Token<int> *tokens, Core *core);
 
 	/*	fields	*/	
 	//int *destinationList;
@@ -160,7 +160,7 @@ public:
 	~ContextChange();
 
 	// overriding the super method
-	void execute(Token<int> *tokens, Core &core);
+	void execute(Token<int> *tokens, Core *core);
 
 	/*	fields	*/	
 	short binds;
@@ -182,7 +182,7 @@ public:
 	ContextRestore(short &ch, int* ind);
 	~ContextRestore();
 	// overriding the super method
-	void execute(Token<int> *tokens, Core &core);
+	void execute(Token<int> *tokens, Core *core);
 
 };
 
@@ -195,7 +195,7 @@ public:
 	Stop(short &ch, int idx[2]);
 	~Stop();
 	// overriding the super method
-	void execute(Token<int> *tokens, Core &core);
+	void execute(Token<int> *tokens, Core *core);
 };
 
 
@@ -213,7 +213,7 @@ public:
 	Constant(short &ch, int* indx, T &value);
 	~Constant();
 	// overriding the super method
-	void execute(Token<int> *tokens, Core &core);
+	void execute(Token<int> *tokens, Core *core);
 
 	/*	fields	*/
 
@@ -245,7 +245,7 @@ Constant<T>::~Constant()
 	it recieves an input at port 0
 */
 template<class T>
-void Constant<T>::execute(Token<int> *tokens, Core &core)
+void Constant<T>::execute(Token<int> *tokens, Core *core)
 {
 	short port = tokens[0].tag->port;
 	Context cx = tokens[0].tag->conx;
