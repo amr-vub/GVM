@@ -8,13 +8,12 @@
 //#include <vector>
 #include "Token.h"
 #include "Context.h"
+#include "TokenDispatcher.h"
+#include "MatchingUnit.h"
+#include "Scheduler.h"
+#include "IMemory.h"
 
-class TokenDispatcher;
-class MatchingUnit;
-class Scheduler;
-class MatchingUnit;
-class IMemory;
-class Tokenizer;
+#include "Tokenizer.h"
 /** 
 * This class defines the Core.
 * A core is the basic building block of the GVM.
@@ -30,22 +29,22 @@ class Core
 {
 public:
 	Core(int corid);
-	Core(void);
-	~Core(void);
-	Core(Core &obj);
+	Core();
+	~Core();
+	Core(Core const &obj) { /* FIXME */ abort(); }
 
 	void start();
 
 	// fields part (for simplicity, I will make them public)
-	TokenDispatcher* dispatcher;
+	TokenDispatcher dispatcher;
 
-	MatchingUnit* matchUnit;
+	MatchingUnit matchUnit;
 
-	Scheduler* sch;
+	Scheduler sch;
 
-	IMemory* memory;
+	IMemory memory;
 
-	Tokenizer* tokenizer;
+	Tokenizer tokenizer;
 
 	ContextCreater conxObj;
 

@@ -9,7 +9,6 @@
 #include <tuple>
 #include <map>
 #include "Context.h"
-#include "Core.h"
 #include "PE.h"
 
 using namespace std;
@@ -56,7 +55,7 @@ public:
 	void sendStop(Token<int> *tok);
 
 	/*	fields	*/
-	Core core;
+	Core *core;
 
 	Switcher *swicther;
 	ContextManager *contextManager;

@@ -4,7 +4,8 @@
 * GVM
 */
 #pragma once
-#include "Core.h"
+
+class Core;
 /*
 * This class represents the first element in the GVM pipleine,
 * the TokenDispatcher, which is responsible for dispatching tokens
@@ -22,6 +23,6 @@ public:
 	void dispatch(Token<int> *tok);
 
 	// fields part
-	Core core;
+	Core *core;
 };
 

@@ -5,8 +5,9 @@
 */
 #pragma once
 
-#include "Core.h"
 #include "Token.h"
+
+class Core;
 
 /** 
 * This class defines the GVM scheduler, which is responsible for:
@@ -27,6 +28,6 @@ public:
 	void execute(Token<int> &it);
 
 	// fields
-	Core core;
+	Core *core;
 };
 
