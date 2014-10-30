@@ -19,9 +19,14 @@ Instruction::Instruction(short &ch, int idx[2])
 	generateUniqueIdx();	
 }
 
-
+// deleting the pointers in the distList
 Instruction::~Instruction(void)
 {
+	for (Tuple_vector::iterator it= this->distList.begin(); it != this->distList.end(); ++ it)
+	{
+		delete [] get<0>(*it);
+	}
+	this->distList.clear();
 }
 
 Instruction::Instruction(void)
