@@ -51,13 +51,13 @@ int _tmain(int argc, _TCHAR* argv[])
 			parser::parserMain(line);
 		}
 	}
-			
+	// create the only seq core		
 	Core core = Core(0);
-
+	// start instruction address
 	int indxStrAdd[2] = {0,0};
-
+	// get a context
 	Context *firstCx = core.conxObj.getUniqueCx(core.coreID);
-
+	// get the user input, and for each, create a token
 	for(int i=0;i<globalNum_ips;i++)
 	{
 		cin >> data;
@@ -69,6 +69,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	start = std::clock();
+	// start the actual work
 	core.start();
 	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
     std::cout<<"Total time: "<< duration <<'\n';

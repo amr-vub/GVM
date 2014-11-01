@@ -145,12 +145,15 @@ void parser::parseLit(vector<string> &stmtToks)
 	int idx[2] = {1,  atoi(stmtToks[1].c_str())};
 	short port = atoi(stmtToks[2].c_str());
 
+	// TODO
 	int value = atoi(stmtToks[4].c_str());
 
 	// query the memory for the source instruction to add literals to it
 	Instruction *inst= IMemory::get(idx);
-
-	inst->addLiterals(port, value);
+	// TODO
+	Datum d = Datum(value);
+	d.token_Type = Datum::INT;
+	inst->addLiterals(port, d);
 
 	IMemory::put(idx[0], idx[1], inst);
 }

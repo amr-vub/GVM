@@ -36,7 +36,7 @@ Instruction::Instruction(void)
 /*
 
 */
-void Instruction::addLiterals(short &port, int &value)
+void Instruction::addLiterals(short &port, Datum &value)
 {
 
 }
@@ -117,7 +117,7 @@ vector<Datum> Operation::createArgsList(Token_Type* toks)
 /*
 	add literals to the op instruction and decrment the no of expected tokens
 */
-void Operation::addLiterals(short &port, int &value)
+void Operation::addLiterals(short &port, Datum &value)
 {
 	this->literals.push_back(make_tuple(port, value));
 	this->tokenInputs--;

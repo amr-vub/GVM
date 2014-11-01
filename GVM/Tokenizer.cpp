@@ -90,11 +90,8 @@ void Switcher::sendToTokinzer(Tuple_vector &dest,Vector_token &tokV)
 		this->tokenizer->wrapAndSend(dest, (*it)->data, (*it)->tag->conx);
 		// freeing memory							
 		delete *it;
-		tokV.erase(it);
-		if(tokV.empty())
-			break;
 	}
-	
+	tokV.clear();
 }
 
 /*	ContextManager	*/
@@ -213,8 +210,10 @@ void ContextManager::restore(Token_Type tok)
 	// if restore value is one, then we no longer need to save this entry
 	if(resArgs.restores <= 1)
 	{
+		Context *cx = new Context();
+		*cx = tok.tag->conx;
 		// append the cx to the avaliable cx pool
-		this->tokenizer->core->conxObj.freeContext(resArgs.cx);
+		this->tokenizer->core->conxObj.freeContext(cx);
 		// erase the entry in the restore map
 		restoreMap.erase(conxId);
 	}

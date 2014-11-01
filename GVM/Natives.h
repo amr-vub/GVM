@@ -40,6 +40,9 @@ public:
 	// Return true if thefirst input is greater than right input.
 	static Datum moreNative(vector<Datum> args);
 
+	// Return true if thefirst input is smaller than right input.
+	static Datum lessNative(vector<Datum> args);
+
 	// Return the input as an int
 	static Datum intNative(vector<Datum> args);
 

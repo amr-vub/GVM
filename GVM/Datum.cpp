@@ -105,9 +105,9 @@ Datum Datum::operator<(const Datum& b)
 	retrn.token_Type = BOOLEAN;
 	// silly way for checking the datum type and act accordingly
 	if(this->token_Type == INT)
-		retrn.bValue = this->iValue > b.iValue; 
+		retrn.bValue = this->iValue < b.iValue; 
 	else if(this->token_Type == FLOAT)
-		retrn.bValue = this->fValue > b.fValue; 
+		retrn.bValue = this->fValue < b.fValue; 
 
 	return retrn;
 }

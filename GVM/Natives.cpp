@@ -42,6 +42,12 @@ Datum Natives::moreNative(vector<Datum> args)
 	return args[0] > args[1];
 }
 
+// Return true if thefirst input is smaller than right input.
+Datum Natives::lessNative(vector<Datum> args)
+{
+	return args[0] < args[1];
+}
+
 // Return the input as an int
 Datum Natives::intNative(vector<Datum> args)
 {
@@ -57,6 +63,7 @@ map<string, MyFuncPtrType> Natives::generateMap()
 	temp["sub"] = &Natives::subNative;
 	temp["mul"] = &Natives::mulNative;
 	temp["more"] = &Natives::moreNative;
+	temp["less"] = &Natives::lessNative;
 	temp["int"] = &Natives::intNative;
 
 	return temp;

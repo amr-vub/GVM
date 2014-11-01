@@ -69,7 +69,12 @@ Context* ContextCreater::getUniqueCx(short &corId)
 {
 	// if there exist a free already created context, return it
 	if(!this->cxPool.empty())
-		return this->cxPool.back();	
+	{
+		Context *cx = this->cxPool.back();	
+		// delete it as it's already taken
+		this->cxPool.pop_back();
+		return cx;
+	}
 	else
 		new Context(corId, ++this->conxCounter);
 }

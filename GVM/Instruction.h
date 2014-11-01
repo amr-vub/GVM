@@ -41,7 +41,7 @@ public:
 	//virtual void execute2(Token_Type *tokens, Core *core);
 
 	// TODO
-	virtual void addLiterals(short &port, int &value);
+	virtual void addLiterals(short &port, Datum &value);
 
 	//generate unique instIdx
 	void generateUniqueIdx();
@@ -87,7 +87,7 @@ public:
 	vector<Datum> createArgsList(Token_Type* toks);
 
 	// add literals to this inst
-	void addLiterals(short &port, int &value);
+	void addLiterals(short &port, Datum &value);
 	
 	/*	fields	*/
 
