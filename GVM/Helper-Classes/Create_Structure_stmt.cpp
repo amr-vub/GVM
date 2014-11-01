@@ -98,11 +98,14 @@ void Create_Structure_stmt::createConstant(vector<string> &strTokns)
 {
 	// get the idx
 	int indx[2] = {0, atoi(strTokns[2].c_str())};
+	// TODO 
 	int value = atoi(strTokns[4].c_str());
+
 	short ch = 0;
 
-	// create the sink inst
-	Constant<int> *constant = new Constant<int>(ch, indx, value);
+	// create the constant inst
+	// TODO 
+	Constant<Datum> *constant = new Constant<Datum>(ch, indx, Datum(value));
 
 	// add to the memory
 	putInMemory(0, indx[1], constant);

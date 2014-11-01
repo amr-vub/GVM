@@ -53,7 +53,7 @@ void Instruction::generateUniqueIdx()
 	this->InstInx |= temp;
 }
 /*
-void Instruction::execute2(Token<int> *tokens, Core *core)
+void Instruction::execute2(Token_Type *tokens, Core *core)
 {
 
 }
@@ -78,9 +78,9 @@ Operation::Operation(string &opCode, short &input,
 /*
 	preparing the args list
 */
-vector<int> Operation::createArgsList(Token<int>* toks)
+vector<Datum> Operation::createArgsList(Token_Type* toks)
 {
-	vector<int> retArgs;
+	vector<Datum> retArgs;
 	if(this->literals.empty())
 		// means that this op inst expect no literals
 		for(int i=0; i<this->inputs;i++)
@@ -123,14 +123,14 @@ void Operation::addLiterals(short &port, int &value)
 	this->tokenInputs--;
 }
 
-void Operation::execute(Token<int> *tokens, Core *core)
+void Operation::execute(Token_Type *tokens, Core *core)
 {
 	// get the conceret function to be implemented based on the opcode of this objs
 	MyFuncPtrType op_func_pointer = Natives::opcodes_pointers[this->opCode];
 
-	int res;
+	Datum res;
 	// prepare the args
-	vector<int> args = createArgsList(tokens);
+	vector<Datum> args = createArgsList(tokens);
 	// calling the function with the input arguments
 	res = (*op_func_pointer)(args);
 
@@ -155,7 +155,7 @@ Sink::~Sink()
 /*
 Sink instruction simply forwad it's inputs to thier dest
 */
-void Sink::execute(Token<int> *tokens, Core *core)
+void Sink::execute(Token_Type *tokens, Core *core)
 {
 	//std::cout<< core.dispatcher;
 	// send the res to tokenizer
@@ -163,7 +163,7 @@ void Sink::execute(Token<int> *tokens, Core *core)
 }
 
 /*
-void Sink::execute2(Token<int> *tokens, Core *core)
+void Sink::execute2(Token_Type *tokens, Core *core)
 {
 	// send the res to tokenizer
 	core->tokenizer->wrapAndSend((this->distList), tokens[0].data, tokens[0].tag->conx);
@@ -189,7 +189,7 @@ Switch instruction execution
 - This condition token's data value determins the index of the chosen dest
 - All tokens recieved before the condition var are stored
 */
-void Switch::execute(Token<int> *tokens, Core *core)
+void Switch::execute(Token_Type *tokens, Core *core)
 {
 	short port = tokens[0].tag->port;
 	if(port == 0)
@@ -201,10 +201,10 @@ void Switch::execute(Token<int> *tokens, Core *core)
 
 		// first get all of the stored tokens
 		long cx = tokens[0].tag->conx.conxId;
-		vector<Token<int>*> toksV = core->tokenizer.swicther.getAllElement(cx);
+		vector<Token_Type*> toksV = core->tokenizer.swicther.getAllElement(cx);
 
 		// then determine thier dest based on the recieved token's data
-		int destIdx = tokens[0].data;
+		int destIdx = tokens[0].data.iValue;
 		Tuple_vector dest;
 
 		// valide index
@@ -254,7 +254,7 @@ ContextChange::~ContextChange()
 	- Change the context of the recieved tok
 	- save the old cx to be restored when a context restore inst is executed
 */
-void ContextChange::execute(Token<int> *tokens, Core *core)
+void ContextChange::execute(Token_Type *tokens, Core *core)
 {
 	// delegate to the context manger obj to handel the context change execution details
 	core->tokenizer.contextManager.bind_save(tokens[0], this->todest, this->retDest, this->binds, this->restores);
@@ -273,7 +273,7 @@ ContextRestore::~ContextRestore()
 	ContextRestore instruction execution
 	- Restore the context of the recieved tok
 */
-void ContextRestore::execute(Token<int> *tokens, Core *core)
+void ContextRestore::execute(Token_Type *tokens, Core *core)
 {
 	// delegate to the context manger obj to handel the context restore execution details
 	core->tokenizer.contextManager.restore(tokens[0]);
@@ -288,7 +288,7 @@ Stop::~Stop()
 {
 }
 
-void Stop::execute(Token<int> *tokens, Core *core)
+void Stop::execute(Token_Type *tokens, Core *core)
 {
 	core->tokenizer.sendStop(tokens);
 }

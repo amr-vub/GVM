@@ -5,7 +5,7 @@
 */
 #pragma once
 
-#include "Token.h"
+#include "Token_Type.h"
 
 class Core;
 
@@ -23,9 +23,9 @@ public:
 	// the dest instruction on the recieved tokens,
 	// then call the next element in GVM pipeline
 	// "Tokenizer"
-	void executeTwo(Token<int> toks[2]);
+	void executeTwo(Token_Type toks[2]);
 
-	void execute(Token<int> &it);
+	void execute(Token_Type &it);
 
 	// fields
 	Core *core;

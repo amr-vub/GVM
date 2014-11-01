@@ -7,12 +7,14 @@
 //
 
 #include "stdafx.h"
+#include "Token_Type.h"
 #include "Core.h"
 #include "parser.h"
 #include "IMemory.h"
 #include "MatchingUnit.h"
 #include "TokenDispatcher.h"
 #include "Scheduler.h"
+#include "Datum.h"
 
 #include <iostream>
 #include <fstream>
@@ -60,7 +62,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		cin >> data;
 		Tag * tag = new Tag(*firstCx, 0, indxStrAdd);
-		Token<int> *tok = new Token<int>(data, tag);
+		Datum datum = Datum(data);
+		datum.token_Type = Datum::INT;
+		Token_Type *tok = new Token_Type(datum, tag);
 		core.inbox.push_back(tok);
 	}
 
@@ -72,7 +76,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	// when it returns from start, the token that resides in the inbox
 	// will be the program result
 	cout<< "the result is : \n";
-	cout<< core.inbox.front()->data;
+	cout<< core.inbox.front()->data.iValue;
 
 	return 0;
 }

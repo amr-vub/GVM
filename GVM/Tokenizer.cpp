@@ -32,7 +32,7 @@ Tokenizer::~Tokenizer(void)
 	\param:
 		cx: new token context
 */
-void Tokenizer::wrapAndSend(Tuple_vector &distList, int &res, Context &cx)
+void Tokenizer::wrapAndSend(Tuple_vector &distList, Datum &res, Context &cx)
 {
 	// loop through destination list, for each, create a token and send it to the token queue
 	for (Tuple_vector::iterator it = distList.begin(); it != distList.end(); ++it)
@@ -42,7 +42,7 @@ void Tokenizer::wrapAndSend(Tuple_vector &distList, int &res, Context &cx)
 
 		// construct the new Token
 		Tag *newTag = new Tag(cx, port, instAdd);
-		Token<int>* newTok = new Token<int>(res, newTag);
+		Token_Type* newTok = new Token_Type(res, newTag);
 		
 		// TODO, send to the queue
 		this->core->inbox.push_back(newTok);
@@ -50,7 +50,7 @@ void Tokenizer::wrapAndSend(Tuple_vector &distList, int &res, Context &cx)
 }
 
 // 
-void Tokenizer::sendStop(Token<int> *tok)
+void Tokenizer::sendStop(Token_Type *tok)
 {
 	this->core->inbox.push_back(tok);
 	this->core->active = false;
@@ -65,7 +65,7 @@ Switcher::~Switcher()
 {
 }
 // add an element to the map
-void Switcher::addSwitchStorageElement(Token<int>* tok)
+void Switcher::addSwitchStorageElement(Token_Type* tok)
 {
 	long cx = tok->tag->conx.conxId;	
 	this->switchStorage[cx].push_back(tok);
@@ -118,7 +118,7 @@ ContextManager::~ContextManager()
 	\param: rest
 		how many return arguments I expect from this call	
 */
-void ContextManager::bind_save(Token<int> &tok, int* destAdd, int* retAdd, short &binds, short &rest)
+void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short &rest)
 {
 	Context old_cx = tok.tag->conx;
 	Context *new_cx = NULL;
@@ -164,7 +164,7 @@ void ContextManager::bind_save(Token<int> &tok, int* destAdd, int* retAdd, short
 	- Save the old cx together with the retAdd, chunk, port & restores
 	- Delegate it to the tokenizer
 */
-void ContextManager::bind_send(Token<int> &tok, int* destAdd, int* retAdd, short &rest, Context* new_cx)
+void ContextManager::bind_send(Token_Type &tok, int* destAdd, int* retAdd, short &rest, Context* new_cx)
 {
 	// store all of the req info to restore the cx in the restore map
 	RestoreArgs restArgs =  
@@ -188,7 +188,7 @@ void ContextManager::bind_send(Token<int> &tok, int* destAdd, int* retAdd, short
 	\param: tok
 		the recieved token to restore it's cx
 */
-void ContextManager::restore(Token<int> tok)
+void ContextManager::restore(Token_Type tok)
 {
 	// query the restore map by the  to get the resArgs
 	/*

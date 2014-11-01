@@ -18,33 +18,34 @@ Natives::~Natives(void)
 }
 
 // Add 2 arguments and returns the output
-int Natives::addNative(vector<int> args)
+Datum Natives::addNative(vector<Datum> args)
 {
 	return args[0] + args[1];
 }
 
 // Sub 2 arguments and returns the output
-int Natives::subNative(vector<int> args)
+Datum Natives::subNative(vector<Datum> args)
 {
 	return args[0] - args[1];
 }
 
 
 // Sub 2 arguments and returns the output
-int Natives::mulNative(vector<int> args)
+Datum Natives::mulNative(vector<Datum> args)
 {
 	return args[0] * args[1];
 }
 
 // Return true if thefirst input is greater than right input.
-int Natives::moreNative(vector<int> args)
+Datum Natives::moreNative(vector<Datum> args)
 {
 	return args[0] > args[1];
 }
 
 // Return the input as an int
-int Natives::intNative(vector<int> args)
+Datum Natives::intNative(vector<Datum> args)
 {
+	args[0].setTo(Datum::INT);
 	return args[0];
 }
 

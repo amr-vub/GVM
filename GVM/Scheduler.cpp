@@ -27,7 +27,7 @@ Scheduler::~Scheduler(void)
 // then call the next element in GVM pipeline
 // "Tokenizer"
 // \param: the token array
-void Scheduler::executeTwo(Token<int> toks[2])
+void Scheduler::executeTwo(Token_Type toks[2])
 {
 	//getting the tokens from 
 
@@ -44,7 +44,7 @@ void Scheduler::executeTwo(Token<int> toks[2])
 // then call the next element in GVM pipeline
 // "Tokenizer"
 // \param: the token to be executed upon
-void Scheduler::execute(Token<int> &tok)
+void Scheduler::execute(Token_Type &tok)
 {
 	// getting the dest inst add
 	int *instAdd = tok.tag->instAdd;	

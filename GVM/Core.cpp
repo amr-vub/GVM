@@ -35,7 +35,7 @@ void Core::start()
 	while(this->active)
 	{	
 		if(!this->inbox.empty()){
-			Token<int> *tok = this->inbox.front();
+			Token_Type *tok = this->inbox.front();
 			this->dispatcher.dispatch(tok);
 			this->inbox.erase(this->inbox.begin());
 			//delete tok;

@@ -8,7 +8,7 @@
 
 #include <tuple>
 #include <map>
-#include "Token.h"
+#include "Token_Type.h"
 #include "Context.h"
 #include "PE.h"
 
@@ -18,7 +18,7 @@ class Core;
 class Tokenizer;
 
 struct RestoreArgs;
-typedef vector<Token<int>*> Vector_token;
+typedef vector<Token_Type*> Vector_token;
 typedef map<long, RestoreArgs> RestorMapType;
 typedef map<long, tuple<short, Context*>> ContextMapType;
 
@@ -49,7 +49,7 @@ public:
 	~Switcher();
 
 	// add an element to the map
-	void addSwitchStorageElement(Token<int> *tok);
+	void addSwitchStorageElement(Token_Type *tok);
 
 	Vector_token getAllElement(long &cx);
 
@@ -74,10 +74,10 @@ public:
 	~ContextManager();
 
 	// 
-	void bind_save(Token<int> &tok, int* destAdd, int* retAdd, short &binds, short &rest);
+	void bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short &rest);
 
 	// restore the cx for the recieved tok
-	void restore(Token<int> tok);
+	void restore(Token_Type tok);
 
 	/*	fields	*/
 
@@ -93,7 +93,7 @@ public:
 	Tokenizer *tokenizer;
 
 private:
-	void bind_send(Token<int> &tok, int* destAdd, int* retAdd, short &rest, Context* cx);	
+	void bind_send(Token_Type &tok, int* destAdd, int* retAdd, short &rest, Context* cx);	
 };
 
 
@@ -110,10 +110,10 @@ public:
 	Tokenizer();
 	~Tokenizer(void);	
 	// create a new token and send it to the token queue
-	void wrapAndSend(Tuple_vector &distList, int &res, Context &cx);
+	void wrapAndSend(Tuple_vector &distList, Datum &res, Context &cx);
 
 	//
-	void sendStop(Token<int> *tok);
+	void sendStop(Token_Type *tok);
 
 	/*	fields	*/
 	Core *core;

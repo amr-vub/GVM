@@ -82,6 +82,7 @@
   <ItemGroup>
     <ClInclude Include="Context.h" />
     <ClInclude Include="Core.h" />
+    <ClInclude Include="Datum.h" />
     <ClInclude Include="Helper-Classes\Create_Structure_stmt.h" />
     <ClInclude Include="Helper-Classes\parser.h" />
     <ClInclude Include="IMemory.h" />
@@ -97,10 +98,12 @@
     <ClInclude Include="Token.h" />
     <ClInclude Include="TokenDispatcher.h" />
     <ClInclude Include="Tokenizer.h" />
+    <ClInclude Include="Token_Type.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="Core.cpp" />
+    <ClCompile Include="Datum.cpp" />
     <ClCompile Include="GVM.cpp" />
     <ClCompile Include="Helper-Classes\Create_Structure_stmt.cpp" />
     <ClCompile Include="Helper-Classes\parser.cpp" />

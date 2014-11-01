@@ -7,7 +7,7 @@
 
 #pragma once
 #include <map>
-#include "Token.h"
+#include "Token_Type.h"
 
 using namespace std;
 
@@ -29,7 +29,7 @@ public:
 	MatchingUnit();
 	~MatchingUnit(void);
 
-	void executeOrUpdateTable(Token<int> *tok);
+	void executeOrUpdateTable(Token_Type *tok);
 
 	//fields
 
@@ -37,6 +37,6 @@ public:
 	Core *core;
 	// The local tokens table that reflects the existing tokens
 	// in the matching units that are waiting for thier pairs
-	map<pair<long, long>, Token<int>*> tokenTable;
+	map<pair<long, long>, Token_Type*> tokenTable;
 };
 

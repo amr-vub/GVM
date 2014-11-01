@@ -69,6 +69,12 @@
     <ClInclude Include="Helper-Classes\Create_Structure_stmt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Datum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Token_Type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -114,6 +120,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Helper-Classes\Create_Structure_stmt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Datum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

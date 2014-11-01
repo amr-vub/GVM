@@ -4,7 +4,7 @@
 * GVM
 */
 #pragma once
-#include "Token.h"
+#include "Token_Type.h"
 
 class Core;
 /*
@@ -21,7 +21,7 @@ public:
 	TokenDispatcher();
 	~TokenDispatcher(void);	
 
-	void dispatch(Token<int> *tok);
+	void dispatch(Token_Type *tok);
 
 	// fields part
 	Core *core;

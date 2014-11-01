@@ -21,7 +21,7 @@ TokenDispatcher::~TokenDispatcher(void)
 * \param 
 tok : the fetched token from the token queue
 */
-void TokenDispatcher::dispatch(Token<int> *tok)
+void TokenDispatcher::dispatch(Token_Type *tok)
 {
 	// getting instruction address
 	int *instIdx = tok->tag->instAdd;

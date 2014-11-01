@@ -8,13 +8,12 @@
 #include <string>
 #include <vector>
 #include <tuple>
-#include "Token.h"
 #include "PE.h"
 #include "Core.h"
 
 using namespace std;
 
-typedef int (*MyFuncPtrType)(vector<int>);
+//typedef Datum (*MyFuncPtrType)(vector<int>);
 
 /*
 * This class defines the base structure of instructions that Imemory
@@ -37,9 +36,9 @@ public:
 	Instruction(short &ch, int idx[2]);
 	~Instruction();
 	// Abstract function that has to be implemeted by all subtypes
-	virtual void execute(Token<int> *tokens, Core *core) = 0;
+	virtual void execute(Token_Type *tokens, Core *core) = 0;
 
-	//virtual void execute2(Token<int> *tokens, Core *core);
+	//virtual void execute2(Token_Type *tokens, Core *core);
 
 	// TODO
 	virtual void addLiterals(short &port, int &value);
@@ -65,7 +64,7 @@ public:
 
 	// vectors of literals
 	// Only for Context change and Operation Instructions
-	vector<tuple<short, int>> literals;
+	vector<tuple<short, Datum>> literals;
 };
 
 /*
@@ -82,10 +81,10 @@ public:
 	~Operation();
 
 	// overriding the super method
-	void execute(Token<int> *tokens, Core *core);
+	void execute(Token_Type *tokens, Core *core);
 
 	// preparing the args list
-	vector<int> createArgsList(Token<int>* toks);
+	vector<Datum> createArgsList(Token_Type* toks);
 
 	// add literals to this inst
 	void addLiterals(short &port, int &value);
@@ -113,9 +112,9 @@ public:
 	Sink(short ch, int *idx);
 	~Sink();
 	
-	void execute2(Token<int> *tokens, Core *core);
+	void execute2(Token_Type *tokens, Core *core);
 	// overriding the super method
-	void execute(Token<int> *tokens, Core *core);
+	void execute(Token_Type *tokens, Core *core);
 
 	/*	fields	*/
 
@@ -137,7 +136,7 @@ public:
 	~Switch();
 
 	// overriding the super method
-	void execute(Token<int> *tokens, Core *core);
+	void execute(Token_Type *tokens, Core *core);
 
 	/*	fields	*/	
 	//int *destinationList;
@@ -159,7 +158,7 @@ public:
 	~ContextChange();
 
 	// overriding the super method
-	void execute(Token<int> *tokens, Core *core);
+	void execute(Token_Type *tokens, Core *core);
 
 	/*	fields	*/	
 	short binds;
@@ -181,7 +180,7 @@ public:
 	ContextRestore(short &ch, int* ind);
 	~ContextRestore();
 	// overriding the super method
-	void execute(Token<int> *tokens, Core *core);
+	void execute(Token_Type *tokens, Core *core);
 
 };
 
@@ -194,7 +193,7 @@ public:
 	Stop(short &ch, int idx[2]);
 	~Stop();
 	// overriding the super method
-	void execute(Token<int> *tokens, Core *core);
+	void execute(Token_Type *tokens, Core *core);
 };
 
 
@@ -212,7 +211,7 @@ public:
 	Constant(short &ch, int* indx, T &value);
 	~Constant();
 	// overriding the super method
-	void execute(Token<int> *tokens, Core *core);
+	void execute(Token_Type *tokens, Core *core);
 
 	/*	fields	*/
 
@@ -244,7 +243,7 @@ Constant<T>::~Constant()
 	it recieves an input at port 0
 */
 template<class T>
-void Constant<T>::execute(Token<int> *tokens, Core *core)
+void Constant<T>::execute(Token_Type *tokens, Core *core)
 {
 	short port = tokens[0].tag->port;
 	Context cx = tokens[0].tag->conx;

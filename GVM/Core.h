@@ -11,6 +11,7 @@
 #include "Scheduler.h"
 #include "IMemory.h"
 #include "Tokenizer.h"
+#include "Token_Type.h"
 
 /** 
 * This class defines the Core.
@@ -52,7 +53,7 @@ public:
 	bool active;
 
 	// Token queue
-	vector<Token<int>*> inbox;
+	vector<Token_Type*> inbox;
 
 };
 
