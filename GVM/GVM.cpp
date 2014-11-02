@@ -76,8 +76,13 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	// when it returns from start, the token that resides in the inbox
 	// will be the program result
+	Token_Type *tok = core.inbox.front();
 	cout<< "the result is : \n";
-	cout<< core.inbox.front()->data.iValue;
+	cout<< tok->data.iValue;
+	core.inbox.clear();
+
+	// freeing memory
+	delete tok;
 
 	return 0;
 }

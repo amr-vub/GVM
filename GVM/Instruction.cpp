@@ -160,6 +160,8 @@ void Sink::execute(Token_Type *tokens, Core *core)
 	//std::cout<< core.dispatcher;
 	// send the res to tokenizer
 	core->tokenizer.wrapAndSend((this->distList), tokens[0].data, tokens[0].tag->conx);
+	// freeing memory
+	delete tokens;
 }
 
 /*
@@ -214,6 +216,8 @@ void Switch::execute(Token_Type *tokens, Core *core)
 			if(!toksV.empty()) //at least one token exists
 				core->tokenizer.swicther.sendToTokinzer(dest, toksV);
 		}
+		// freeing memory
+		delete tokens;
 	}
 	else
 	{
@@ -258,6 +262,8 @@ void ContextChange::execute(Token_Type *tokens, Core *core)
 {
 	// delegate to the context manger obj to handel the context change execution details
 	core->tokenizer.contextManager.bind_save(tokens[0], this->todest, this->retDest, this->binds, this->restores);
+	// freeing memory
+	delete tokens;
 }
 
 /*********************** ContextRestore Inst Part ******************************/
@@ -277,6 +283,8 @@ void ContextRestore::execute(Token_Type *tokens, Core *core)
 {
 	// delegate to the context manger obj to handel the context restore execution details
 	core->tokenizer.contextManager.restore(tokens[0]);
+	//freeing memory
+	delete tokens;
 }
 
 /*********************** Stop Inst Part ******************************/

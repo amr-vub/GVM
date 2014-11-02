@@ -77,7 +77,7 @@ public:
 	void bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short &rest);
 
 	// restore the cx for the recieved tok
-	void restore(Token_Type tok);
+	void restore(Token_Type &tok);
 
 	/*	fields	*/
 

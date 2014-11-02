@@ -31,7 +31,7 @@ void TokenDispatcher::dispatch(Token_Type *tok)
 	if(instIdx[0] == 0)
 	{
 		// call the schedual directly
-		this->core->sch.execute(*tok);
+		this->core->sch.execute(*tok);		
 	}
 	else
 		// call the matching unit

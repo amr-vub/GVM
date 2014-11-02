@@ -163,13 +163,15 @@ void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short
 */
 void ContextManager::bind_send(Token_Type &tok, int* destAdd, int* retAdd, short &rest, Context* new_cx)
 {
+	Context *old_cx = new Context();
+	*old_cx = tok.tag->conx;
 	// store all of the req info to restore the cx in the restore map
 	RestoreArgs restArgs =  
 	{
 		retAdd[0],	// det chunk 	
 		retAdd[1],	// dest instruction address
 		tok.tag->port,// dest port number
-		&tok.tag->conx, 	// old context	
+		old_cx, 	// old context	
 		rest,		// number of expected return values
 	};
 	restoreMap[new_cx->conxId] = restArgs;	
@@ -185,7 +187,7 @@ void ContextManager::bind_send(Token_Type &tok, int* destAdd, int* retAdd, short
 	\param: tok
 		the recieved token to restore it's cx
 */
-void ContextManager::restore(Token_Type tok)
+void ContextManager::restore(Token_Type &tok)
 {
 	// query the restore map by the  to get the resArgs
 	/*

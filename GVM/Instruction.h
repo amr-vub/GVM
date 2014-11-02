@@ -250,4 +250,6 @@ void Constant<T>::execute(Token_Type *tokens, Core *core)
 
 	if(0 == port)
 		core->tokenizer.wrapAndSend(this->distList, this->value, cx);
+	// freeing memory
+	delete tokens;
 }
