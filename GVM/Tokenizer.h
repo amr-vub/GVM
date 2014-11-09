@@ -74,7 +74,9 @@ public:
 	~ContextManager();
 
 	// 
-	void bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short &rest);
+	void bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short rest);
+
+	void bind_send(Token_Type &tok, int* destAdd, short destPort, int* retAdd, short rest, Context* cx);	
 
 	// restore the cx for the recieved tok
 	void restore(Token_Type &tok);
@@ -90,10 +92,7 @@ public:
 	// The key here is the Old conxId
 	ContextMapType contextMap;
 
-	Tokenizer *tokenizer;
-
-private:
-	void bind_send(Token_Type &tok, int* destAdd, int* retAdd, short &rest, Context* cx);	
+	Tokenizer *tokenizer;	
 };
 
 

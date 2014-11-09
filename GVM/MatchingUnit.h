@@ -13,6 +13,7 @@ using namespace std;
 
 class Core;
 
+typedef map<pair<long, long>, tuple<short, vector<Token_Type*>>> TokenTableType;
 
 /*
 * This class encapsulate the functionality of the matching unit.
@@ -37,6 +38,6 @@ public:
 	Core *core;
 	// The local tokens table that reflects the existing tokens
 	// in the matching units that are waiting for thier pairs
-	map<pair<long, long>, Token_Type*> tokenTable;
+	TokenTableType tokenTable;
 };
 

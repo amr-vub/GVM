@@ -242,15 +242,6 @@ ContextChange::~ContextChange()
 	// freeing memory
 	delete [] this->todest;
 	delete [] this->retDest;
-	for(Tuple_vector::iterator it = this->distList.begin() ; it!=this->distList.end(); ++it)
-	{
-		// Tuple_vector = vector<tuple<int*,short>>
-		tuple<int*,short> temp = (*it);
-		distList.erase(it);
-		delete [] get<0>(temp);
-		if(distList.end() == it)
-			break;
-	}
 
 }
 /*
@@ -285,6 +276,77 @@ void ContextRestore::execute(Token_Type *tokens, Core *core)
 	core->tokenizer.contextManager.restore(tokens[0]);
 	//freeing memory
 	delete tokens;
+}
+
+/*********************** Split Inst Part ******************************/
+
+Split::Split(short chunk, int* idx, short binds, int *todest, int *mergeDest) : Instruction(chunk, idx)
+{
+	this->binds = binds;
+	this->todest = todest;
+	this->mergeDest = mergeDest;
+}
+
+Split::~Split()
+{
+	// freeing memory
+	delete [] this->todest;
+	delete [] this->mergeDest;
+}
+/*
+
+*/
+void Split::execute(Token_Type *tokens, Core *core)
+{
+	// TODO : think about abstraction
+	//returnVectorOfDatums(tokens[0].data);
+
+	Token_Type *tok = new Token_Type();
+	tok->tag = new Tag();
+	int portIdx= 0;
+
+	if(tokens[0].data.token_Type == Datum::I_VECTOR)
+	{
+		//loop through array elements and for each, create a new token with new context
+		for(vector<int>::iterator it = tokens[0].data.iValue_v.begin(); it!=tokens[0].data.iValue_v.end(); ++it)
+		{
+			tok->data = Datum(*it);
+			doSplitWork(tok,  tokens, portIdx++, core);				
+		}
+	}
+	else if(tokens[0].data.token_Type == Datum::F_VECTOR)
+	{
+		//loop through array elements and for each, create a new token with new context
+		for(vector<float>::iterator it = tokens[0].data.fValue_v.begin(); it!=tokens[0].data.fValue_v.end(); ++it)
+		{
+			tok->data = Datum(*it);
+			doSplitWork(tok,  tokens, portIdx++, core);
+		}
+	}
+	// update the array operation, i.e. the merge instruction, with the size
+	// of the splited array as it's new input
+	Operation *op = (Operation*) IMemory::get(mergeDest);
+	op->tokenInputs = portIdx;
+	op->inputs = portIdx;
+	IMemory::put(mergeDest[0], mergeDest[1], op);
+
+	// free memory
+	delete tokens;
+}
+
+/*
+	A function just to encapsulte the dulicated code
+	Prepare the token, create new context and call the bind_send method
+*/
+void Split::doSplitWork(Token_Type* tok, Token_Type* tokens, short portIdx, Core *core)
+{
+	*tok->tag = *tokens[0].tag;
+	// change the port to match the element index
+	tok->tag->port = portIdx;
+	// generate new context
+	Context *new_cx = core->conxObj.getUniqueCx(core->coreID);
+	// send each element in the array to the same instruction instance
+	core->tokenizer.contextManager.bind_send(*tok, this->todest, 0, this->mergeDest, 1, new_cx);
 }
 
 /*********************** Stop Inst Part ******************************/

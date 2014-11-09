@@ -185,6 +185,30 @@ public:
 };
 
 /*
+	Split Instruction
+	This instruction is mainly for parallizing for loop
+	Given a compound data, it splits them into different 
+	tokens and send each to the tokenizer with new cx.
+	Format: INST SPL <idx> <binds> <to> <merge>
+*/
+class Split : public Instruction
+{
+public:
+	Split(short chunk, int* idx, short binds, int *todest, int *mergeDest);
+	~Split();
+
+	// overriding the super method
+	void execute(Token_Type *tokens, Core *core);
+
+	/*	fields	*/
+	short binds;
+	int *todest;
+	int *mergeDest;
+private:
+	void doSplitWork(Token_Type* tok, Token_Type* tokens, short portIdx, Core *core);
+};
+
+/*
 	Stop Instruction
 */
 class Stop : public Instruction

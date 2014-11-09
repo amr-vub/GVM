@@ -83,7 +83,7 @@ void parser::parseInst(vector<string> &stmtToks)
 	else if(stmtToks[1].compare("SPL") == 0)
 	{
 		// split inst
-		// TODO
+		Create_Structure_stmt::createSplit(stmtToks);
 	}
 	else if(stmtToks[1].compare("CHN") == 0)
 	{

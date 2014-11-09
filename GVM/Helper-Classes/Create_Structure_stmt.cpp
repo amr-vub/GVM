@@ -105,7 +105,9 @@ void Create_Structure_stmt::createConstant(vector<string> &strTokns)
 
 	// create the constant inst
 	// TODO 
-	Constant<Datum> *constant = new Constant<Datum>(ch, indx, Datum(value));
+	Datum dat = Datum(value);
+	dat.token_Type = Datum::INT;
+	Constant<Datum> *constant = new Constant<Datum>(ch, indx, dat);
 
 	// add to the memory
 	putInMemory(0, indx[1], constant);
@@ -153,7 +155,34 @@ void Create_Structure_stmt::createContextRestore(vector<string> &strTokns)
 	putInMemory(0, indx[1], contextRestore);
 }
 
-/* Create a ContextRestore instruction and store it in the IMemory
+/*
+
+	Create a split instruction and store it in the IMemory
+	\param:
+		strToknd: vector of strings. 
+			e.g. [INST SPL <idx> <binds> <to> <merge>]
+
+*/
+void Create_Structure_stmt::createSplit(vector<string> &strTokns)
+{
+	int indx[2] = {0, atoi(strTokns[2].c_str())};
+	short binds = atoi(strTokns[3].c_str());	
+	int* toAdd =  new int[];
+	toAdd[0] = atoi(strTokns[4].c_str());
+	toAdd[1] = atoi(strTokns[5].c_str());
+
+	int* mergeAdd =  new int[];
+	mergeAdd[0] = atoi(strTokns[6].c_str());
+	mergeAdd[1] = atoi(strTokns[7].c_str());
+
+	// create the inst
+	Split *split = new Split(0, indx, binds, toAdd, mergeAdd);
+
+	// add to the memory
+	putInMemory(0, indx[1], split);
+}
+
+/* Create a Stop instruction and store it in the IMemory
 	\param: 
 		strToknd: vector of strings. 
 			e.g. ['INST' 'STP' '<idx>']

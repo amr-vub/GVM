@@ -27,6 +27,22 @@ void Datum::setTo(Type eType)
 }
 
 // overloading primitive operators
+/*	==	*/
+Datum Datum::operator==(const Datum& b)
+{
+	Datum retrn;
+	// setting the token type for the new created Datum
+	retrn.token_Type = this->token_Type;
+	// silly way for checking the datum type and act accordingly
+	if(this->token_Type == INT)
+		retrn.bValue = this->iValue == b.iValue; 
+	else if(this->token_Type == FLOAT)
+		retrn.bValue = this->fValue == b.fValue; 
+
+	return retrn;
+}
+
+// overloading primitive operators
 /*	+	*/
 Datum Datum::operator+(const Datum& b)
 {
@@ -111,3 +127,12 @@ Datum Datum::operator<(const Datum& b)
 
 	return retrn;
 }
+
+/*
+	This function acts as an abstraction level for the split
+	to use it without worrying about the supported data types
+
+vector<Datum> Datum::returnVectorOfDatums(Datum &dat)
+{
+	
+}*/

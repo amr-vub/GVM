@@ -45,6 +45,23 @@ public:
 
 	// Return the input as an int
 	static Datum intNative(vector<Datum> args);
+	
+	// Return the true if the twi inputs are equal
+	static Datum equalsNative(vector<Datum> args);
+
+	// returns an vector with range specified in the datum of the inputs
+	static Datum rangeNative(vector<Datum> args);
+
+	// takess two vectors, and returns one vector of both of them concatenated
+	static Datum vecCatNative(vector<Datum> args);
+
+	
+	/*
+		Takess two vectors. The first is values, the second is booleans.
+		If the boolean value is true, the crossponding value in the
+		first array is kept, otherwise it's pruned
+	*/
+	static Datum vecPruneNative(vector<Datum> args);
 
 	/*	fields	*/
 	// global map as a table for native ops function pointers

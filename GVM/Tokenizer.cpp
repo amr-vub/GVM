@@ -115,7 +115,7 @@ ContextManager::~ContextManager()
 	\param: rest
 		how many return arguments I expect from this call	
 */
-void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short &rest)
+void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short rest)
 {
 	Context old_cx = tok.tag->conx;
 	Context *new_cx = NULL;
@@ -144,14 +144,14 @@ void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short
 				this->contextMap.erase(old_cx.conxId);
 		}
 		// bind and send the recieved tok
-		bind_send(tok, retAdd, destAdd,  rest, new_cx);
+		bind_send(tok, destAdd, tok.tag->port, retAdd, rest, new_cx);
 	}
 	else
 	{
 		// generate new context
 		new_cx = this->tokenizer->core->conxObj.getUniqueCx(this->tokenizer->core->coreID);
 		// just changing the cx of one token, no further to come
-		bind_send(tok, destAdd, retAdd, rest, new_cx);
+		bind_send(tok, destAdd, tok.tag->port, retAdd, rest, new_cx);
 	}
 }
 
@@ -161,7 +161,7 @@ void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short
 	- Save the old cx together with the retAdd, chunk, port & restores
 	- Delegate it to the tokenizer
 */
-void ContextManager::bind_send(Token_Type &tok, int* destAdd, int* retAdd, short &rest, Context* new_cx)
+void ContextManager::bind_send(Token_Type &tok, int* destAdd, short destPort, int* retAdd, short rest, Context* new_cx)
 {
 	Context *old_cx = new Context();
 	*old_cx = tok.tag->conx;
@@ -178,7 +178,7 @@ void ContextManager::bind_send(Token_Type &tok, int* destAdd, int* retAdd, short
 	
 	// send the tok to the tokenizer
 	Tuple_vector temp;
-	temp.push_back(make_tuple(destAdd, tok.tag->port));
+	temp.push_back(make_tuple(destAdd, destPort));
 	this->tokenizer->wrapAndSend(temp ,tok.data, *new_cx);
 }
 
