@@ -165,7 +165,7 @@ void Create_Structure_stmt::createContextRestore(vector<string> &strTokns)
 */
 void Create_Structure_stmt::createSplit(vector<string> &strTokns)
 {
-	int indx[2] = {0, atoi(strTokns[2].c_str())};
+	int indx[2] = {1, atoi(strTokns[2].c_str())};
 	short binds = atoi(strTokns[3].c_str());	
 	int* toAdd =  new int[];
 	toAdd[0] = atoi(strTokns[4].c_str());
@@ -176,10 +176,10 @@ void Create_Structure_stmt::createSplit(vector<string> &strTokns)
 	mergeAdd[1] = atoi(strTokns[7].c_str());
 
 	// create the inst
-	Split *split = new Split(0, indx, binds, toAdd, mergeAdd);
+	Split *split = new Split(1, indx, binds, toAdd, mergeAdd);
 
 	// add to the memory
-	putInMemory(0, indx[1], split);
+	putInMemory(1, indx[1], split);
 }
 
 /* Create a Stop instruction and store it in the IMemory

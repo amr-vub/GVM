@@ -64,16 +64,19 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 	{
 		// check first if the dest inst has literals
 		Operation* inst = (Operation*) IMemory::get(tok->tag->instAdd);
-		vector<Token_Type*> *tempV = new vector<Token_Type*>();
-		tempV->push_back(tok);
+		vector<Token_Type*> tempV = vector<Token_Type*>();
+		tempV.push_back(tok);
 		if(inst->tokenInputs == inst->inputs && inst->inputs == 1)
 		{
 			//send it to the sch
-			this->core->sch.executeTwo(*tempV);
+			this->core->sch.executeTwo(tempV);
+			delete tok;
 		}
 		else if(inst->literals.empty())
+		{
 			// save the token in the token table, and wait for it's pair
-			tokenTable[make_pair(cx.conxId, instIdx)] = make_tuple(inst->tokenInputs, *tempV);
+			tokenTable[make_pair(cx.conxId, instIdx)] = make_tuple(inst->tokenInputs, tempV);			
+		}
 		else
 		{
 			// prepare the literal as a token
@@ -83,14 +86,15 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 			Tag *tag = new Tag(tok->tag->conx, port, tok->tag->instAdd);
 			Token_Type *tok2 = new Token_Type(value, tag);
 			if(port < tok->tag->port)
-				tempV->insert(tempV->begin(), tok2);
+				tempV.insert(tempV.begin(), tok2);
 			else
-				tempV->insert(tempV->end(), tok2);
+				tempV.insert(tempV.end(), tok2);
 			//send it to the sch
-			this->core->sch.executeTwo(*tempV);
+			this->core->sch.executeTwo(tempV);
 			//tempV.clear();
 			// delete here
-			delete tok2;
+			delete tok2;	
+			delete tok;
 		}
 	}
 }
