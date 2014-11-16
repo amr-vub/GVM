@@ -13,7 +13,13 @@ using namespace std;
 
 class Core;
 
-typedef map<pair<long, long>, tuple<short, vector<Token_Type*>>> TokenTableType;
+struct TokenTableValue {
+	short inputs;
+	short Indx;
+	Token_Type** tokenArr;
+};
+
+typedef map<pair<long, long>,TokenTableValue> TokenTableType;
 
 /*
 * This class encapsulate the functionality of the matching unit.

@@ -44,38 +44,49 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 	if(tokenIt != tokenTable.end()){
 		// there is a match for the recieved token, then
 		// check if thier no more inputs to come
-		vector<Token_Type*> tokens = get<1>(tokenIt->second);
-		tokens.push_back(tok);
-		// get<0> -> input size ; get<1> -> vector of tokens
-		if(get<0>(tokenIt->second) == tokens.size())
+					
+		if(tokenIt->second.Indx + 1 == tokenIt->second.inputs)
 		{
 			// fetch and send them to the schedualer
-			core->sch.executeTwo(tokens);
-			tokenTable.erase(tokenIt);		
+			tokenIt->second.tokenArr[tokenIt->second.Indx] = tok;
+			core->sch.executeTwo(tokenIt->second.tokenArr);
+			//delete memory for the array of tokens
+			delete [] tokenIt->second.tokenArr;
+			tokenTable.erase(tokenIt);						
 		}
 		else
 		{
 			// still more inputs to come , i.e only in the case of array operation,
 			// then update the tokentable
-			tokenTable[make_pair(cx.conxId, instIdx)] = make_tuple(get<0>(tokenIt->second),tokens);
+			tokenIt->second.tokenArr[tokenIt->second.Indx++] = tok;			
+			tokenTable[make_pair(cx.conxId, instIdx)] = tokenIt->second;
 		}
 	}
 	else
 	{
 		// check first if the dest inst has literals
-		Operation* inst = (Operation*) IMemory::get(tok->tag->instAdd);
-		vector<Token_Type*> tempV = vector<Token_Type*>();
-		tempV.push_back(tok);
+		Operation* inst = (Operation*) IMemory::get(tok->tag->instAdd);		
+
+		Token_Type** tokensArr;
+
 		if(inst->tokenInputs == inst->inputs && inst->inputs == 1)
 		{
-			//send it to the sch
-			this->core->sch.executeTwo(tempV);
-			delete tok;
+			//send it to the sch			
+			this->core->sch.executeTwo(&tok);
+			delete tok;			
 		}
 		else if(inst->literals.empty())
 		{
-			// save the token in the token table, and wait for it's pair
-			tokenTable[make_pair(cx.conxId, instIdx)] = make_tuple(inst->tokenInputs, tempV);			
+			// First time to get a token with this indx
+			// save the token in the token table, and wait for the rest			
+			tokensArr = new Token_Type*[inst->inputs];
+			tokensArr[0] = tok;
+			TokenTableValue savedTKstruct = {
+				savedTKstruct.inputs = inst->inputs,
+				savedTKstruct.Indx = 1,
+				savedTKstruct.tokenArr = tokensArr
+			};
+			tokenTable[make_pair(cx.conxId, instIdx)] =	savedTKstruct;
 		}
 		else
 		{
@@ -85,16 +96,25 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 			Datum value = get<1>(temp);
 			Tag *tag = new Tag(tok->tag->conx, port, tok->tag->instAdd);
 			Token_Type *tok2 = new Token_Type(value, tag);
+			
+			Token_Type* tokenPacket[2];
+
 			if(port < tok->tag->port)
-				tempV.insert(tempV.begin(), tok2);
+			{
+				tokenPacket[0] = tok2;
+				tokenPacket[1] = tok;
+			}
 			else
-				tempV.insert(tempV.end(), tok2);
+			{
+				tokenPacket[0] = tok;
+				tokenPacket[1] = tok2;
+			}
 			//send it to the sch
-			this->core->sch.executeTwo(tempV);
+			this->core->sch.executeTwo(tokenPacket);
 			//tempV.clear();
 			// delete here
 			delete tok2;	
-			delete tok;
+			delete tok;			
 		}
 	}
 }

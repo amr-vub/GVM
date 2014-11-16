@@ -23,7 +23,7 @@ public:
 	// the dest instruction on the recieved tokens,
 	// then call the next element in GVM pipeline
 	// "Tokenizer"
-	void executeTwo(vector<Token_Type*> &toks);
+	void executeTwo(Token_Type* toks[]);
 
 	void execute(Token_Type &it);
 

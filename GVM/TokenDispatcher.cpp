@@ -36,6 +36,5 @@ void TokenDispatcher::dispatch(Token_Type *tok)
 	else
 		// call the matching unit
 		this->core->matchUnit.executeOrUpdateTable(tok);
-	;
 	//core.coreID;
 }

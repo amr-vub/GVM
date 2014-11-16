@@ -27,7 +27,7 @@ Scheduler::~Scheduler(void)
 // then call the next element in GVM pipeline
 // "Tokenizer"
 // \param: the token vector
-void Scheduler::executeTwo(vector<Token_Type*> &toks)
+void Scheduler::executeTwo(Token_Type** toks)
 {
 	//getting the tokens from 
 
@@ -36,14 +36,7 @@ void Scheduler::executeTwo(vector<Token_Type*> &toks)
 
 	Instruction* inst = this->core->memory.get(instAdd);
 
-	Token_Type *tokensPacket = new Token_Type[toks.size()];
-	// TODO: remove
-	short idx = 0;
-	for (vector<Token_Type*>::iterator it = toks.begin(); it!=toks.end();++it)
-	{
-		tokensPacket[idx++] = *(*it);
-	}
-	inst->execute(tokensPacket, this->core);
+	inst->execute(toks, this->core);
 	//toks.clear();
 	//try
 	//delete [] tokensPacket;
@@ -61,5 +54,7 @@ void Scheduler::execute(Token_Type &tok)
 
 	Instruction* inst = this->core->memory.get(instAdd);
 
-	inst->execute(&tok, this->core);
+	Token_Type* tokArr[1] = {&tok};
+
+	inst->execute(tokArr, this->core);
 }

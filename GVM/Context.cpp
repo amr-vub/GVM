@@ -37,7 +37,7 @@ void Context::generateUniqueConx()
 {
 	//put the core value in the MSB of conxId
 	this->conxId = this->coreId;
-	this->conxId <<= 32;
+	this->conxId <<= 16;
 
 	// now we OR the conx with the conxId 
 	// so conxId will be like a pair (coreId, conx)

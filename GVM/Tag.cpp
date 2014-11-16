@@ -33,11 +33,11 @@ void Tag::generateUniqeMix()
 {
 		//put the chunk value in the MSB of instIdx
 	this->instIdx = this->instAdd[0];
-	this->instIdx <<= 32;
+	this->instIdx <<= 16;
 
 	// now we OR the mem Add with the instIdx 
 	// so instIdx will be like a pair (chunk, memAdd)
 	long temp = 0;
-	temp = this->instAdd[0];
+	temp = this->instAdd[1];
 	this->instIdx |= temp;
 }
