@@ -31,9 +31,7 @@ bool isLegalLine(string &line);
 int _tmain(int argc, _TCHAR* argv[])
 {	
 	clock_t start;
-    double duration;
-
-	int data;		
+    double duration;		
 
 	// open the instrucion file to parse
 	fstream instFile;
@@ -55,17 +53,35 @@ int _tmain(int argc, _TCHAR* argv[])
 	Core core = Core(0);
 	// start instruction address
 	int indxStrAdd[2] = {0,0};
+	string input;
+	vector<string> strToks;
 	// get a context
 	Context *firstCx = core.conxObj.getUniqueCx(core.coreID);
 	// get the user input, and for each, create a token
 	for(int i=0;i<globalNum_ips;i++)
 	{
-		cin >> data;
+		getline(cin,input);
+		parser::Tokenize(input,strToks);
 		Tag * tag = new Tag(*firstCx, 0, indxStrAdd);
-		Datum datum = Datum(data);
-		datum.token_Type = Datum::INT;
-		Token_Type *tok = new Token_Type(datum, tag);
-		core.inbox.push_back(tok);
+		if(strToks.size() == 1)
+		{			
+			Datum datum = Datum(atoi(strToks[0].c_str()));
+			datum.token_Type = Datum::INT;
+			Token_Type *tok = new Token_Type(datum, tag);
+			core.inbox.push_back(tok);
+		}
+		else if(strToks.size() > 1)
+		{
+			Datum datum = Datum();
+			datum.token_Type = Datum::I_VECTOR;
+			for (int i = 0; i < strToks.size(); i++)
+			{
+				datum.iValue_v.push_back(atoi(strToks[i].c_str()));
+			}						
+			Token_Type *tok = new Token_Type(datum, tag);
+			core.inbox.push_back(tok);
+		}
+
 	}
 
 	start = std::clock();

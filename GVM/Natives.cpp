@@ -138,6 +138,30 @@ Datum Natives::vecPruneNative(vector<Datum> args)
 	return ret;
 }
 
+// Returns an vector from the input tokens
+Datum Natives::vecNative(vector<Datum> args)
+{
+	Datum ret;		
+	if(args[0].token_Type == Datum::INT)
+	{
+		ret.token_Type = Datum::I_VECTOR;
+		for (int i = 1; i < args.size(); i++)
+		{
+			ret.iValue_v.push_back(args[i].iValue);
+		}
+	}
+	else if(args[0].token_Type == Datum::FLOAT)
+	{
+		ret.token_Type = Datum::F_VECTOR;
+		for (int i = 1; i < args.size(); i++)
+		{
+			ret.iValue_v.push_back(args[i].fValue);
+		}
+	}
+	
+	return ret;
+}
+
 // static function to intialize the map 
 map<string, MyFuncPtrType> Natives::generateMap()
 {
@@ -152,6 +176,7 @@ map<string, MyFuncPtrType> Natives::generateMap()
 	temp["arrCat"] = &Natives::vecCatNative;
 	temp["arrPrune"] = &Natives::vecPruneNative;
 	temp["equal"] = &Natives::equalsNative;
+	temp["array"] = &Natives::vecNative;
 
 	return temp;
 }

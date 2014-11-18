@@ -54,7 +54,6 @@ public:
 
 	// takess two vectors, and returns one vector of both of them concatenated
 	static Datum vecCatNative(vector<Datum> args);
-
 	
 	/*
 		Takess two vectors. The first is values, the second is booleans.
@@ -62,6 +61,9 @@ public:
 		first array is kept, otherwise it's pruned
 	*/
 	static Datum vecPruneNative(vector<Datum> args);
+
+	// Returns an vector from the input tokens
+	static Datum Natives::vecNative(vector<Datum> args);
 
 	/*	fields	*/
 	// global map as a table for native ops function pointers

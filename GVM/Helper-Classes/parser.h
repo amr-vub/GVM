@@ -57,7 +57,7 @@ public:
 	//
 	static void Tokenize(const string& str,
                       vector<string>& tokens,
-                      const string& delimiters);
+                      const string& delimiters= " ");
 
 	//array of function pointers
 	//static Vector_type vector_parser_pointer;
