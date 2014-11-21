@@ -42,6 +42,12 @@ Datum Natives::moreNative(vector<Datum> args)
 	return args[0] > args[1];
 }
 
+// Return true if thefirst input is greater than or equal right input.
+Datum Natives::moreEqNative(vector<Datum> args)
+{
+	return args[0] >= args[1];
+}
+
 // Return true if thefirst input is smaller than right input.
 Datum Natives::lessNative(vector<Datum> args)
 {
@@ -162,6 +168,86 @@ Datum Natives::vecNative(vector<Datum> args)
 	return ret;
 }
 
+
+// Returns the upper bound of the array
+Datum Natives::vecBoundNative(vector<Datum> args)
+{
+	Datum ret;
+	ret.token_Type = Datum::INT;
+
+	switch (args[0].token_Type)
+	{
+		case Datum::I_VECTOR:
+			ret.iValue = args[0].iValue_v.size()-1;
+			break;
+		case Datum::F_VECTOR:
+			ret.iValue = args[0].fValue_v.size()-1;
+			break;
+		case Datum::B_VECTOR:
+			ret.iValue = args[0].bValue_v.size()-1;
+			break;
+	}
+	
+	return ret;	
+}
+
+/*
+	Returns the element at the given index
+	args[0] -> vector
+	args[1] -> index (we assume the index is INT without checking)
+*/
+Datum Natives::vecGetNative(vector<Datum> args)
+{
+	Datum ret;	
+
+	switch (args[0].token_Type)
+	{
+		case Datum::I_VECTOR:
+			{
+				ret.token_Type = Datum::INT;
+				ret.iValue = args[0].iValue_v[args[1].iValue];
+				break;
+			}
+		case Datum::F_VECTOR:
+			{
+				ret.token_Type = Datum::FLOAT;
+				ret.iValue = args[0].fValue_v[args[1].iValue];
+				break;
+			}
+		case Datum::B_VECTOR:
+			{
+				ret.token_Type = Datum::BOOLEAN;
+				ret.bValue = args[0].bValue_v[args[1].iValue];
+				break;
+			}
+	}
+	
+	return ret;	
+}
+
+// Retruns the length of the array
+Datum Natives::vecLengthNative(vector<Datum> args)
+{
+	Datum ret;
+	ret.token_Type = Datum::INT;
+
+	switch (args[0].token_Type)
+	{
+		case Datum::I_VECTOR:
+			ret.iValue = args[0].iValue_v.size();
+			break;
+		case Datum::F_VECTOR:
+			ret.iValue = args[0].fValue_v.size();
+			break;
+		case Datum::B_VECTOR:
+			ret.iValue = args[0].bValue_v.size();
+			break;
+	}
+	
+	return ret;	
+	
+}
+
 // static function to intialize the map 
 map<string, MyFuncPtrType> Natives::generateMap()
 {
@@ -170,13 +256,17 @@ map<string, MyFuncPtrType> Natives::generateMap()
 	temp["sub"] = &Natives::subNative;
 	temp["mul"] = &Natives::mulNative;
 	temp["more"] = &Natives::moreNative;
+	temp["moreEq"] = &Natives::moreEqNative;
 	temp["less"] = &Natives::lessNative;
 	temp["int"] = &Natives::intNative;
 	temp["range"] = &Natives::rangeNative;
 	temp["arrCat"] = &Natives::vecCatNative;
 	temp["arrPrune"] = &Natives::vecPruneNative;
-	temp["equal"] = &Natives::equalsNative;
+	temp["equals"] = &Natives::equalsNative;
 	temp["array"] = &Natives::vecNative;
+	temp["arrLen"] = &Natives::vecLengthNative;
+	temp["arrGet"] = &Natives::vecGetNative;
+	temp["arrBound"] = &Natives::vecBoundNative;
 
 	return temp;
 }

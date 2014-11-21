@@ -32,10 +32,10 @@ Tokenizer::~Tokenizer(void)
 	\param:
 		cx: new token context
 */
-void Tokenizer::wrapAndSend(Tuple_vector &distList, Datum &res, Context &cx)
+void Tokenizer::wrapAndSend(Vector_Tuple &distList, Datum &res, Context &cx)
 {
 	// loop through destination list, for each, create a token and send it to the token queue
-	for (Tuple_vector::iterator it = distList.begin(); it != distList.end(); ++it)
+	for (Vector_Tuple::iterator it = distList.begin(); it != distList.end(); ++it)
 	{
 		int* instAdd = get<0>(*it);
 		short port = get<1>(*it);
@@ -83,7 +83,7 @@ Vector_token Switcher::getAllElement(long &cx)
 	for the recieved dest and token vectors, loop through the the tokens and for each
 	delegate to the tokenizer to send them to the queue
 */
-void Switcher::sendToTokinzer(Tuple_vector &dest,Vector_token &tokV)
+void Switcher::sendToTokinzer(Vector_Tuple &dest,Vector_token &tokV)
 {
 	for(Vector_token::iterator it = tokV.begin(); it!=tokV.end(); ++it)
 	{
@@ -115,7 +115,7 @@ ContextManager::~ContextManager()
 	\param: rest
 		how many return arguments I expect from this call	
 */
-void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short rest)
+void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short rest, long &instIdx)
 {
 	Context old_cx = tok.tag->conx;
 	Context *new_cx = NULL;
@@ -124,24 +124,27 @@ void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short
 	if(binds > 1)
 	{
 		// if no element already exists for that tok. i.e the first argument to arrive
-		if(this->contextMap.find(old_cx.conxId) == contextMap.end())
+		if(this->contextMap.find(make_pair(old_cx.conxId, instIdx)) == contextMap.end())
 		{
 			// generate new context
 			new_cx = this->tokenizer->core->conxObj.getUniqueCx(this->tokenizer->core->coreID);
 			// update the context map, cause we have still binds-1 toks to come
-			this->contextMap[old_cx.conxId] = make_tuple(--binds, new_cx);			
+			this->contextMap[make_pair(old_cx.conxId, instIdx)] = make_tuple(binds-1, new_cx);			
 
 		}
 		else
 		{
 			// then no need to create a new context, just get the already created on
 			// for the same old context Id
-			new_cx = get<1>(this->contextMap[old_cx.conxId]);
-			bds = get<0>(this->contextMap[old_cx.conxId]);
+			new_cx = get<1>(this->contextMap[make_pair(old_cx.conxId, instIdx)]);
+			bds = get<0>(this->contextMap[make_pair(old_cx.conxId, instIdx)]);
 			// check if the stored binds is == 1. i.e. all of the expected toks have arrived
 			if(bds == 1)
 				// delete the entry from the context map
-				this->contextMap.erase(old_cx.conxId);
+				this->contextMap.erase(make_pair(old_cx.conxId, instIdx));
+			else
+				// update the context map, cause we have still binds-1 toks to come
+				this->contextMap[make_pair(old_cx.conxId, instIdx)] = make_tuple(bds-1, new_cx);	
 		}
 		// bind and send the recieved tok
 		bind_send(tok, destAdd, tok.tag->port, retAdd, rest, new_cx);
@@ -170,14 +173,14 @@ void ContextManager::bind_send(Token_Type &tok, int* destAdd, short destPort, in
 	{
 		retAdd[0],	// det chunk 	
 		retAdd[1],	// dest instruction address
-		tok.tag->port,// dest port number
+		destPort,// dest port number
 		old_cx, 	// old context	
 		rest,		// number of expected return values
 	};
-	restoreMap[new_cx->conxId] = restArgs;	
+	restoreMap[make_pair(destPort, new_cx->conxId)] = restArgs;	
 	
 	// send the tok to the tokenizer
-	Tuple_vector temp;
+	Vector_Tuple temp;
 	temp.push_back(make_tuple(destAdd, destPort));
 	this->tokenizer->wrapAndSend(temp ,tok.data, *new_cx);
 }
@@ -200,11 +203,11 @@ void ContextManager::restore(Token_Type &tok)
 		};
 	*/	
 	long conxId = tok.tag->conx.conxId;
-	RestoreArgs resArgs = restoreMap[conxId];
+	RestoreArgs resArgs = restoreMap[make_pair(tok.tag->port, conxId)];
 	Context old_cx = *resArgs.cx;
 
 	// send the tok to the tokenizer
-	Tuple_vector temp;
+	Vector_Tuple temp;
 	int index[2] = {resArgs.chunk, resArgs.idx};
 	temp.push_back(make_tuple(index, resArgs.port));
 	this->tokenizer->wrapAndSend(temp, tok.data, old_cx);
@@ -217,11 +220,11 @@ void ContextManager::restore(Token_Type &tok)
 		// append the cx to the avaliable cx pool
 		this->tokenizer->core->conxObj.freeContext(cx);
 		// erase the entry in the restore map
-		restoreMap.erase(conxId);
+		restoreMap.erase(make_pair(tok.tag->port, conxId));
 	}
 	else
 	{
 		resArgs.restores--;
-		restoreMap[conxId] = resArgs;
+		restoreMap[make_pair(tok.tag->port, conxId)] = resArgs;
 	}
 }

@@ -60,7 +60,7 @@ public:
 
 	// List of destination nodes that the result 
 	// of executing this instruction should be forwarded to
-	Tuple_vector distList;
+	MAP_Vector_Tuple distList;
 
 	// vectors of literals
 	// Only for Context change and Operation Instructions
@@ -139,7 +139,7 @@ public:
 	void execute(Token_Type **tokens, Core *core);
 
 	/*	fields	*/	
-	//int *destinationList;
+	vector<int> destinationList;
 
 };
 
@@ -159,6 +159,9 @@ public:
 
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
+
+	// add literals to this inst
+	void addLiterals(short &port, Datum &value);
 
 	/*	fields	*/	
 	short binds;
@@ -273,7 +276,7 @@ void Constant<T>::execute(Token_Type **tokens, Core *core)
 	Context cx = tokens[0]->tag->conx;
 
 	if(0 == port)
-		core->tokenizer.wrapAndSend(this->distList, this->value, cx);
+		core->tokenizer.wrapAndSend(this->distList[port], this->value, cx);
 	// freeing memory
 	delete tokens[0];
 }

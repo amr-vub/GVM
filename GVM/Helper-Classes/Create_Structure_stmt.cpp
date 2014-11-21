@@ -9,6 +9,8 @@
 #include "Instruction.h"
 #include "IMemory.h"
 
+extern short _CHUNK_GLOBAL;
+
 // save instruction in the IMemory
 void putInMemory(short ch, int &idx,Instruction *instIp);
 
@@ -29,13 +31,12 @@ Create_Structure_stmt::~Create_Structure_stmt(void)
 void Create_Structure_stmt::createOperation(vector<string> &strTokns)
 {
 	string opCode = strTokns[3];
-	short inputs = atoi(strTokns[4].c_str());
-	short ch = 1;
-	int indx[2] = {ch, atoi(strTokns[2].c_str())};	
+	short inputs = atoi(strTokns[4].c_str());	
+	int indx[2] = {_CHUNK_GLOBAL, atoi(strTokns[2].c_str())};	
 
 	//create operation object
-	Operation *op = new Operation(opCode, inputs, ch, indx);	
-	putInMemory(ch, indx[1], op);
+	Operation *op = new Operation(opCode, inputs, _CHUNK_GLOBAL, indx);	
+	putInMemory(_CHUNK_GLOBAL, indx[1], op);
 	
 }
 
@@ -46,10 +47,10 @@ void Create_Structure_stmt::createOperation(vector<string> &strTokns)
 */
 void Create_Structure_stmt::createSwitch(vector<string> &strTokns)
 {
-	int instIdx[2] = {0, atoi(strTokns[2].c_str())};
+	int instIdx[2] = {_CHUNK_GLOBAL, atoi(strTokns[2].c_str())};
 
 	// create the SWI instruction	
-	Switch *swi = new Switch(0, instIdx);
+	Switch *swi = new Switch(_CHUNK_GLOBAL, instIdx);
 
 	short ch;
 	int idx;
@@ -62,13 +63,12 @@ void Create_Structure_stmt::createSwitch(vector<string> &strTokns)
 		it++;
 		// get the inst indx
 		idx = atoi((*it).c_str());
-		int *indx = new int[2];
-		indx[0] = ch;
-		indx[1] = idx;
-		// add to the inst dest list
-		swi->distList.push_back(make_tuple(indx, 0));
+
+		// add to the switch dest list
+		swi->destinationList.push_back(ch);
+		swi->destinationList.push_back(idx);
 	}
-	putInMemory(0, instIdx[1], swi);
+	putInMemory(_CHUNK_GLOBAL, instIdx[1], swi);
 
 }
 
@@ -80,13 +80,13 @@ void Create_Structure_stmt::createSwitch(vector<string> &strTokns)
 void Create_Structure_stmt::createSink(vector<string> &strTokns)
 {
 	// get the idx
-	int indx[2] = {0, atoi(strTokns[2].c_str())};
+	int indx[2] = {_CHUNK_GLOBAL, atoi(strTokns[2].c_str())};
 
 	// create the sink inst
-	Sink *sink = new Sink(0, indx);
+	Sink *sink = new Sink(_CHUNK_GLOBAL, indx);
 
 	// add to the memory
-	putInMemory(0, indx[1], sink);
+	putInMemory(_CHUNK_GLOBAL, indx[1], sink);
 }
 
 /* Create a constant instruction and store it in the IMemory
@@ -97,20 +97,18 @@ void Create_Structure_stmt::createSink(vector<string> &strTokns)
 void Create_Structure_stmt::createConstant(vector<string> &strTokns)
 {
 	// get the idx
-	int indx[2] = {0, atoi(strTokns[2].c_str())};
+	int indx[2] = {_CHUNK_GLOBAL, atoi(strTokns[2].c_str())};
 	// TODO 
-	int value = atoi(strTokns[4].c_str());
-
-	short ch = 0;
+	int value = atoi(strTokns[4].c_str());	
 
 	// create the constant inst
 	// TODO 
 	Datum dat = Datum(value);
 	dat.token_Type = Datum::INT;
-	Constant<Datum> *constant = new Constant<Datum>(ch, indx, dat);
+	Constant<Datum> *constant = new Constant<Datum>(_CHUNK_GLOBAL, indx, dat);
 
 	// add to the memory
-	putInMemory(0, indx[1], constant);
+	putInMemory(_CHUNK_GLOBAL, indx[1], constant);
 }
 
 /* Create a ContextChange instruction and store it in the IMemory
@@ -120,7 +118,7 @@ void Create_Structure_stmt::createConstant(vector<string> &strTokns)
 */
 void Create_Structure_stmt::createContextChange(vector<string> &strTokns)
 {
-	int indx[2] = {0, atoi(strTokns[2].c_str())};
+	int indx[2] = {_CHUNK_GLOBAL, atoi(strTokns[2].c_str())};
 	short binds = atoi(strTokns[3].c_str());
 	short restores = atoi(strTokns[4].c_str());
 	int* toAdd =  new int[];
@@ -132,10 +130,10 @@ void Create_Structure_stmt::createContextChange(vector<string> &strTokns)
 	retAdd[1] = atoi(strTokns[8].c_str());
 
 	// create the inst
-	ContextChange* contextChange = new ContextChange(0, indx, binds, restores, toAdd, retAdd);
+	ContextChange* contextChange = new ContextChange(_CHUNK_GLOBAL, indx, binds, restores, toAdd, retAdd);
 
 	// add to the memory
-	putInMemory(0, indx[1], contextChange);
+	putInMemory(_CHUNK_GLOBAL, indx[1], contextChange);
 }
 
 /* Create a ContextRestore instruction and store it in the IMemory
@@ -145,14 +143,14 @@ void Create_Structure_stmt::createContextChange(vector<string> &strTokns)
 */
 void Create_Structure_stmt::createContextRestore(vector<string> &strTokns)
 {
-	int indx[2] = {0, atoi(strTokns[2].c_str())};
+	int indx[2] = {_CHUNK_GLOBAL, atoi(strTokns[2].c_str())};
 	short ch = indx[0];
 
 	// create the inst
 	ContextRestore* contextRestore = new ContextRestore(ch, indx);
 
 	// add to the memory
-	putInMemory(0, indx[1], contextRestore);
+	putInMemory(_CHUNK_GLOBAL, indx[1], contextRestore);
 }
 
 /*
@@ -165,7 +163,7 @@ void Create_Structure_stmt::createContextRestore(vector<string> &strTokns)
 */
 void Create_Structure_stmt::createSplit(vector<string> &strTokns)
 {
-	int indx[2] = {1, atoi(strTokns[2].c_str())};
+	int indx[2] = {_CHUNK_GLOBAL, atoi(strTokns[2].c_str())};
 	short binds = atoi(strTokns[3].c_str());	
 	int* toAdd =  new int[];
 	toAdd[0] = atoi(strTokns[4].c_str());
@@ -176,10 +174,10 @@ void Create_Structure_stmt::createSplit(vector<string> &strTokns)
 	mergeAdd[1] = atoi(strTokns[7].c_str());
 
 	// create the inst
-	Split *split = new Split(1, indx, binds, toAdd, mergeAdd);
+	Split *split = new Split(_CHUNK_GLOBAL, indx, binds, toAdd, mergeAdd);
 
 	// add to the memory
-	putInMemory(1, indx[1], split);
+	putInMemory(_CHUNK_GLOBAL, indx[1], split);
 }
 
 /* Create a Stop instruction and store it in the IMemory
@@ -189,14 +187,13 @@ void Create_Structure_stmt::createSplit(vector<string> &strTokns)
 */
 void Create_Structure_stmt::createStop(vector<string> &strTokns)
 {
-	int indx[2] = {0, atoi(strTokns[2].c_str())};
-	short ch = indx[0];
+	int indx[2] = {_CHUNK_GLOBAL, atoi(strTokns[2].c_str())};	
 
 	// create the inst
-	Stop* stop = new Stop(ch, indx);
+	Stop* stop = new Stop(_CHUNK_GLOBAL, indx);
 
 	// add to the memory
-	putInMemory(0, indx[1], stop);
+	putInMemory(_CHUNK_GLOBAL, indx[1], stop);
 
 }
 

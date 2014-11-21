@@ -45,6 +45,8 @@ public:
 	Datum operator/(const Datum& b);
 	/*	>	*/
 	Datum operator>(const Datum& b);
+	/*	>=	*/
+	Datum operator>=(const Datum& b);
 	/*	<	*/
 	Datum operator<(const Datum& b);
 

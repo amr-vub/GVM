@@ -19,8 +19,8 @@ class Tokenizer;
 
 struct RestoreArgs;
 typedef vector<Token_Type*> Vector_token;
-typedef map<long, RestoreArgs> RestorMapType;
-typedef map<long, tuple<short, Context*>> ContextMapType;
+typedef map<pair<short, long>, RestoreArgs> RestorMapType;
+typedef map<pair<long, long>, tuple<short, Context*>> ContextMapType;
 
 
 
@@ -57,7 +57,7 @@ public:
 	map<long, Vector_token> switchStorage;
 
 	// Forward tokens to the tokenizer queue
-	void sendToTokinzer(Tuple_vector &dest, Vector_token &tokV);
+	void sendToTokinzer(Vector_Tuple &dest, Vector_token &tokV);
 
 	/*	fields	*/
 	Tokenizer *tokenizer;
@@ -74,7 +74,7 @@ public:
 	~ContextManager();
 
 	// 
-	void bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short rest);
+	void bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short rest, long &instIdx);
 
 	void bind_send(Token_Type &tok, int* destAdd, short destPort, int* retAdd, short rest, Context* cx);	
 
@@ -109,7 +109,7 @@ public:
 	Tokenizer();
 	~Tokenizer(void);	
 	// create a new token and send it to the token queue
-	void wrapAndSend(Tuple_vector &distList, Datum &res, Context &cx);
+	void wrapAndSend(Vector_Tuple &distList, Datum &res, Context &cx);
 
 	//
 	void sendStop(Token_Type *tok);

@@ -54,15 +54,16 @@ int _tmain(int argc, _TCHAR* argv[])
 	// start instruction address
 	int indxStrAdd[2] = {0,0};
 	string input;
-	vector<string> strToks;
+	
 	// get a context
 	Context *firstCx = core.conxObj.getUniqueCx(core.coreID);
 	// get the user input, and for each, create a token
 	for(int i=0;i<globalNum_ips;i++)
 	{
+		vector<string> strToks;
 		getline(cin,input);
 		parser::Tokenize(input,strToks);
-		Tag * tag = new Tag(*firstCx, 0, indxStrAdd);
+		Tag * tag = new Tag(*firstCx, i, indxStrAdd);
 		if(strToks.size() == 1)
 		{			
 			Datum datum = Datum(atoi(strToks[0].c_str()));
@@ -114,12 +115,14 @@ bool isLegalLine(string &line)
 		if((*it) == '$')
 			return false;
 		// this fixed the problem of e.g. "\tINST...."
-		if((*it) == '\t')
+		while((*it) == '\t')
 		{
 			line.erase(it);
 			if(it == line.end())
 				break;
 		}
+		if(it == line.end())
+			break;
 	}
 	return true;
 }

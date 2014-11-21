@@ -22,10 +22,15 @@ Instruction::Instruction(short &ch, int idx[2])
 // deleting the pointers in the distList
 Instruction::~Instruction(void)
 {
-	for (Tuple_vector::iterator it= this->distList.begin(); it != this->distList.end(); ++ it)
+	for(auto mp: this->distList)
 	{
-		delete [] get<0>(*it);
+		for (auto vect : mp.second)
+		{
+			delete [] get<0>(vect);
+		}
+		mp.second.clear();
 	}
+
 	this->distList.clear();
 }
 
@@ -136,7 +141,7 @@ void Operation::execute(Token_Type **tokens, Core *core)
 
 
 	// send the res to tokenizer
-	core->tokenizer.wrapAndSend((this->distList), res, tokens[0][0].tag->conx);
+	core->tokenizer.wrapAndSend((this->distList[0]), res, tokens[0][0].tag->conx);
 }
 
 
@@ -159,7 +164,7 @@ void Sink::execute(Token_Type **tokens, Core *core)
 {
 	//std::cout<< core.dispatcher;
 	// send the res to tokenizer
-	core->tokenizer.wrapAndSend((this->distList), tokens[0][0].data, tokens[0][0].tag->conx);
+	core->tokenizer.wrapAndSend((this->distList[tokens[0][0].tag->port]), tokens[0][0].data, tokens[0][0].tag->conx);
 	// freeing memory
 	delete tokens[0];
 }
@@ -204,17 +209,26 @@ void Switch::execute(Token_Type **tokens, Core *core)
 		// first get all of the stored tokens
 		long cx = tokens[0][0].tag->conx.conxId;
 		vector<Token_Type*> toksV = core->tokenizer.swicther.getAllElement(cx);
-
+		// NEW: Switch has to forward all of its recieved tokens
+		toksV.push_back(tokens[0]);
 		// then determine thier dest based on the recieved token's data
-		int destIdx = tokens[0][0].data.iValue;
-		Tuple_vector dest;
+		int destIdx = tokens[0][0].data.iValue * 2;
+		int *indx = new int[2];
+		indx[0] = this->destinationList[destIdx];
+		indx[1] = this->destinationList[destIdx+1];		
 
 		// valide index
-		if(this->distList.size() > destIdx)
-		{
-			dest.push_back(this->distList[destIdx]);
-			if(!toksV.empty()) //at least one token exists
-				core->tokenizer.swicther.sendToTokinzer(dest, toksV);
+		if(this->destinationList.size() > destIdx)
+		{					
+			// loop through the saved existing tokens, for each 
+			// determine the destination address and the port num
+			// based on the recieved index and SWITCH <destination LIST>
+			for(auto tok: toksV){
+				Vector_Tuple dest;
+				short port = tok->tag->port;
+				dest.push_back(make_tuple(indx, port));
+				core->tokenizer.wrapAndSend(dest, tok->data, tok->tag->conx);
+			}
 		}
 		// freeing memory
 		delete tokens[0];
@@ -244,6 +258,13 @@ ContextChange::~ContextChange()
 	delete [] this->retDest;
 
 }
+
+// add literals to this inst
+void ContextChange::addLiterals(short &port, Datum &value)
+{
+	this->literals.push_back(make_tuple(port, value));
+}
+
 /*
 	ContextChange instruction execution
 	- Change the context of the recieved tok
@@ -251,8 +272,29 @@ ContextChange::~ContextChange()
 */
 void ContextChange::execute(Token_Type **tokens, Core *core)
 {
-	// delegate to the context manger obj to handel the context change execution details
-	core->tokenizer.contextManager.bind_save(tokens[0][0], this->todest, this->retDest, this->binds, this->restores);
+	// Checks is the instruction already has literals or not
+	if(this->literals.empty())
+		// delegate to the context manger obj to handel the context change execution details
+		core->tokenizer.contextManager.bind_save(tokens[0][0], this->todest, this->retDest, 
+		this->binds, this->restores, this->InstInx);
+	else
+	{
+		// means that there exist at least one literal, then compare the binds to the literals size
+		for(auto lit : this->literals)
+		{
+			// prepare the literal as a token			
+			short port = get<0>(lit);
+			Datum value = get<1>(lit);
+			Tag *tag = new Tag(tokens[0]->tag->conx, port, tokens[0]->tag->instAdd);
+			Token_Type tok2 =  Token_Type(value, tag);
+			// then send delegate
+			core->tokenizer.contextManager.bind_save(tok2, this->todest, this->retDest, 
+				this->binds, this->restores, this->InstInx);			
+		}
+		this->literals.clear();
+		core->tokenizer.contextManager.bind_save(tokens[0][0], this->todest, this->retDest, 
+			this->binds, this->restores, this->InstInx);
+	}
 	// freeing memory
 	delete tokens[0];
 }

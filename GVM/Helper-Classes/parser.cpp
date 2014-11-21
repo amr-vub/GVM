@@ -11,6 +11,7 @@
 #include "Instruction.h"
 
 extern short globalNum_ips;
+short _CHUNK_GLOBAL = 0;
 
 parser::parser(void)
 {
@@ -125,14 +126,20 @@ void parser:: parseLink(vector<string> &stmtToks)
 
 	// query the memory for the source instruction to add destination address to it
 	Instruction *inst= IMemory::get(add1);
-	inst->distList.push_back(make_tuple(add2,port2));
+	inst->distList[port1].push_back(make_tuple(add2,port2));
 	IMemory::put(add1[0], add1[1], inst);
 }
+
+/*
+	Parse CHUNK stmt
+
+	CHUNK [0|1]
+*/
 
 void parser::parseChunk(vector<string> &stmtToks)
 {
 	// just fake for now a memory insertion
-
+	_CHUNK_GLOBAL = atoi(stmtToks[1].c_str());
 }
 
 /*
@@ -142,7 +149,7 @@ void parser::parseChunk(vector<string> &stmtToks)
 */
 void parser::parseLit(vector<string> &stmtToks)
 {
-	int idx[2] = {1,  atoi(stmtToks[1].c_str())};
+	int idx[2] = {_CHUNK_GLOBAL,  atoi(stmtToks[1].c_str())};
 	short port = atoi(stmtToks[2].c_str());
 
 	// TODO

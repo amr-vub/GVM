@@ -32,7 +32,7 @@ Datum Datum::operator==(const Datum& b)
 {
 	Datum retrn;
 	// setting the token type for the new created Datum
-	retrn.token_Type = this->token_Type;
+	retrn.token_Type = BOOLEAN;
 	// silly way for checking the datum type and act accordingly
 	if(this->token_Type == INT)
 		retrn.bValue = this->iValue == b.iValue; 
@@ -113,6 +113,32 @@ Datum Datum::operator>(const Datum& b)
 
 	return retrn;
 }
+
+/*	>=	*/
+Datum Datum::operator>=(const Datum& b)
+{
+	Datum retrn;
+	// setting the token type for the new created Datum
+	retrn.token_Type = BOOLEAN;
+	// silly way for checking the datum type and act accordingly
+	switch(this->token_Type)
+	{
+	case INT:
+		retrn.bValue = this->iValue >= b.iValue; 
+		break;
+	case FLOAT:
+		retrn.bValue = this->fValue >= b.fValue; 
+		break;
+	case I_VECTOR:
+		retrn.bValue = this->iValue_v.size() >= b.iValue_v.size(); 
+		break;
+	case F_VECTOR:
+		retrn.bValue = this->fValue_v.size() >= b.fValue_v.size(); 
+		break;
+	}
+	return retrn;
+}
+
 /*	<	*/
 Datum Datum::operator<(const Datum& b)
 {

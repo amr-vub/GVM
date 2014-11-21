@@ -40,6 +40,9 @@ public:
 	// Return true if thefirst input is greater than right input.
 	static Datum moreNative(vector<Datum> args);
 
+	// Return true if thefirst input is greater than or equal right input.
+	static Datum moreEqNative(vector<Datum> args);
+
 	// Return true if thefirst input is smaller than right input.
 	static Datum lessNative(vector<Datum> args);
 
@@ -64,6 +67,15 @@ public:
 
 	// Returns an vector from the input tokens
 	static Datum Natives::vecNative(vector<Datum> args);
+
+	// Returns the upper bound of the array
+	static Datum Natives::vecBoundNative(vector<Datum> args);
+
+	// Returns the element at the given index
+	static Datum Natives::vecGetNative(vector<Datum> args);
+
+	// Retruns the length of the array
+	static Datum Natives::vecLengthNative(vector<Datum> args);
 
 	/*	fields	*/
 	// global map as a table for native ops function pointers
