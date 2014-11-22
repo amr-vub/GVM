@@ -147,7 +147,7 @@ void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short
 				this->contextMap[make_pair(old_cx.conxId, instIdx)] = make_tuple(bds-1, new_cx);	
 		}
 		// bind and send the recieved tok
-		bind_send(tok, destAdd, tok.tag->port, retAdd, rest, new_cx);
+		bind_send(tok, destAdd, -1, retAdd, rest, new_cx);
 	}
 	else
 	{
@@ -177,11 +177,11 @@ void ContextManager::bind_send(Token_Type &tok, int* destAdd, short destPort, in
 		old_cx, 	// old context	
 		rest,		// number of expected return values
 	};
-	restoreMap[make_pair(destPort, new_cx->conxId)] = restArgs;	
+	restoreMap[new_cx->conxId] = restArgs;	
 	
 	// send the tok to the tokenizer
 	Vector_Tuple temp;
-	temp.push_back(make_tuple(destAdd, destPort));
+	temp.push_back(make_tuple(destAdd, tok.tag->port));
 	this->tokenizer->wrapAndSend(temp ,tok.data, *new_cx);
 }
 
@@ -203,13 +203,18 @@ void ContextManager::restore(Token_Type &tok)
 		};
 	*/	
 	long conxId = tok.tag->conx.conxId;
-	RestoreArgs resArgs = restoreMap[make_pair(tok.tag->port, conxId)];
+	RestoreArgs resArgs = restoreMap[conxId];
 	Context old_cx = *resArgs.cx;
 
 	// send the tok to the tokenizer
 	Vector_Tuple temp;
 	int index[2] = {resArgs.chunk, resArgs.idx};
-	temp.push_back(make_tuple(index, resArgs.port));
+	// chekc if we need to change the port or not
+	if(resArgs.port != -1)
+		temp.push_back(make_tuple(index, resArgs.port));
+	else if(resArgs.port == -1)
+		temp.push_back(make_tuple(index, tok.tag->port));
+
 	this->tokenizer->wrapAndSend(temp, tok.data, old_cx);
 
 	// if restore value is one, then we no longer need to save this entry
@@ -220,11 +225,11 @@ void ContextManager::restore(Token_Type &tok)
 		// append the cx to the avaliable cx pool
 		this->tokenizer->core->conxObj.freeContext(cx);
 		// erase the entry in the restore map
-		restoreMap.erase(make_pair(tok.tag->port, conxId));
+		restoreMap.erase(conxId);
 	}
 	else
 	{
 		resArgs.restores--;
-		restoreMap[make_pair(tok.tag->port, conxId)] = resArgs;
+		restoreMap[conxId] = resArgs;
 	}
 }

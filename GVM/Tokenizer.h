@@ -19,7 +19,7 @@ class Tokenizer;
 
 struct RestoreArgs;
 typedef vector<Token_Type*> Vector_token;
-typedef map<pair<short, long>, RestoreArgs> RestorMapType;
+typedef unordered_map<long, RestoreArgs> RestorMapType;
 typedef map<pair<long, long>, tuple<short, Context*>> ContextMapType;
 
 
@@ -54,7 +54,7 @@ public:
 	Vector_token getAllElement(long &cx);
 
 	// a storage map for switch instruction tokens	
-	map<long, Vector_token> switchStorage;
+	unordered_map<long, Vector_token> switchStorage;
 
 	// Forward tokens to the tokenizer queue
 	void sendToTokinzer(Vector_Tuple &dest, Vector_token &tokV);

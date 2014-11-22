@@ -58,6 +58,16 @@ public:
 	// unique index for the inst based on the (chunk, instAdd)
 	long InstInx;
 
+	/*	Fields for operation and split instructions manily	*/
+
+	// total number of inputs
+	short inputs;
+
+	// total numbers of expected tokens
+	short tokenInputs;
+
+	/* End */
+
 	// List of destination nodes that the result 
 	// of executing this instruction should be forwarded to
 	MAP_Vector_Tuple distList;
@@ -95,10 +105,10 @@ public:
 	string opCode;
 
 	// total number of inputs
-	short inputs;
+	//short inputs;
 
 	// total numbers of expected tokens
-	short tokenInputs;
+	//short tokenInputs;
 };
 
 /*
@@ -193,6 +203,9 @@ public:
 	Given a compound data, it splits them into different 
 	tokens and send each to the tokenizer with new cx.
 	Format: INST SPL <idx> <binds> <to> <merge>
+
+	// total numbers of expected tokens --> equals binds as well, no literals are allowed for split inst
+	// that's just a workaround to use the executeorupdate methodd in the matching unit for this inst as well
 */
 class Split : public Instruction
 {
@@ -204,7 +217,7 @@ public:
 	void execute(Token_Type **tokens, Core *core);
 
 	/*	fields	*/
-	short binds;
+
 	int *todest;
 	int *mergeDest;
 private:

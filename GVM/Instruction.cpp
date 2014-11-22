@@ -324,7 +324,8 @@ void ContextRestore::execute(Token_Type **tokens, Core *core)
 
 Split::Split(short chunk, int* idx, short binds, int *todest, int *mergeDest) : Instruction(chunk, idx)
 {
-	this->binds = binds;
+	this->inputs = binds;
+	this->tokenInputs = binds;
 	this->todest = todest;
 	this->mergeDest = mergeDest;
 }

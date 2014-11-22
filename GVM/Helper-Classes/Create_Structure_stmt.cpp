@@ -175,7 +175,6 @@ void Create_Structure_stmt::createSplit(vector<string> &strTokns)
 
 	// create the inst
 	Split *split = new Split(_CHUNK_GLOBAL, indx, binds, toAdd, mergeAdd);
-
 	// add to the memory
 	putInMemory(_CHUNK_GLOBAL, indx[1], split);
 }
