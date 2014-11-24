@@ -81,25 +81,25 @@ Operation::Operation(string &opCode, short &input,
 	this->tokenInputs = input;
 }
 /*
-	preparing the args list
+preparing the args list
 */
 vector<Datum> Operation::createArgsList(Token_Type** toks)
 {
 	vector<Datum> retArgs;
 	if(this->literals.empty())
 		// means that this op inst expect no literals
-		for(int i=0; i<this->inputs;i++)
-			retArgs.push_back(toks[i]->data);
+			for(int i=0; i<this->inputs;i++)
+				retArgs.push_back(toks[i]->data);
 	else
 	{		
 		// this inst has literal inputs
 		/*
 		if(this->tokenInputs == 0)
-			// no tokens are expeccted, just op between literals
-			for(vector<tuple<short, int>>::iterator it = literals.begin() ; it!=literals.end(); ++it)
-			{			
-				retArgs.push_back(get<1>(*it));							
-			}
+		// no tokens are expeccted, just op between literals
+		for(vector<tuple<short, int>>::iterator it = literals.begin() ; it!=literals.end(); ++it)
+		{			
+		retArgs.push_back(get<1>(*it));							
+		}
 		*/				
 		// one literal and one token
 		if(toks[0]->tag->port < get<0>(literals.front()))
@@ -113,14 +113,14 @@ vector<Datum> Operation::createArgsList(Token_Type** toks)
 			retArgs.push_back(toks[0]->data);
 		}
 
-		
+
 	}
 	return retArgs;
 
 }
 
 /*
-	add literals to the op instruction and decrment the no of expected tokens
+add literals to the op instruction and decrment the no of expected tokens
 */
 void Operation::addLiterals(short &port, Datum &value)
 {
@@ -172,8 +172,8 @@ void Sink::execute(Token_Type **tokens, Core *core)
 /*
 void Sink::execute2(Token_Type *tokens, Core *core)
 {
-	// send the res to tokenizer
-	core->tokenizer->wrapAndSend((this->distList), tokens[0][0].data, tokens[0][0].tag->conx);
+// send the res to tokenizer
+core->tokenizer->wrapAndSend((this->distList), tokens[0][0].data, tokens[0][0].tag->conx);
 }
 */
 /*********************** SWITCH Inst Part ******************************/
@@ -207,8 +207,9 @@ void Switch::execute(Token_Type **tokens, Core *core)
 		// with the same context
 
 		// first get all of the stored tokens
-		long cx = tokens[0][0].tag->conx.conxId;
-		vector<Token_Type*> toksV = core->tokenizer.swicther.getAllElement(cx);
+		
+		vector<Token_Type*> toksV = core->tokenizer.swicther.
+			getAllElement(tokens[0][0].tag->conx.conxId,tokens[0][0].tag->instIdx );
 		// NEW: Switch has to forward all of its recieved tokens
 		toksV.push_back(tokens[0]);
 		// then determine thier dest based on the recieved token's data
@@ -266,17 +267,17 @@ void ContextChange::addLiterals(short &port, Datum &value)
 }
 
 /*
-	ContextChange instruction execution
-	- Change the context of the recieved tok
-	- save the old cx to be restored when a context restore inst is executed
+ContextChange instruction execution
+- Change the context of the recieved tok
+- save the old cx to be restored when a context restore inst is executed
 */
 void ContextChange::execute(Token_Type **tokens, Core *core)
 {
 	// Checks is the instruction already has literals or not
 	if(this->literals.empty())
 		// delegate to the context manger obj to handel the context change execution details
-		core->tokenizer.contextManager.bind_save(tokens[0][0], this->todest, this->retDest, 
-		this->binds, this->restores, this->InstInx);
+			core->tokenizer.contextManager.bind_save(tokens[0][0], this->todest, this->retDest, 
+			this->binds, this->restores, this->InstInx);
 	else
 	{
 		// means that there exist at least one literal, then compare the binds to the literals size
@@ -309,8 +310,8 @@ ContextRestore::~ContextRestore()
 {
 }
 /*
-	ContextRestore instruction execution
-	- Restore the context of the recieved tok
+ContextRestore instruction execution
+- Restore the context of the recieved tok
 */
 void ContextRestore::execute(Token_Type **tokens, Core *core)
 {
@@ -348,23 +349,43 @@ void Split::execute(Token_Type **tokens, Core *core)
 	tok->tag = new Tag();
 	int portIdx= 0;
 
-	if(tokens[0][0].data.token_Type == Datum::I_VECTOR)
+	switch(tokens[0][0].data.token_Type)
 	{
-		//loop through array elements and for each, create a new token with new context
-		for(vector<int>::iterator it = tokens[0][0].data.iValue_v.begin(); it!=tokens[0][0].data.iValue_v.end(); ++it)
+	case Datum::I_VECTOR:
 		{
-			tok->data = Datum(*it);
-			doSplitWork(tok,  *tokens, portIdx++, core);				
+			//loop through array elements and for each, create a new token with new context
+			for(vector<int>::iterator it = tokens[0][0].data.iValue_v.begin(); it!=tokens[0][0].data.iValue_v.end(); ++it)
+			{
+				tok->data = Datum(*it);
+				tok->data.token_Type = Datum::INT;
+				doSplitWork(tok,  tokens, portIdx++, core);				
+			}
 		}
-	}
-	else if(tokens[0][0].data.token_Type == Datum::F_VECTOR)
-	{
-		//loop through array elements and for each, create a new token with new context
-		for(vector<float>::iterator it = tokens[0][0].data.fValue_v.begin(); it!=tokens[0][0].data.fValue_v.end(); ++it)
+		break;
+	case Datum::F_VECTOR:
 		{
-			tok->data = Datum(*it);
-			doSplitWork(tok,  *tokens, portIdx++, core);
+			//loop through array elements and for each, create a new token with new context
+			for(vector<float>::iterator it = tokens[0][0].data.fValue_v.begin(); it!=tokens[0][0].data.fValue_v.end(); ++it)
+			{
+				tok->data = Datum(*it);
+				tok->data.token_Type = Datum::FLOAT;
+				doSplitWork(tok,  tokens, portIdx++, core);
+			}
 		}
+		break;
+	case Datum::B_VECTOR:
+		{
+			//loop through array elements and for each, create a new token with new context
+			for(vector<bool>::iterator it = tokens[0][0].data.bValue_v.begin(); it!=tokens[0][0].data.bValue_v.end(); ++it)
+			{
+				tok->data = Datum(*it);
+				tok->data.token_Type = Datum::BOOLEAN;
+				doSplitWork(tok,  tokens, portIdx++, core);
+			}
+		}
+		break;
+	default:
+		printf("_____ERORR_____ Split\n");
 	}
 	// update the array operation, i.e. the merge instruction, with the size
 	// of the splited array as it's new input
@@ -374,22 +395,30 @@ void Split::execute(Token_Type **tokens, Core *core)
 	IMemory::put(mergeDest[0], mergeDest[1], op);
 
 	// free memory
-	delete tokens[0];
+	//delete [] tokens;
 }
 
 /*
-	A function just to encapsulte the dulicated code
-	Prepare the token, create new context and call the bind_send method
+A function just to encapsulte the dulicated code
+Prepare the token, create new context and call the bind_send method
 */
-void Split::doSplitWork(Token_Type* tok, Token_Type* tokens, short portIdx, Core *core)
+void Split::doSplitWork(Token_Type* tok, Token_Type** tokens, short portIdx, Core *core)
 {
-	*tok->tag = *tokens->tag;
+	*tok->tag = *tokens[0]->tag;
 	// change the port to match the element index
 	tok->tag->port = portIdx;
 	// generate new context
 	Context *new_cx = core->conxObj.getUniqueCx(core->coreID);
 	// send each element in the array to the same instruction instance
-	core->tokenizer.contextManager.bind_send(*tok, this->todest, 0, this->mergeDest, 1, new_cx);
+	core->tokenizer.contextManager.bind_send(*tok, this->todest, portIdx, 0, this->mergeDest, 1, new_cx);
+	// then send the args
+
+	for(int i = 1; i<this->inputs; i++)
+	{
+		Vector_Tuple dest;
+		dest.push_back(make_tuple(tokens[i]->tag->instAdd,tokens[i]->tag->port));
+		core->tokenizer.wrapAndSend(dest, tokens[i]->data, *new_cx);
+	}
 }
 
 /*********************** Stop Inst Part ******************************/

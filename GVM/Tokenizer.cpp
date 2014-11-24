@@ -68,14 +68,15 @@ Switcher::~Switcher()
 void Switcher::addSwitchStorageElement(Token_Type* tok)
 {
 	long cx = tok->tag->conx.conxId;	
-	this->switchStorage[cx].push_back(tok);
+	long instAdd = tok->tag->instIdx;
+	this->switchStorage[make_pair(cx, instAdd)].push_back(tok);
 }
 
 //get an element from the storage based on the context
-Vector_token Switcher::getAllElement(long &cx)
+Vector_token Switcher::getAllElement(long &cx, long &instAdd)
 {
-	Vector_token temp = this->switchStorage[cx];
-	this->switchStorage.erase(cx);
+	Vector_token temp = this->switchStorage[make_pair(cx, instAdd)];
+	this->switchStorage.erase(make_pair(cx, instAdd));
 	return temp;
 }
 
@@ -147,14 +148,14 @@ void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short
 				this->contextMap[make_pair(old_cx.conxId, instIdx)] = make_tuple(bds-1, new_cx);	
 		}
 		// bind and send the recieved tok
-		bind_send(tok, destAdd, -1, retAdd, rest, new_cx);
+		bind_send(tok, destAdd, -1, tok.tag->port, retAdd, rest, new_cx);
 	}
 	else
 	{
 		// generate new context
 		new_cx = this->tokenizer->core->conxObj.getUniqueCx(this->tokenizer->core->coreID);
 		// just changing the cx of one token, no further to come
-		bind_send(tok, destAdd, tok.tag->port, retAdd, rest, new_cx);
+		bind_send(tok, destAdd, tok.tag->port, tok.tag->port, retAdd, rest, new_cx);
 	}
 }
 
@@ -164,7 +165,8 @@ void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short
 	- Save the old cx together with the retAdd, chunk, port & restores
 	- Delegate it to the tokenizer
 */
-void ContextManager::bind_send(Token_Type &tok, int* destAdd, short destPort, int* retAdd, short rest, Context* new_cx)
+void ContextManager::bind_send(Token_Type &tok, int* destAdd, short destPort, short sentPort,
+							   int* retAdd, short rest, Context* new_cx)
 {
 	Context *old_cx = new Context();
 	*old_cx = tok.tag->conx;
@@ -181,7 +183,7 @@ void ContextManager::bind_send(Token_Type &tok, int* destAdd, short destPort, in
 	
 	// send the tok to the tokenizer
 	Vector_Tuple temp;
-	temp.push_back(make_tuple(destAdd, tok.tag->port));
+	temp.push_back(make_tuple(destAdd, sentPort));
 	this->tokenizer->wrapAndSend(temp ,tok.data, *new_cx);
 }
 

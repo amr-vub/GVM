@@ -48,7 +48,7 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 		if(tokenIt->second.Indx + 1 == tokenIt->second.inputs)
 		{
 			// fetch and send them to the schedualer
-			tokenIt->second.tokenArr[tokenIt->second.Indx] = tok;
+			tokenIt->second.tokenArr[tok->tag->port] = tok;
 			core->sch.executeTwo(tokenIt->second.tokenArr);
 			//delete memory for the array of tokens
 			delete [] tokenIt->second.tokenArr;
@@ -58,7 +58,8 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 		{
 			// still more inputs to come , i.e only in the case of array operation,
 			// then update the tokentable
-			tokenIt->second.tokenArr[tokenIt->second.Indx++] = tok;			
+			tokenIt->second.Indx++;
+			tokenIt->second.tokenArr[tok->tag->port] = tok;			
 			tokenTable[make_pair(cx.conxId, instIdx)] = tokenIt->second;
 		}
 	}
@@ -80,7 +81,7 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 			// First time to get a token with this indx
 			// save the token in the token table, and wait for the rest			
 			tokensArr = new Token_Type*[inst->inputs];
-			tokensArr[0] = tok;
+			tokensArr[tok->tag->port] = tok;
 			TokenTableValue savedTKstruct = {
 				savedTKstruct.inputs = inst->inputs,
 				savedTKstruct.Indx = 1,

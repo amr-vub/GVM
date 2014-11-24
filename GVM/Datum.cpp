@@ -8,7 +8,7 @@
 #include "Datum.h"
 
 
-Datum::~Datum(void)
+Datum::~Datum()
 {
 }
 
@@ -50,11 +50,17 @@ Datum Datum::operator+(const Datum& b)
 	// setting the token type for the new created Datum
 	retrn.token_Type = this->token_Type;
 	// silly way for checking the datum type and act accordingly
-	if(this->token_Type == INT)
+	switch(this->token_Type)
+	{
+	case INT:
 		retrn.iValue = this->iValue + b.iValue; 
-	else if(this->token_Type == FLOAT)
+		break;
+	case FLOAT:
 		retrn.fValue = this->fValue + b.fValue; 
-
+		break;
+	default:
+		printf("_____ERORR_____ + \n");
+	}
 	return retrn;
 }
 /*	-	*/
@@ -63,11 +69,18 @@ Datum Datum::operator-(const Datum& b)
 	Datum retrn;
 	// setting the token type for the new created Datum
 	retrn.token_Type = this->token_Type;
-	// silly way for checking the datum type and act accordingly
-	if(this->token_Type == INT)
+
+	switch(this->token_Type)
+	{
+	case INT:
 		retrn.iValue = this->iValue - b.iValue; 
-	else if(this->token_Type == FLOAT)
+		break;
+	case FLOAT:
 		retrn.fValue = this->fValue - b.fValue; 
+		break;
+	default:
+		printf("_____ERORR_____ - \n");
+	}
 
 	return retrn;
 }
@@ -77,11 +90,17 @@ Datum Datum::operator*(const Datum& b)
 	Datum retrn;
 	// setting the token type for the new created Datum
 	retrn.token_Type = this->token_Type;
-	// silly way for checking the datum type and act accordingly
-	if(this->token_Type == INT)
+	switch(this->token_Type)
+	{
+	case INT:
 		retrn.iValue = this->iValue * b.iValue; 
-	else if(this->token_Type == FLOAT)
+		break;
+	case FLOAT:
 		retrn.fValue = this->fValue * b.fValue; 
+		break;
+	default:
+		printf("_____ERORR_____ * \n");
+	}
 
 	return retrn;
 }
@@ -91,11 +110,18 @@ Datum Datum::operator/(const Datum& b)
 	Datum retrn;
 	// setting the token type for the new created Datum
 	retrn.token_Type = this->token_Type;
-	// silly way for checking the datum type and act accordingly
-	if(this->token_Type == INT)
+
+	switch(this->token_Type)
+	{
+	case INT:
 		retrn.iValue = this->iValue / b.iValue; 
-	else if(this->token_Type == FLOAT)
+		break;
+	case FLOAT:
 		retrn.fValue = this->fValue / b.fValue; 
+		break;
+	default:
+		printf("_____ERORR_____ / \n");
+	}
 
 	return retrn;
 }
@@ -105,11 +131,18 @@ Datum Datum::operator>(const Datum& b)
 	Datum retrn;
 	// setting the token type for the new created Datum
 	retrn.token_Type = BOOLEAN;
-	// silly way for checking the datum type and act accordingly
-	if(this->token_Type == INT)
+	
+	switch(this->token_Type)
+	{
+	case INT:
 		retrn.bValue = this->iValue > b.iValue; 
-	else if(this->token_Type == FLOAT)
+		break;
+	case FLOAT:
 		retrn.bValue = this->fValue > b.fValue; 
+		break;
+	default:
+		printf("_____ERORR_____ > \n");
+	} 
 
 	return retrn;
 }
@@ -129,12 +162,16 @@ Datum Datum::operator>=(const Datum& b)
 	case FLOAT:
 		retrn.bValue = this->fValue >= b.fValue; 
 		break;
+	default:
+		printf("_____ERORR_____ >= \n");
+		/*
 	case I_VECTOR:
 		retrn.bValue = this->iValue_v.size() >= b.iValue_v.size(); 
 		break;
 	case F_VECTOR:
 		retrn.bValue = this->fValue_v.size() >= b.fValue_v.size(); 
 		break;
+		*/
 	}
 	return retrn;
 }
@@ -145,11 +182,18 @@ Datum Datum::operator<(const Datum& b)
 	Datum retrn;
 	// setting the token type for the new created Datum
 	retrn.token_Type = BOOLEAN;
-	// silly way for checking the datum type and act accordingly
-	if(this->token_Type == INT)
+
+	switch(this->token_Type)
+	{
+	case INT:
 		retrn.bValue = this->iValue < b.iValue; 
-	else if(this->token_Type == FLOAT)
+		break;
+	case FLOAT:
 		retrn.bValue = this->fValue < b.fValue; 
+		break;
+	default:
+		printf("_____ERORR_____ < \n");
+	} 
 
 	return retrn;
 }

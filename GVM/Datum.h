@@ -27,8 +27,8 @@ public:
 		B_VECTOR
 	} token_Type;
 
-	Datum(int iValue = NULL,float fValue = NULL, char cValue = NULL, const string& sValue = " ");
-	~Datum(void);
+	Datum(int iValue = -1,float fValue = -1, char cValue = -1, const string& sValue = " ");	
+	~Datum();
 
 	//changing the type
 	void setTo(Type eType);

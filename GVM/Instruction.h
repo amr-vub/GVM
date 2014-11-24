@@ -221,7 +221,7 @@ public:
 	int *todest;
 	int *mergeDest;
 private:
-	void doSplitWork(Token_Type* tok, Token_Type* tokens, short portIdx, Core *core);
+	void doSplitWork(Token_Type* tok, Token_Type** tokens, short portIdx, Core *core);
 };
 
 /*

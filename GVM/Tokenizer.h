@@ -51,10 +51,10 @@ public:
 	// add an element to the map
 	void addSwitchStorageElement(Token_Type *tok);
 
-	Vector_token getAllElement(long &cx);
+	Vector_token getAllElement(long &cx, long &instAdd);
 
 	// a storage map for switch instruction tokens	
-	unordered_map<long, Vector_token> switchStorage;
+	map<pair<long,long>, Vector_token> switchStorage;
 
 	// Forward tokens to the tokenizer queue
 	void sendToTokinzer(Vector_Tuple &dest, Vector_token &tokV);
@@ -76,7 +76,8 @@ public:
 	// 
 	void bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short rest, long &instIdx);
 
-	void bind_send(Token_Type &tok, int* destAdd, short destPort, int* retAdd, short rest, Context* cx);	
+	void bind_send(Token_Type &tok, int* destAdd, short destPort
+		, short sentPort, int* retAdd, short rest, Context* cx);	
 
 	// restore the cx for the recieved tok
 	void restore(Token_Type &tok);
