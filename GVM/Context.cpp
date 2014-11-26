@@ -37,7 +37,7 @@ void Context::generateUniqueConx()
 {
 	//put the core value in the MSB of conxId
 	this->conxId = this->coreId;
-	this->conxId <<= 16;
+	this->conxId <<= 24;
 
 	// now we OR the conx with the conxId 
 	// so conxId will be like a pair (coreId, conx)
@@ -76,7 +76,7 @@ Context* ContextCreater::getUniqueCx(short &corId)
 		return cx;
 	}
 	else
-		new Context(corId, ++this->conxCounter);
+		return new Context(corId, ++this->conxCounter);
 }
 
 // free an already created context and add it to the avaliable vector

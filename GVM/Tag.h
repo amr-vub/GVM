@@ -22,7 +22,7 @@ public:
 	short port;
 	int instAdd[2];
 	// unique mix of chunk and memory location
-	long instIdx;
+	unsigned long instIdx;
 
 public:
 	Tag(Context &cx, short prt, int *instAdd);

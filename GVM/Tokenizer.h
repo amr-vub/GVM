@@ -51,7 +51,7 @@ public:
 	// add an element to the map
 	void addSwitchStorageElement(Token_Type *tok);
 
-	Vector_token getAllElement(long &cx, long &instAdd);
+	Vector_token getAllElement(unsigned long &cxID, unsigned long &instAdd);
 
 	// a storage map for switch instruction tokens	
 	map<pair<long,long>, Vector_token> switchStorage;
@@ -74,9 +74,9 @@ public:
 	~ContextManager();
 
 	// 
-	void bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short rest, long &instIdx);
+	void bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short rest, unsigned long &instIdx);
 
-	void bind_send(Token_Type &tok, int* destAdd, short destPort
+	short bind_send(Token_Type &tok, int* destAdd, short destPort
 		, short sentPort, int* retAdd, short rest, Context* cx);	
 
 	// restore the cx for the recieved tok
@@ -110,12 +110,20 @@ public:
 	Tokenizer();
 	~Tokenizer(void);	
 	// create a new token and send it to the token queue
-	void wrapAndSend(Vector_Tuple &distList, Datum &res, Context &cx);
+	void wrapAndSend(Vector_Tuple &distList, Datum &res, Context &cx, short &coreId);
 
-	//
+	// The load balanacer handler function
+	short loadBalancer();
+
+	// propogate the stop token
 	void sendStop(Token_Type *tok);
 
 	/*	fields	*/
+
+	//vector of other cores in the system
+	static vector<Core*> coreList;
+
+	// the core that this tokenizer belongs to
 	Core *core;
 
 	Switcher swicther;

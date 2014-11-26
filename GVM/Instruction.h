@@ -56,7 +56,7 @@ public:
 	int idx[2];
 
 	// unique index for the inst based on the (chunk, instAdd)
-	long InstInx;
+	unsigned long InstInx;
 
 	/*	Fields for operation and split instructions manily	*/
 
@@ -289,7 +289,7 @@ void Constant<T>::execute(Token_Type **tokens, Core *core)
 	Context cx = tokens[0]->tag->conx;
 
 	if(0 == port)
-		core->tokenizer.wrapAndSend(this->distList[port], this->value, cx);
+		core->tokenizer.wrapAndSend(this->distList[port], this->value, cx, core->coreID);
 	// freeing memory
 	delete tokens[0];
 }

@@ -29,18 +29,48 @@ Core::~Core(void)
 {
 }
 
+// Entry point for starting the core work
 void Core::start()
 {
-	this->active = true;
+	this->active = true;	
 	while(this->active)
 	{			
 		if(!this->inbox.empty()){
 			Token_Type *tok = this->inbox.front();
 			//this->inbox.pop_back();			
 			this->dispatcher.dispatch(tok);
-			this->inbox.erase(this->inbox.begin());			
+			this->eraseToken();			
 		}
-		else
-			break;
+		//else
+			//boost::this_thread::sleep(boost::posix_time::milliseconds(1));
 	}
+}
+
+// spawn the thread
+void Core::run()
+{
+	this->c_thread = boost::thread(&Core::start, this);
+}
+
+// wait for the thread to finish
+void Core::stop()
+{
+	this->c_thread.join();
+}
+
+// insert tokens into the core's queue in a safe way
+// TODO, till we use TBB concurrent vector
+void Core::insertToken(Token_Type* tok)
+{
+	// first acquire the lock
+	boost::lock_guard<boost::mutex> guard(c_mutex);
+	inbox.push_back(tok);
+}
+
+
+// erase tokens into the core's queue
+void Core::eraseToken()
+{
+	boost::lock_guard<boost::mutex> guard(c_mutex);
+	inbox.erase(inbox.begin());
 }

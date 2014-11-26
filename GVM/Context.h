@@ -35,7 +35,7 @@ public:
 
 	// The unique context index, that will be generating by the function
 	// generateUniqueConx
-	long conxId;
+	unsigned long conxId;
 
 };
 

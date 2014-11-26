@@ -50,7 +50,7 @@ void Instruction::generateUniqueIdx()
 {
 	// put the chunck value in the MSB
 	this->InstInx = this->idx[0];
-	this->InstInx <<= 32;
+	this->InstInx <<= 31;
 
 	//put the InstAdd in the LSB
 	long temp = 0;
@@ -141,7 +141,7 @@ void Operation::execute(Token_Type **tokens, Core *core)
 
 
 	// send the res to tokenizer
-	core->tokenizer.wrapAndSend((this->distList[0]), res, tokens[0][0].tag->conx);
+	core->tokenizer.wrapAndSend((this->distList[0]), res, tokens[0][0].tag->conx, core->coreID);
 }
 
 
@@ -164,7 +164,8 @@ void Sink::execute(Token_Type **tokens, Core *core)
 {
 	//std::cout<< core.dispatcher;
 	// send the res to tokenizer
-	core->tokenizer.wrapAndSend((this->distList[tokens[0][0].tag->port]), tokens[0][0].data, tokens[0][0].tag->conx);
+	core->tokenizer.wrapAndSend((this->distList[tokens[0][0].tag->port]), tokens[0][0].data, 
+		tokens[0][0].tag->conx, core->coreID);
 	// freeing memory
 	delete tokens[0];
 }
@@ -228,7 +229,7 @@ void Switch::execute(Token_Type **tokens, Core *core)
 				Vector_Tuple dest;
 				short port = tok->tag->port;
 				dest.push_back(make_tuple(indx, port));
-				core->tokenizer.wrapAndSend(dest, tok->data, tok->tag->conx);
+				core->tokenizer.wrapAndSend(dest, tok->data, tok->tag->conx, core->coreID);
 			}
 		}
 		// freeing memory
@@ -410,14 +411,15 @@ void Split::doSplitWork(Token_Type* tok, Token_Type** tokens, short portIdx, Cor
 	// generate new context
 	Context *new_cx = core->conxObj.getUniqueCx(core->coreID);
 	// send each element in the array to the same instruction instance
-	core->tokenizer.contextManager.bind_send(*tok, this->todest, portIdx, 0, this->mergeDest, 1, new_cx);
+	short crID = core->tokenizer.contextManager.bind_send(*tok, this->todest, portIdx, 0, this->mergeDest, 1, new_cx);
 	// then send the args
 
 	for(int i = 1; i<this->inputs; i++)
 	{
 		Vector_Tuple dest;
 		dest.push_back(make_tuple(tokens[i]->tag->instAdd,tokens[i]->tag->port));
-		core->tokenizer.wrapAndSend(dest, tokens[i]->data, *new_cx);
+		// TODO, change the core id		
+		core->tokenizer.wrapAndSend(dest, tokens[i]->data, *new_cx, crID);
 	}
 }
 
