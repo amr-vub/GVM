@@ -39,7 +39,7 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 	// query the local table to see if a token already exists
 	// TODO : Replace Make pair (or not?)
 	TokenTableType::iterator tokenIt = 
-		tokenTable.find(make_pair(cx.conxId, instIdx));
+		tokenTable.find(tok->tag->tokenID);
 
 	if(tokenIt != tokenTable.end()){
 		// there is a match for the recieved token, then
@@ -60,7 +60,7 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 			// then update the tokentable
 			tokenIt->second.Indx++;
 			tokenIt->second.tokenArr[tok->tag->port] = tok;			
-			tokenTable[make_pair(cx.conxId, instIdx)] = tokenIt->second;
+			tokenTable[tok->tag->tokenID] = tokenIt->second;
 		}
 	}
 	else
@@ -87,7 +87,7 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 				savedTKstruct.Indx = 1,
 				savedTKstruct.tokenArr = tokensArr
 			};
-			tokenTable[make_pair(cx.conxId, instIdx)] =	savedTKstruct;
+			tokenTable[tok->tag->tokenID] =	savedTKstruct;
 		}
 		else
 		{

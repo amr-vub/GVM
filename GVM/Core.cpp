@@ -36,10 +36,10 @@ void Core::start()
 	while(this->active)
 	{			
 		if(!this->inbox.empty()){
-			Token_Type *tok = this->inbox.front();
+			Token_Type *tok = this->getLastElement();//this->inbox.front();
 			//this->inbox.pop_back();			
 			this->dispatcher.dispatch(tok);
-			this->eraseToken();			
+			//this->eraseToken();			
 		}
 		//else
 			//boost::this_thread::sleep(boost::posix_time::milliseconds(1));
@@ -64,7 +64,7 @@ void Core::insertToken(Token_Type* tok)
 {
 	// first acquire the lock
 	boost::lock_guard<boost::mutex> guard(c_mutex);
-	inbox.push_back(tok);
+	inbox.push(tok);
 }
 
 
@@ -72,5 +72,17 @@ void Core::insertToken(Token_Type* tok)
 void Core::eraseToken()
 {
 	boost::lock_guard<boost::mutex> guard(c_mutex);
-	inbox.erase(inbox.begin());
+	inbox.pop();
+}
+
+// get the last element of the queue and erase it afterwards
+// TODO
+Token_Type* Core::getLastElement()
+{	
+	boost::lock_guard<boost::mutex> guard(c_mutex);
+	
+	Token_Type* temp = this->inbox.front();
+	this->inbox.pop();
+
+	return temp;
 }

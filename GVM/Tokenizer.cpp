@@ -91,16 +91,14 @@ Switcher::~Switcher()
 // add an element to the map
 void Switcher::addSwitchStorageElement(Token_Type* tok)
 {
-	long cx = tok->tag->conx.conxId;	
-	long instAdd = tok->tag->instIdx;
-	this->switchStorage[make_pair(cx, instAdd)].push_back(tok);
+	this->switchStorage[tok->tag->tokenID].push_back(tok);
 }
 
 //get an element from the storage based on the context
-Vector_token Switcher::getAllElement(unsigned long &cxID, unsigned long &instAdd)
+Vector_token Switcher::getAllElement(unsigned long long &tokenId)
 {
-	Vector_token temp = this->switchStorage[make_pair(cxID, instAdd)];
-	this->switchStorage.erase(make_pair(cxID, instAdd));
+	Vector_token temp = this->switchStorage[tokenId];
+	this->switchStorage.erase(tokenId);
 	return temp;
 }
 
@@ -149,27 +147,27 @@ void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short
 	if(binds > 1)
 	{
 		// if no element already exists for that tok. i.e the first argument to arrive
-		if(this->contextMap.find(make_pair(old_cx.conxId, instIdx)) == contextMap.end())
+		if(this->contextMap.find(tok.tag->tokenID) == contextMap.end())
 		{
 			// generate new context
 			new_cx = this->tokenizer->core->conxObj.getUniqueCx(this->tokenizer->core->coreID);				
 			// update the context map, cause we have still binds-1 toks to come
-			this->contextMap[make_pair(old_cx.conxId, instIdx)] = make_tuple(binds-1, new_cx);			
+			this->contextMap[tok.tag->tokenID] = make_tuple(binds-1, new_cx);			
 
 		}
 		else
 		{
 			// then no need to create a new context, just get the already created on
 			// for the same old context Id
-			new_cx = get<1>(this->contextMap[make_pair(old_cx.conxId, instIdx)]);
-			bds = get<0>(this->contextMap[make_pair(old_cx.conxId, instIdx)]);
+			new_cx = get<1>(this->contextMap[tok.tag->tokenID]);
+			bds = get<0>(this->contextMap[tok.tag->tokenID]);
 			// check if the stored binds is == 1. i.e. all of the expected toks have arrived
 			if(bds == 1)
 				// delete the entry from the context map
-				this->contextMap.erase(make_pair(old_cx.conxId, instIdx));
+				this->contextMap.erase(tok.tag->tokenID);
 			else
 				// update the context map, cause we have still binds-1 toks to come
-				this->contextMap[make_pair(old_cx.conxId, instIdx)] = make_tuple(bds-1, new_cx);	
+				this->contextMap[tok.tag->tokenID] = make_tuple(bds-1, new_cx);	
 		}
 		// bind and send the recieved tok
 		bind_send(tok, destAdd, -1, tok.tag->port, retAdd, rest, new_cx);

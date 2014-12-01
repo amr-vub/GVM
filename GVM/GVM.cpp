@@ -79,7 +79,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			Datum datum = Datum(atoi(strToks[0].c_str()));
 			datum.token_Type = Datum::INT;
 			Token_Type *tok = new Token_Type(datum, tag);
-			core->inbox.push_back(tok);
+			core->inbox.push(tok);
 		}
 		else if(strToks.size() > 1)
 		{
@@ -90,7 +90,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				datum.iValue_v.push_back(atoi(strToks[i].c_str()));
 			}						
 			Token_Type *tok = new Token_Type(datum, tag);
-			core->inbox.push_back(tok);
+			core->inbox.push(tok);
 		}
 
 	}
@@ -114,7 +114,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	Token_Type *tok = core->inbox.front();
 	cout<< "the result is : \n";
 	cout<< tok->data.iValue;
-	core->inbox.clear();
+	//core->inbox.();
 
 	// freeing memory
 	delete tok;

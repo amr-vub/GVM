@@ -13,6 +13,7 @@
 #include "Tokenizer.h"
 #include "Token_Type.h"
 
+#include <queue>
 #include<boost\thread\thread.hpp>
 #include<boost\thread\thread_time.hpp>
 #include<boost\thread\mutex.hpp>
@@ -50,6 +51,9 @@ public:
 	// erase tokens into the core's queue
 	void eraseToken();
 
+	// get the last element of the queue and erase it afterwards
+	Token_Type* getLastElement();
+
 	// fields part (for simplicity, I will make them public)
 	TokenDispatcher dispatcher;
 
@@ -69,7 +73,7 @@ public:
 	bool active;
 
 	// Token queue
-	vector<Token_Type*> inbox;
+	queue<Token_Type*> inbox;
 
 private:
 	// the thread that will run this core

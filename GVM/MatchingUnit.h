@@ -6,7 +6,7 @@
 */
 
 #pragma once
-#include <map>
+#include <unordered_map>
 #include "Token_Type.h"
 
 using namespace std;
@@ -19,7 +19,7 @@ struct TokenTableValue {
 	Token_Type** tokenArr;
 };
 
-typedef map<pair<long, long>,TokenTableValue> TokenTableType;
+typedef unordered_map<unsigned long long,TokenTableValue> TokenTableType;
 
 /*
 * This class encapsulate the functionality of the matching unit.

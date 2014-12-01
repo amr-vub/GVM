@@ -210,7 +210,7 @@ void Switch::execute(Token_Type **tokens, Core *core)
 		// first get all of the stored tokens
 		
 		vector<Token_Type*> toksV = core->tokenizer.swicther.
-			getAllElement(tokens[0][0].tag->conx.conxId,tokens[0][0].tag->instIdx );
+			getAllElement(tokens[0][0].tag->tokenID );
 		// NEW: Switch has to forward all of its recieved tokens
 		toksV.push_back(tokens[0]);
 		// then determine thier dest based on the recieved token's data

@@ -56,7 +56,7 @@ ContextCreater::ContextCreater()
 
 ContextCreater::~ContextCreater()
 {
-	// loop through avaliable to delete pointers
+	// loop through avaliable to delete cx pointers
 	while (!this->cxPool.empty()){
 		Context* temp = this->cxPool.back();
         this->cxPool.pop_back();
