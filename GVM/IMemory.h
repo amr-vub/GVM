@@ -24,21 +24,24 @@ class IMemory
 {
 public:
 	IMemory();
-	~IMemory(void);
+	~IMemory();
+
+	// adding a copy constructor for managing the map of pointers copy
+	IMemory(const IMemory &obj);
 	/* given an instruction idx, return the respective instruction
 	*	\param: 
 			idx: instruction index
 		\return
 			the respective instruction
 	*/
-	static Instruction* get(int *idx);		
+	Instruction* get(int *idx);		
 
-	static void put(short chunk, int idx, Instruction* inst);
+	void put(short chunk, int idx, Instruction* inst);
 
 	//fields
 	//Core core;
 	// a hash table that represents the memory data structure
-	static map<int, Instruction*> Imemory[2];
+	map<int, Instruction*> Imemory[2];
 
 };
 

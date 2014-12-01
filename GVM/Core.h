@@ -32,7 +32,7 @@
 class Core
 {
 public:
-	Core(int corid);
+	Core(int corid, IMemory &__memory);
 	Core();
 	~Core();
 	Core(Core const &obj) { /* FIXME */ abort(); }

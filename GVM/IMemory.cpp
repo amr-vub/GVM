@@ -8,7 +8,7 @@
 #include "IMemory.h"
 #include "Instruction.h"
 
-ImemoryMapTyp IMemory::Imemory[2];
+//ImemoryMapTyp IMemory::Imemory[2];
 
 IMemory::IMemory()
 {
@@ -19,7 +19,7 @@ IMemory::IMemory()
 // Freeing the memory
 // loop through the map, get the second element (Instruction*)
 // and delete it. 
-IMemory::~IMemory(void)
+IMemory::~IMemory()
 {
 	for(ImemoryMapTyp::iterator it= Imemory[0].begin(); it!=Imemory[0].end();++it)
 	{
@@ -31,6 +31,22 @@ IMemory::~IMemory(void)
 		delete (*it).second;
 	}
 	Imemory[1].clear();
+}
+// adding a copy constructor for managing the map of pointers copy
+
+IMemory::IMemory(const IMemory &obj){
+	/*
+		- loop through the memory.
+		- Allocate new instruction pointer
+		- copy the old value to the new copy
+	*/
+/**/
+	for(int i = 0; i <2;++i) // for chunk i
+		for(auto mem : obj.Imemory[i]) // loop through each element of the map
+		{
+			Instruction *ptr = mem.second->getCopy(mem.second);
+			this->Imemory[i][mem.first] = ptr;			
+		}
 }
 
 /* given an instruction idx, return the respective instruction

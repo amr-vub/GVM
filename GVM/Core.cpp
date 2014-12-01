@@ -8,7 +8,7 @@
 #include "Core.h"
 
 // constructor
-Core::Core(int corid)
+Core::Core(int corid, IMemory &__memory) : memory(__memory)
 {
 	this->active = false;
 	this->coreID = corid;
@@ -17,6 +17,7 @@ Core::Core(int corid)
 	this->matchUnit.core = this;
 	this->sch.core = this;
 	this->tokenizer.core = this;
+	//this->memory = __memory;
 
 }
 

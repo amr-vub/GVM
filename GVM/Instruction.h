@@ -46,6 +46,9 @@ public:
 	//generate unique instIdx
 	void generateUniqueIdx();
 
+	// delagation workaround
+	virtual Instruction* getCopy(Instruction* cpy) = 0;
+
 	/*	fields	*/
 
 	// which chunk of memory this instruction is stored
@@ -56,7 +59,7 @@ public:
 	int idx[2];
 
 	// unique index for the inst based on the (chunk, instAdd)
-	unsigned long InstInx;
+	unsigned long InstInx;	
 
 	/*	Fields for operation and split instructions manily	*/
 
@@ -99,6 +102,9 @@ public:
 	// add literals to this inst
 	void addLiterals(short &port, Datum &value);
 	
+	// delagation workaround
+	Instruction* getCopy(Instruction* cpy);
+
 	/*	fields	*/
 
 	// the opCode that determins the operation to be executed
@@ -121,10 +127,14 @@ class Sink : public Instruction
 public:
 	Sink(short ch, int *idx);
 	~Sink();
+	Sink();
 	
 	void execute2(Token_Type *tokens, Core *core);
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
+
+	// delagation workaround
+	Instruction* getCopy(Instruction* cpy);
 
 	/*	fields	*/
 
@@ -148,6 +158,9 @@ public:
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
 
+	// delagation workaround
+	Instruction* getCopy(Instruction* cpy);
+
 	/*	fields	*/	
 	vector<int> destinationList;
 
@@ -165,6 +178,7 @@ class ContextChange : public Instruction
 {
 public:
 	ContextChange(short chunk, int* indx, short &bds, short &rstors, int* to, int* ret);
+	ContextChange();
 	~ContextChange();
 
 	// overriding the super method
@@ -172,6 +186,9 @@ public:
 
 	// add literals to this inst
 	void addLiterals(short &port, Datum &value);
+
+	// delagation workaround
+	Instruction* getCopy(Instruction* cpy);
 
 	/*	fields	*/	
 	short binds;
@@ -192,8 +209,12 @@ class ContextRestore : public Instruction
 public:
 	ContextRestore(short &ch, int* ind);
 	~ContextRestore();
+	ContextRestore();
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
+
+	// delagation workaround
+	Instruction* getCopy(Instruction* cpy);
 
 };
 
@@ -212,9 +233,13 @@ class Split : public Instruction
 public:
 	Split(short chunk, int* idx, short binds, int *todest, int *mergeDest);
 	~Split();
+	Split();
 
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
+
+	// delagation workaround
+	Instruction* getCopy(Instruction* cpy);
 
 	/*	fields	*/
 
@@ -232,8 +257,12 @@ class Stop : public Instruction
 public:
 	Stop(short &ch, int idx[2]);
 	~Stop();
+	Stop();
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
+
+	// delagation workaround
+	Instruction* getCopy(Instruction* cpy);
 };
 
 
@@ -252,6 +281,9 @@ public:
 	~Constant();
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
+
+	// delagation workaround
+	Instruction* getCopy(Instruction* cpy);
 
 	/*	fields	*/
 

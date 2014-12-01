@@ -51,7 +51,7 @@ void parser::Tokenize(const string& str,
 * instruction out of it based on the type argument.
 * stmtToks : e.g. ["INST", "OPR", "idx", "OPCODE", "noOfips"]
 */
-void parser::parseInst(vector<string> &stmtToks)
+void parser::parseInst(vector<string> &stmtToks, IMemory &_InstructionMemory)
 {
 	// here also, as we only have small set of instructions types, and
 	// to debug easily, we will use if statments instead of functions pointers
@@ -59,47 +59,47 @@ void parser::parseInst(vector<string> &stmtToks)
 	{
 		// start inst		
 		globalNum_ips = atoi(stmtToks[3].c_str());
-		Create_Structure_stmt::createSink(stmtToks);
+		Create_Structure_stmt::createSink(stmtToks, _InstructionMemory );
 	}
 	else if(stmtToks[1].compare("STP") == 0)
 	{
 		// stop inst
-		Create_Structure_stmt::createStop(stmtToks);
+		Create_Structure_stmt::createStop(stmtToks, _InstructionMemory );
 	}
 	else if(stmtToks[1].compare("OPR") == 0)
 	{
 		// operation inst
-		Create_Structure_stmt::createOperation(stmtToks);
+		Create_Structure_stmt::createOperation(stmtToks, _InstructionMemory );
 	}
 	else if(stmtToks[1].compare("SWI") == 0)
 	{
 		// SWITCH inst
-		Create_Structure_stmt::createSwitch(stmtToks);
+		Create_Structure_stmt::createSwitch(stmtToks, _InstructionMemory );
 	}
 	else if(stmtToks[1].compare("SNK") == 0)
 	{
 		// sink inst
-		Create_Structure_stmt::createSink(stmtToks);
+		Create_Structure_stmt::createSink(stmtToks, _InstructionMemory );
 	}
 	else if(stmtToks[1].compare("SPL") == 0)
 	{
 		// split inst
-		Create_Structure_stmt::createSplit(stmtToks);
+		Create_Structure_stmt::createSplit(stmtToks, _InstructionMemory );
 	}
 	else if(stmtToks[1].compare("CHN") == 0)
 	{
 		// contextChange inst
-		Create_Structure_stmt::createContextChange(stmtToks);
+		Create_Structure_stmt::createContextChange(stmtToks, _InstructionMemory );
 	}
 	else if(stmtToks[1].compare("RST") == 0)
 	{
 		// Context resotre inst
-		Create_Structure_stmt::createContextRestore(stmtToks);
+		Create_Structure_stmt::createContextRestore(stmtToks, _InstructionMemory );
 	}
 	else if(stmtToks[1].compare("CNS") == 0)
 	{
 		// Constant inst
-		Create_Structure_stmt::createConstant(stmtToks);
+		Create_Structure_stmt::createConstant(stmtToks, _InstructionMemory );
 	}
 }
 
@@ -107,7 +107,7 @@ void parser::parseInst(vector<string> &stmtToks)
 	Parse the link instruction
 	e.g. : LINK chunk idx port -> chunk idx port
 */
-void parser:: parseLink(vector<string> &stmtToks)
+void parser:: parseLink(vector<string> &stmtToks, IMemory &_InstructionMemory)
 {
 	// collecting info from the instruction
 	short chunk1 = atoi(stmtToks[1].c_str());
@@ -125,9 +125,9 @@ void parser:: parseLink(vector<string> &stmtToks)
 	add2[1] = idx2;
 
 	// query the memory for the source instruction to add destination address to it
-	Instruction *inst= IMemory::get(add1);
+	Instruction *inst= _InstructionMemory.get(add1);
 	inst->distList[port1].push_back(make_tuple(add2,port2));
-	IMemory::put(add1[0], add1[1], inst);
+	_InstructionMemory.put(add1[0], add1[1], inst);
 }
 
 /*
@@ -136,7 +136,7 @@ void parser:: parseLink(vector<string> &stmtToks)
 	CHUNK [0|1]
 */
 
-void parser::parseChunk(vector<string> &stmtToks)
+void parser::parseChunk(vector<string> &stmtToks, IMemory &_InstructionMemory)
 {
 	// just fake for now a memory insertion
 	_CHUNK_GLOBAL = atoi(stmtToks[1].c_str());
@@ -147,7 +147,7 @@ void parser::parseChunk(vector<string> &stmtToks)
 
 	LITR <inst> <port> <= <value>
 */
-void parser::parseLit(vector<string> &stmtToks)
+void parser::parseLit(vector<string> &stmtToks, IMemory &_InstructionMemory)
 {
 	int idx[2] = {_CHUNK_GLOBAL,  atoi(stmtToks[1].c_str())};
 	short port = atoi(stmtToks[2].c_str());
@@ -156,19 +156,19 @@ void parser::parseLit(vector<string> &stmtToks)
 	int value = atoi(stmtToks[4].c_str());
 
 	// query the memory for the source instruction to add literals to it
-	Instruction *inst= IMemory::get(idx);
+	Instruction *inst= _InstructionMemory.get(idx);
 	// TODO
 	Datum d = Datum(value);
 	d.token_Type = Datum::INT;
 	inst->addLiterals(port, d);
 
-	IMemory::put(idx[0], idx[1], inst);
+	_InstructionMemory.put(idx[0], idx[1], inst);
 }
 
 // function to redirect the input stmt the correct parser
 // \param: 
 //		stmt: one line of the input file
-void parser::parserMain(string &line)
+void parser::parserMain(string &line, IMemory &_InstructionMemory)
 {
 	// Tokenize the input string by white spaces
 	// e.g. : INST PB 0 2
@@ -183,24 +183,24 @@ void parser::parserMain(string &line)
 	if(comp.compare("INST") == 0)
 	{
 		// Instruction statment, delegate to parseInst
-		parseInst(strToks);
+		parseInst(strToks, _InstructionMemory);
 	}
 	else if(comp.compare("CHUNK") == 0)
 	{
 		// CHUNK statment
 		// TODO
-		parseChunk(strToks);		
+		parseChunk(strToks, _InstructionMemory);		
 	}
 	else if(comp.compare("LINK") == 0)
 	{
 		// LINK statment
 		// TODO
-		parseLink(strToks);
+		parseLink(strToks, _InstructionMemory);
 	}
 	else if(comp.compare("LITR") == 0)
 	{
 		// literal statment		
-		parseLit(strToks);
+		parseLit(strToks, _InstructionMemory);
 	}
 	else if(comp.compare("TRIV") == 0)
 	{
