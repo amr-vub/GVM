@@ -40,9 +40,6 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	string line;
 
-	// create the instruction memory
-	IMemory __memory;
-
 	if(instFile.is_open())
 	{
 		// read the file line by line
@@ -50,15 +47,15 @@ int _tmain(int argc, _TCHAR* argv[])
 		{
 			if(!isLegalLine(line))
 				continue;
-			parser::parserMain(line, __memory);
+			parser::parserMain(line);
 		}
 	}
 	// create a core per processor
-	short coreNumbers = 4;
+	short coreNumbers = 2;
 	vector<Core*> coreList;
 	for (int i = 0; i < coreNumbers; i++)
 	{
-		Core *core = new Core(i, __memory);
+		Core *core = new Core(i);
 		core->tokenizer.coreList.push_back(core);
 		coreList.push_back(core);
 	}

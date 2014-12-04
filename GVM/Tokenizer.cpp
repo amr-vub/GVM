@@ -126,6 +126,7 @@ ContextManager::ContextManager()
 ContextManager::~ContextManager()
 {
 }
+
 /*	
 	This function handels the context change in case of multiple binds i.e. <binds> > 1
 	
@@ -150,34 +151,43 @@ void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short
 		if(this->contextMap.find(tok.tag->tokenID) == contextMap.end())
 		{
 			// generate new context
-			new_cx = this->tokenizer->core->conxObj.getUniqueCx(this->tokenizer->core->coreID);				
+			new_cx = this->tokenizer->core->conxObj.getUniqueCx(this->tokenizer->core->coreID);					
+
+			// bind and send the recieved tok
+			short newCoreId = bind_send(tok, destAdd, -1, tok.tag->port, retAdd, rest, new_cx, -1);
+
 			// update the context map, cause we have still binds-1 toks to come
-			this->contextMap[tok.tag->tokenID] = make_tuple(binds-1, new_cx);			
+			contextMapContent csMapContent = {new_cx, binds-1, newCoreId};
+			this->contextMap[tok.tag->tokenID] = csMapContent;	
 
 		}
 		else
 		{
 			// then no need to create a new context, just get the already created on
 			// for the same old context Id
-			new_cx = get<1>(this->contextMap[tok.tag->tokenID]);
-			bds = get<0>(this->contextMap[tok.tag->tokenID]);
+			new_cx = this->contextMap[tok.tag->tokenID].cx;
+			bds = this->contextMap[tok.tag->tokenID].bds;
+			short oldCoreId = this->contextMap[tok.tag->tokenID].coreId;
 			// check if the stored binds is == 1. i.e. all of the expected toks have arrived
 			if(bds == 1)
 				// delete the entry from the context map
 				this->contextMap.erase(tok.tag->tokenID);
 			else
+			{
 				// update the context map, cause we have still binds-1 toks to come
-				this->contextMap[tok.tag->tokenID] = make_tuple(bds-1, new_cx);	
+				//contextMapContent csMapContent = {new_cx, bds-1, oldCoreId};
+				this->contextMap[tok.tag->tokenID].bds--;	
+			}
+			// bind and send the recieved tok
+			bind_send(tok, destAdd, -1, tok.tag->port, retAdd, rest, new_cx, oldCoreId);
 		}
-		// bind and send the recieved tok
-		bind_send(tok, destAdd, -1, tok.tag->port, retAdd, rest, new_cx);
 	}
 	else
 	{
 		// generate new context
 		new_cx = this->tokenizer->core->conxObj.getUniqueCx(this->tokenizer->core->coreID);
 		// just changing the cx of one token, no further to come
-		bind_send(tok, destAdd, tok.tag->port, tok.tag->port, retAdd, rest, new_cx);
+		bind_send(tok, destAdd, tok.tag->port, tok.tag->port, retAdd, rest, new_cx, -1);
 	}
 }
 
@@ -188,7 +198,7 @@ void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short
 	- Delegate it to the tokenizer
 */
 short ContextManager::bind_send(Token_Type &tok, int* destAdd, short destPort, short sentPort,
-							   int* retAdd, short rest, Context* new_cx)
+							   int* retAdd, short rest, Context* new_cx, short corId)
 {
 	Context *old_cx = new Context();
 	*old_cx = tok.tag->conx;
@@ -207,8 +217,15 @@ short ContextManager::bind_send(Token_Type &tok, int* destAdd, short destPort, s
 	Vector_Tuple temp;
 	temp.push_back(make_tuple(destAdd, sentPort));
 	// resolve where to send the token
-	short corId = this->tokenizer->loadBalancer();
+	if(corId == -1)
+	{
+		short newCorId = this->tokenizer->loadBalancer();
+		this->tokenizer->wrapAndSend(temp ,tok.data, *new_cx, newCorId);
+		return newCorId;
+	}
+	
 	this->tokenizer->wrapAndSend(temp ,tok.data, *new_cx, corId);
+
 	return corId;
 }
 

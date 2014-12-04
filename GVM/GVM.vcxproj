@@ -52,7 +52,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Amr\Dropbox\GPS\Masters\Thesis\TrashCode\boost_1_57_0;C:\Users\Amr\Dropbox\GPS\Masters\Thesis\MyCodeRepo\GVM\GVM\Helper-Classes;C:\Users\Amr\Dropbox\GPS\Masters\Thesis\MyCodeRepo\GVM\GVM;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Amr\Dropbox\GPS\Masters\Thesis\TrashCode\boost_1_57_0;C:\Users\Amr\Dropbox\GPS\Masters\Thesis\MycodeRep\GVM;C:\Users\Amr\Dropbox\GPS\Masters\Thesis\MycodeRep\GVM\Helper-Classes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

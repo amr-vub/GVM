@@ -145,23 +145,12 @@ void Operation::execute(Token_Type **tokens, Core *core)
 }
 
 
-Instruction* Operation::getCopy(Instruction* cpy)
-{
-	Operation *op = new Operation();
-	*op = *((Operation*) cpy);
-	return op;
-}
-
 /*********************** SINK Inst Part ******************************/
 
 
 Sink::Sink(short ch, int *idx) : Instruction(ch, idx)
 {
 
-}
-
-Sink::Sink()
-{
 }
 
 Sink::~Sink()
@@ -179,13 +168,6 @@ void Sink::execute(Token_Type **tokens, Core *core)
 		tokens[0][0].tag->conx, core->coreID);
 	// freeing memory
 	delete tokens[0];
-}
-
-Instruction* Sink::getCopy(Instruction* cpy)
-{
-	Sink* snk = new Sink();
-	*snk = *(Sink*)cpy;
-	return snk;
 }
 
 /*
@@ -260,13 +242,6 @@ void Switch::execute(Token_Type **tokens, Core *core)
 	}	
 }
 
-Instruction* Switch::getCopy(Instruction* cpy)
-{
-	Switch *swi = new Switch();
-	*swi = *((Switch*) cpy);
-	return swi;
-}
-
 /*********************** ContextChange Inst Part ******************************/
 
 ContextChange::ContextChange(short chunk, int *indx, short &bds, short &rstors, int* to, int* ret)
@@ -283,11 +258,6 @@ ContextChange::~ContextChange()
 	// freeing memory
 	delete [] this->todest;
 	delete [] this->retDest;
-
-}
-
-ContextChange::ContextChange()
-{	
 
 }
 
@@ -331,20 +301,9 @@ void ContextChange::execute(Token_Type **tokens, Core *core)
 	delete tokens[0];
 }
 
-Instruction* ContextChange::getCopy(Instruction* cpy)
-{
-	ContextChange* cxCh = new ContextChange();
-	*cxCh = *(ContextChange*) cpy;
-	return cxCh;
-}
-
 /*********************** ContextRestore Inst Part ******************************/
 
 ContextRestore::ContextRestore(short &ch, int* ind) : Instruction(ch, ind)
-{
-}
-
-ContextRestore::ContextRestore()
 {
 }
 
@@ -363,13 +322,6 @@ void ContextRestore::execute(Token_Type **tokens, Core *core)
 	delete tokens[0];
 }
 
-Instruction* ContextRestore::getCopy(Instruction* cpy)
-{
-	ContextRestore* cxRst = new ContextRestore();
-	*cxRst = *(ContextRestore*) cpy;
-	return cxRst;
-}
-
 /*********************** Split Inst Part ******************************/
 
 Split::Split(short chunk, int* idx, short binds, int *todest, int *mergeDest) : Instruction(chunk, idx)
@@ -385,10 +337,6 @@ Split::~Split()
 	// freeing memory
 	delete [] this->todest;
 	delete [] this->mergeDest;
-}
-
-Split::Split()
-{
 }
 /*
 
@@ -442,10 +390,10 @@ void Split::execute(Token_Type **tokens, Core *core)
 	}
 	// update the array operation, i.e. the merge instruction, with the size
 	// of the splited array as it's new input
-	Operation *op = (Operation*) core->memory.get(mergeDest);
+	Operation *op = (Operation*) IMemory::get(mergeDest);
 	op->tokenInputs = portIdx;
 	op->inputs = portIdx;
-	core->memory.put(mergeDest[0], mergeDest[1], op);
+	IMemory::put(mergeDest[0], mergeDest[1], op);
 
 	// free memory
 	//delete [] tokens;
@@ -463,25 +411,17 @@ void Split::doSplitWork(Token_Type* tok, Token_Type** tokens, short portIdx, Cor
 	// generate new context
 	Context *new_cx = core->conxObj.getUniqueCx(core->coreID);
 	// send each element in the array to the same instruction instance
-	short crID = core->tokenizer.contextManager.bind_send(*tok, this->todest, portIdx, 0, this->mergeDest, 1, new_cx);
+	short crID = core->tokenizer.contextManager.bind_send(*tok, this->todest, portIdx, 0, this->mergeDest, 1, new_cx, -1);
 	// then send the args
 
 	for(int i = 1; i<this->inputs; i++)
 	{
 		Vector_Tuple dest;
-		dest.push_back(make_tuple(tokens[i]->tag->instAdd,tokens[i]->tag->port));
+		dest.push_back(make_tuple(this->todest,tokens[i]->tag->port));
 		// TODO, change the core id		
 		core->tokenizer.wrapAndSend(dest, tokens[i]->data, *new_cx, crID);
 	}
 }
-
-Instruction* Split::getCopy(Instruction* cpy)
-{
-	Split* splt = new Split();
-	*splt = *(Split*)cpy;
-	return splt;
-}
-
 
 /*********************** Stop Inst Part ******************************/
 Stop::Stop(short &ch, int idx[2]) : Instruction(ch, idx)
@@ -492,29 +432,7 @@ Stop::~Stop()
 {
 }
 
-Stop::Stop()
-{
-}
-
 void Stop::execute(Token_Type **tokens, Core *core)
 {
 	core->tokenizer.sendStop(*tokens);
-}
-
-Instruction* Stop::getCopy(Instruction* cpy)
-{
-	Stop* stp = new Stop();
-	*stp = *(Stop*)cpy;
-	return new Stop();
-}
-
-
-
-
-// delagation workaround
-Instruction* Constant<Datum>::getCopy(Instruction* cpy)
-{
-	Constant<Datum>* cns = new Constant<Datum>();
-	*cns = *((Constant<Datum>*)cpy);
-	return cns;
 }

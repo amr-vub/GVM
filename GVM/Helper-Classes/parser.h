@@ -28,20 +28,20 @@ public:
 	~parser(void);
 
 	// fcuntion to redirect the input stmt the correct parser
-	static void parserMain(string &stmt, IMemory &_InstructionMemory);
+	static void parserMain(string &stmt);
 
 	//function to parse the input in case of INST
-	static void parseInst(vector<string> &stmtToks, IMemory &_InstructionMemory);
+	static void parseInst(vector<string> &stmtToks);
 
 	//function to parse the input in case of CHUNK
 	// TODO
-	 static void parseChunk(vector<string> &stmtToks, IMemory &_InstructionMemory);
+	 static void parseChunk(vector<string> &stmtToks);
 
 	 //function to parse the input in case of LIT	 
-	 static void parseLit(vector<string> &stmtToks, IMemory &_InstructionMemory);
+	 static void parseLit(vector<string> &stmtToks);
 
 	 //function to parse the input in case of LINK
-	 static void parseLink(vector<string> &stmtToks, IMemory &_InstructionMemory);
+	 static void parseLink(vector<string> &stmtToks);
 
 	 //function to parse the input in case of TRIV
 	 // TODO

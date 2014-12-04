@@ -66,7 +66,7 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 	else
 	{
 		// check first if the dest inst has literals
-		Instruction* inst = this->core->memory.get(tok->tag->instAdd);		
+		Instruction* inst = IMemory::get(tok->tag->instAdd);		
 
 		Token_Type** tokensArr;
 

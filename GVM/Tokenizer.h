@@ -18,13 +18,20 @@ class Core;
 class Tokenizer;
 
 struct RestoreArgs;
+struct contextMapContent;
 typedef vector<Token_Type*> Vector_token;
 typedef unordered_map<unsigned long, RestoreArgs> RestorMapType;
-typedef unordered_map<unsigned long long, tuple<short, Context*>> ContextMapType;
+typedef unordered_map<unsigned long long, contextMapContent> ContextMapType;
+
+// structure to hold the context info for bind > 1
+struct contextMapContent{
+	Context *cx;
+	short bds;
+	short coreId;
+};
 
 
-
-// data structure to hold the restored info
+// structure to hold the restored info
 struct RestoreArgs{	
 	// det chunk 
 	short chunk;
@@ -77,7 +84,7 @@ public:
 	void bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short rest, unsigned long &instIdx);
 
 	short bind_send(Token_Type &tok, int* destAdd, short destPort
-		, short sentPort, int* retAdd, short rest, Context* cx);	
+		, short sentPort, int* retAdd, short rest, Context* cx, short corId);	
 
 	// restore the cx for the recieved tok
 	void restore(Token_Type &tok);
