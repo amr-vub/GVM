@@ -132,9 +132,12 @@ Datum Natives::vecPruneNative(vector<Datum> args)
 	{		
 	case Datum::I_VECTOR:
 		{
-			for(vector<int>::iterator it = args[1].iValue_v.begin() ; it != args[1].iValue_v.end(); ++it)
+			for(vector<bool>::iterator it = args[1].bValue_v.begin() ; it != args[1].bValue_v.end(); ++it)
+			{				
 				if(*it)
-					ret.iValue_v.push_back(args[0].iValue_v[idx++]);
+					ret.iValue_v.push_back(args[0].iValue_v[idx]);
+				idx++;
+			}
 			// In case the first arg was longer, then loop
 			for(int i = idx; i<args[0].iValue_v.size();++i)
 				ret.iValue_v.push_back(args[0].iValue_v[idx]);
@@ -142,25 +145,29 @@ Datum Natives::vecPruneNative(vector<Datum> args)
 		}
 		break;
 	case Datum::F_VECTOR:	
-		{
-			idx = 0;
-			for(vector<float>::iterator it = args[1].fValue_v.begin() ; it != args[1].fValue_v.end(); ++it)
+		{			
+			for(vector<bool>::iterator it = args[1].bValue_v.begin() ; it != args[1].bValue_v.end(); ++it)
+			{
 				if(*it)
-					ret.fValue_v.push_back(args[0].fValue_v[idx++]);
-						// In case the first arg was longer, then loop
-				for(int i = idx; i<args[0].iValue_v.size();++i)
 					ret.fValue_v.push_back(args[0].fValue_v[idx]);
+				idx++;
+			}
+			// In case the first arg was longer, then loop
+			for(int i = idx; i<args[0].iValue_v.size();++i)
+				ret.fValue_v.push_back(args[0].fValue_v[idx]);
 		}
 		break;
 	case Datum::B_VECTOR:	
-		{
-			idx = 0;
+		{			
 			for(vector<bool>::iterator it = args[1].bValue_v.begin() ; it != args[1].bValue_v.end(); ++it)
+			{
 				if(*it)
-					ret.bValue_v.push_back(args[0].bValue_v[idx++]);
-						// In case the first arg was longer, then loop
-				for(int i = idx; i<args[0].iValue_v.size();++i)
 					ret.bValue_v.push_back(args[0].bValue_v[idx]);
+				idx++;
+			}
+				// In case the first arg was longer, then loop
+			for(int i = idx; i<args[0].iValue_v.size();++i)
+				ret.bValue_v.push_back(args[0].bValue_v[idx]);
 		}
 		break;
 	default:
@@ -187,14 +194,14 @@ Datum Natives::vecNative(vector<Datum> args)
 		{
 			ret.token_Type = Datum::F_VECTOR;
 			for (int i = 0; i < args.size(); i++)			
-				ret.iValue_v.push_back(args[i].fValue);			
+				ret.fValue_v.push_back(args[i].fValue);			
 		}
 		break;
 	case Datum::BOOLEAN:
 		{
 			ret.token_Type = Datum::B_VECTOR;
 			for (int i = 0; i < args.size(); i++)			
-				ret.iValue_v.push_back(args[i].bValue);			
+				ret.bValue_v.push_back(args[i].bValue);			
 		}
 		break;
 	default:

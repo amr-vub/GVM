@@ -205,7 +205,7 @@ public:
 	Format: INST SPL <idx> <binds> <to> <merge>
 
 	// total numbers of expected tokens --> equals binds as well, no literals are allowed for split inst
-	// that's just a workaround to use the executeorupdate methodd in the matching unit for this inst as well
+	// that's just a workaround to use the executeorupdate method in the matching unit for this inst as well
 */
 class Split : public Instruction
 {

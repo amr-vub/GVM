@@ -416,7 +416,7 @@ void Split::doSplitWork(Token_Type* tok, Token_Type** tokens, short portIdx, Cor
 	for(int i = 1; i<this->inputs; i++)
 	{
 		Vector_Tuple dest;
-		dest.push_back(make_tuple(tokens[i]->tag->instAdd,tokens[i]->tag->port));
+		dest.push_back(make_tuple(this->todest,tokens[i]->tag->port));
 		core->tokenizer.wrapAndSend(dest, tokens[i]->data, *new_cx);
 	}
 }
