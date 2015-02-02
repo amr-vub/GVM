@@ -152,16 +152,22 @@ void parser::parseLit(vector<string> &stmtToks)
 	int idx[2] = {_CHUNK_GLOBAL,  atoi(stmtToks[1].c_str())};
 	short port = atoi(stmtToks[2].c_str());
 
-	// TODO
-	int value = atoi(stmtToks[4].c_str());
-
 	// query the memory for the source instruction to add literals to it
 	Instruction *inst= IMemory::get(idx);
-	// TODO
-	Datum d = Datum(value);
-	d.token_Type = Datum::INT;
+	Datum d;
+	// TODO: might need to parse the literal to predict its type
+	if(stmtToks[4] != "[]")
+	{
+		int value = atoi(stmtToks[4].c_str());		
+		d = Datum(value);
+		d.token_Type = Datum::INT;		
+	}
+	else
+		// construct an empty array		 
+		d.token_Type = Datum::I_VECTOR;		
+	// add the literals to the instruction
 	inst->addLiterals(port, d);
-
+	// update the instruction in the memory
 	IMemory::put(idx[0], idx[1], inst);
 }
 

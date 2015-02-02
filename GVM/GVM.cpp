@@ -120,6 +120,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	delete tok;
 
 	return 0;
+
 }
 
 /* Function to parse the line and skip if it starts with '$'
