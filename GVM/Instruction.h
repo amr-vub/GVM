@@ -43,6 +43,11 @@ public:
 	// TODO
 	virtual void addLiterals(short &port, Datum &value);
 
+	// check if this instruction can be doesn't have local data need and
+	// can be executed independantly!
+	// Every instruction subtype will have to provide an impl for this function
+	virtual bool isINDependant() = 0;
+
 	//generate unique instIdx
 	void generateUniqueIdx();
 
@@ -93,6 +98,10 @@ public:
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
 
+	// check if this instruction can be doesn't have local data need and
+	// can be executed independantly!	
+	bool isINDependant();
+
 	// preparing the args list
 	vector<Datum> createArgsList(Token_Type** toks);
 
@@ -126,6 +135,10 @@ public:
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
 
+	// check if this instruction can be doesn't have local data need and
+	// can be executed independantly!	
+	bool isINDependant();
+
 	/*	fields	*/
 
 
@@ -147,6 +160,10 @@ public:
 
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
+
+	// check if this instruction can be doesn't have local data need and
+	// can be executed independantly!	
+	bool isINDependant();
 
 	/*	fields	*/	
 	vector<int> destinationList;
@@ -173,6 +190,10 @@ public:
 	// add literals to this inst
 	void addLiterals(short &port, Datum &value);
 
+	// check if this instruction can be doesn't have local data need and
+	// can be executed independantly!	
+	bool isINDependant();
+
 	/*	fields	*/	
 	short binds;
 	short restores;
@@ -195,6 +216,10 @@ public:
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
 
+	// check if this instruction can be doesn't have local data need and
+	// can be executed independantly!	
+	bool isINDependant();
+
 };
 
 /*
@@ -216,6 +241,10 @@ public:
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
 
+	// check if this instruction can be doesn't have local data need and
+	// can be executed independantly!	
+	bool isINDependant();
+
 	/*	fields	*/
 
 	int *todest;
@@ -234,6 +263,9 @@ public:
 	~Stop();
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
+	// check if this instruction can be doesn't have local data need and
+	// can be executed independantly!	
+	bool isINDependant();
 };
 
 
@@ -252,6 +284,10 @@ public:
 	~Constant();
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
+
+	// check if this instruction can be doesn't have local data need and
+	// can be executed independantly!	
+	bool isINDependant();
 
 	/*	fields	*/
 
@@ -289,7 +325,14 @@ void Constant<T>::execute(Token_Type **tokens, Core *core)
 	Context cx = tokens[0]->tag->conx;
 
 	if(0 == port)
-		core->tokenizer.wrapAndSend(this->distList[port], this->value, cx, core->coreID);
+		core->tokenizer.wrapAndSend(this->distList[port], this->value, cx, core->coreID, tokens[0]->tag->token_executor_coreID);
 	// freeing memory
 	delete tokens[0];
+}
+
+// constant instruction has no local data dependancy
+template<class T>
+bool Constant<T>::isINDependant()
+{
+	return true;
 }

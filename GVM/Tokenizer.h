@@ -11,6 +11,7 @@
 #include "Token_Type.h"
 #include "Context.h"
 #include "PE.h"
+#include<boost\thread\mutex.hpp>
 
 using namespace std;
 
@@ -117,10 +118,13 @@ public:
 	Tokenizer();
 	~Tokenizer(void);	
 	// create a new token and send it to the token queue
-	void wrapAndSend(Vector_Tuple &distList, Datum &res, Context &cx, short &coreId);
+	void wrapAndSend(Vector_Tuple &distList, Datum &res, Context &cx, short &coreId, short token_executor_coreID);
+
+	// The load distrubuter handler function
+	short loadDistrubuter();
 
 	// The load balanacer handler function
-	short loadBalancer();
+	void loadBalancer();
 
 	// propogate the stop token
 	void sendStop(Token_Type *tok);
@@ -135,4 +139,6 @@ public:
 
 	Switcher swicther;
 	ContextManager contextManager;
+
+	boost::mutex tz_mx;
 };

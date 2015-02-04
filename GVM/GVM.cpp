@@ -51,9 +51,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 	}
 	// create a core per processor
-	short coreNumbers = 2;
+
 	vector<Core*> coreList;
-	for (int i = 0; i < coreNumbers; i++)
+	for (int i = 0; i < CORENUMBERS; i++)
 	{
 		Core *core = new Core(i);
 		core->tokenizer.coreList.push_back(core);
@@ -73,13 +73,13 @@ int _tmain(int argc, _TCHAR* argv[])
 		vector<string> strToks;
 		getline(cin,input);
 		parser::Tokenize(input,strToks);
-		Tag * tag = new Tag(*firstCx, i, indxStrAdd);
+		Tag * tag = new Tag(*firstCx, i, indxStrAdd, core->coreID);
 		if(strToks.size() == 1)
 		{			
 			Datum datum = Datum(atoi(strToks[0].c_str()));
 			datum.token_Type = Datum::INT;
 			Token_Type *tok = new Token_Type(datum, tag);
-			core->inbox.push(tok);
+			core->inbox.push_back(tok);
 		}
 		else if(strToks.size() > 1)
 		{
@@ -90,7 +90,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				datum.iValue_v.push_back(atoi(strToks[i].c_str()));
 			}						
 			Token_Type *tok = new Token_Type(datum, tag);
-			core->inbox.push(tok);
+			core->inbox.push_back(tok);
 		}
 
 	}
@@ -105,6 +105,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	for (int i = 0; i < coreList.size(); i++)
 	{
 		coreList[i]->stop();
+		cout << "Core " << i << " is "<<coreList[i]->Idle_Counter << endl;
 	}	
 	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
     std::cout<<"Total time: "<< duration <<'\n';

@@ -27,8 +27,11 @@ public:
 	// unique mix of cx id and instAdd
 	unsigned long long tokenID;
 
+	// added for the load balancing algorithm to identify the stolen tokens
+	short token_executor_coreID;
+
 public:
-	Tag(Context &cx, short prt, int *instAdd);
+	Tag(Context &cx, short prt, int *instAdd, short token_executor_coreID);
 	Tag(void);
 	~Tag(void);
 	//generate unique id for instAdd {chunk and mem add}

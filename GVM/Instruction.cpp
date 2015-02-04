@@ -141,7 +141,14 @@ void Operation::execute(Token_Type **tokens, Core *core)
 
 
 	// send the res to tokenizer
-	core->tokenizer.wrapAndSend((this->distList[0]), res, tokens[0][0].tag->conx, core->coreID);
+	core->tokenizer.wrapAndSend((this->distList[0]), res, tokens[0][0].tag->conx, core->coreID, 
+		tokens[0][0].tag->token_executor_coreID);
+}
+// OPR is very tedious to be stealed, as it requires
+// at least the sharing of the token tables
+bool Operation::isINDependant()
+{
+	return false;
 }
 
 
@@ -163,11 +170,20 @@ Sink instruction simply forwad it's inputs to thier dest
 void Sink::execute(Token_Type **tokens, Core *core)
 {
 	//std::cout<< core.dispatcher;
-	// send the res to tokenizer
+	short ex_CoreId = tokens[0][0].tag->token_executor_coreID;
+	short crID = core->coreID;	
+	// send the res to this core tokenizer
 	core->tokenizer.wrapAndSend((this->distList[tokens[0][0].tag->port]), tokens[0][0].data, 
-		tokens[0][0].tag->conx, core->coreID);
+		tokens[0][0].tag->conx, crID , ex_CoreId);
+		//this is a stolen token, send it back to it's original core						
 	// freeing memory
 	delete tokens[0];
+}
+
+// no local data dependancy
+bool Sink::isINDependant()
+{
+	return true;
 }
 
 /*
@@ -208,7 +224,7 @@ void Switch::execute(Token_Type **tokens, Core *core)
 		// with the same context
 
 		// first get all of the stored tokens
-		
+
 		vector<Token_Type*> toksV = core->tokenizer.swicther.
 			getAllElement(tokens[0][0].tag->tokenID );
 		// NEW: Switch has to forward all of its recieved tokens
@@ -229,7 +245,8 @@ void Switch::execute(Token_Type **tokens, Core *core)
 				Vector_Tuple dest;
 				short port = tok->tag->port;
 				dest.push_back(make_tuple(indx, port));
-				core->tokenizer.wrapAndSend(dest, tok->data, tok->tag->conx, core->coreID);
+				core->tokenizer.wrapAndSend(dest, tok->data, tok->tag->conx, core->coreID
+					,tokens[0][0].tag->token_executor_coreID);
 			}
 		}
 		// freeing memory
@@ -240,6 +257,12 @@ void Switch::execute(Token_Type **tokens, Core *core)
 		// store this token till we recieve the condition token to specify it's dest
 		core->tokenizer.swicther.addSwitchStorageElement(*tokens);
 	}	
+}
+
+// SWI instruction has local data storage which is also tediuos to share
+bool Switch::isINDependant()
+{
+	return false;
 }
 
 /*********************** ContextChange Inst Part ******************************/
@@ -287,7 +310,7 @@ void ContextChange::execute(Token_Type **tokens, Core *core)
 			// prepare the literal as a token			
 			short port = get<0>(lit);
 			Datum value = get<1>(lit);
-			Tag *tag = new Tag(tokens[0]->tag->conx, port, tokens[0]->tag->instAdd);
+			Tag *tag = new Tag(tokens[0]->tag->conx, port, tokens[0]->tag->instAdd, core->coreID);
 			Token_Type tok2 =  Token_Type(value, tag);
 			// then send delegate
 			core->tokenizer.contextManager.bind_save(tok2, this->todest, this->retDest, 
@@ -299,6 +322,16 @@ void ContextChange::execute(Token_Type **tokens, Core *core)
 	}
 	// freeing memory
 	delete tokens[0];
+}
+
+// CHG can be stolen iff the number of bind is == 1
+// else, contextMap has to be checked for previous entries
+// for the same tokenID. This is done in the tokenizer level
+bool ContextChange::isINDependant()
+{
+	if(this->binds == 1)
+		return true;
+	return false;
 }
 
 /*********************** ContextRestore Inst Part ******************************/
@@ -320,6 +353,12 @@ void ContextRestore::execute(Token_Type **tokens, Core *core)
 	core->tokenizer.contextManager.restore(tokens[0][0]);
 	//freeing memory
 	delete tokens[0];
+}
+
+// All of the restore information is saved locally in the restoreMap
+bool ContextRestore::isINDependant()
+{
+	return false;
 }
 
 /*********************** Split Inst Part ******************************/
@@ -419,10 +458,18 @@ void Split::doSplitWork(Token_Type* tok, Token_Type** tokens, short portIdx, Cor
 		Vector_Tuple dest;
 		dest.push_back(make_tuple(this->todest,tokens[i]->tag->port));
 		// TODO, change the core id		
-		core->tokenizer.wrapAndSend(dest, tokens[i]->data, *new_cx, crID);
+		core->tokenizer.wrapAndSend(dest, tokens[i]->data, *new_cx, crID, tokens[i]->tag->token_executor_coreID);
 	}
 }
 
+// split is treated the same as CHG, but here binds are always
+// bigger than one, so, delegate this to the tokinzer
+bool Split::isINDependant()
+{
+	if(this->tokenInputs == 1) // just in rare cases of the binds == 1
+		return true;
+	return false;
+}
 /*********************** Stop Inst Part ******************************/
 Stop::Stop(short &ch, int idx[2]) : Instruction(ch, idx)
 {
@@ -435,4 +482,10 @@ Stop::~Stop()
 void Stop::execute(Token_Type **tokens, Core *core)
 {
 	core->tokenizer.sendStop(*tokens);
+}
+
+// no need to steal this
+bool Stop::isINDependant()
+{
+	return false;
 }

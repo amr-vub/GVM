@@ -7,9 +7,13 @@
 #include "stdafx.h"
 #include "Tokenizer.h"
 #include "Core.h"
+#include "Instruction.h"
 #include <limits>
 
 vector<Core*> Tokenizer::coreList;
+
+// helper function to get the MAX loaded neighbor core id
+short myMax(short list[NIEGHBOORS], Core *core);
 
 Tokenizer::Tokenizer() 
 {
@@ -35,7 +39,7 @@ Tokenizer::~Tokenizer(void)
 	\param:
 		cx: new token context
 */
-void Tokenizer::wrapAndSend(Vector_Tuple &distList, Datum &res, Context &cx, short &coreId)
+void Tokenizer::wrapAndSend(Vector_Tuple &distList, Datum &res, Context &cx, short &coreId, short token_executor_coreID)
 {
 	// loop through destination list, for each, create a token and send it to the token queue
 	for (Vector_Tuple::iterator it = distList.begin(); it != distList.end(); ++it)
@@ -44,20 +48,34 @@ void Tokenizer::wrapAndSend(Vector_Tuple &distList, Datum &res, Context &cx, sho
 		short port = get<1>(*it);
 
 		// construct the new Token
-		Tag *newTag = new Tag(cx, port, instAdd);
+		Tag *newTag = new Tag(cx, port, instAdd, token_executor_coreID);
 		Token_Type* newTok = new Token_Type(res, newTag);
 		
 		// Send to the core's queue 
-		this->coreList[coreId]->insertToken(newTok);		
+		if(coreId != token_executor_coreID)
+		{
+			// this was a stolen token
+			// check if the new instruction is also independant
+			Instruction *inst = this->core->memory.get(instAdd);
+			if(inst->isINDependant())
+				// then we can also constinue exectuting the stolen token
+				this->coreList[coreId]->insertToken(newTok);	
+			else
+				// else return it to it's owner
+				this->coreList[token_executor_coreID]->insertToken(newTok);		
+		}
+		else // that is not a stolen token
+			this->coreList[coreId]->insertToken(newTok);		
 	}	
 }
 
-// The load balanacer handler function
-short Tokenizer::loadBalancer()
+// The load distrubuter handler function - functional level parallelism (new context --> new core)
+// Here the overloaded core initiate the load distrubution
+short Tokenizer::loadDistrubuter()
 {
 	int MIN = numeric_limits<int>::max();
 	short coreID=0;
-	// initially, we will use a naive load balancing technique based on the min size of core's queue
+	// initially, we will use a naive load distrubuter technique based on the min size of core's queue
 	for(auto cr : coreList)
 	{
 		if(cr->inbox.size()<MIN)
@@ -69,6 +87,80 @@ short Tokenizer::loadBalancer()
 	// corID now has the id for the selected core
 	//printf("% \n",coreID);
 	return coreID;
+}
+
+// The load balanacer handler function
+// This is different than the load distrubuter function,
+// as the underloaded core steals work from direct neighbor overloaded cores.
+void Tokenizer::loadBalancer()
+{
+	// first get the most overloaded core from the neighbors
+	short victim = myMax(this->core->nieghborList, this->core);
+
+	int stolenTokensCount= 0;
+	// if there exist a core with load value over the THRESHOLD
+	if(victim != -1)
+	{
+		boost::lock_guard<boost::mutex> guard(this->coreList[victim]->c_mutex);	
+		if(this->coreList[victim]->inbox.size() < THRESHOLD)
+			return;
+		int victim_InboxSize = this->coreList[victim]->inbox.size();	
+		const int victim_InboxSize_const = victim_InboxSize;		
+		int i = 0;
+		// begin work stealing!!
+		// 1- loop through the victim's inbox, and for every token in it
+		//    check if it's a independant instruction
+		// 2- If so, acquire the lock for this inbox and steal the token
+		// 3- this process will continue till we either loop throught the
+		//    whole inbox, or stole more than or equal to victim's inbox size
+		/**/									
+		for (list<Token_Type*>::iterator it = this->coreList[victim]->inbox.begin();
+			it!=this->coreList[victim]->inbox.end();++it)
+		{
+			// (2)							
+			Token_Type *stolenToken = (*it);		
+			Instruction* inst = this->core->memory.get(stolenToken->tag->instAdd);
+			i++;
+			if(inst->isINDependant())
+			{				
+				this->core->inbox.push_back(stolenToken);		
+				it = this->coreList[victim]->inbox.erase(it);
+				//it = list<Token_Type*>::reverse_iterator();
+				stolenTokensCount++;
+				this->core->Idle_Counter++;
+				/*
+				cout<< "Token is stolen from core: " << this->coreList[victim]->coreID << 
+					" to core: " << this->core->coreID << " and Idle counter is: " << this->core->Idle_Counter<< endl;
+				*/	
+				if(victim_InboxSize_const / 2 <= stolenTokensCount)
+					break;
+			}
+			if(i >= victim_InboxSize_const)
+				break;
+			if(it == this->coreList[victim]->inbox.end())
+				break;
+			victim_InboxSize = this->coreList[victim]->inbox.size();
+		}
+		
+	}
+	//cout<< ""<<endl;
+}
+// helper function to get the MAX loaded neighbor core id
+short myMax(short list[NIEGHBOORS], Core *core)
+{
+	short MAX = THRESHOLD;
+	short victim = -1;
+	for (int i = 0; i < NIEGHBOORS; i++)
+	{
+		short coreIDx = core->nieghborList[i];
+		int inbxSize = core->tokenizer.coreList[coreIDx]->inbox.size();
+		if(core->tokenizer.coreList[coreIDx]->inbox.size() > MAX)
+		{
+			MAX = inbxSize;
+			victim = coreIDx;
+		}
+	}
+	return victim;
 }
 
 // propogate the stop token
@@ -110,7 +202,8 @@ void Switcher::sendToTokinzer(Vector_Tuple &dest,Vector_token &tokV)
 {
 	for(Vector_token::iterator it = tokV.begin(); it!=tokV.end(); ++it)
 	{
-		this->tokenizer->wrapAndSend(dest, (*it)->data, (*it)->tag->conx, this->tokenizer->core->coreID);
+		short crID = this->tokenizer->core->coreID;
+		this->tokenizer->wrapAndSend(dest, (*it)->data, (*it)->tag->conx, crID, crID);
 		// freeing memory							
 		delete *it;
 	}
@@ -219,12 +312,12 @@ short ContextManager::bind_send(Token_Type &tok, int* destAdd, short destPort, s
 	// resolve where to send the token
 	if(corId == -1)
 	{
-		short newCorId = this->tokenizer->loadBalancer();
-		this->tokenizer->wrapAndSend(temp ,tok.data, *new_cx, newCorId);
+		short newCorId = this->tokenizer->loadDistrubuter();
+		this->tokenizer->wrapAndSend(temp ,tok.data, *new_cx, newCorId, newCorId);
 		return newCorId;
 	}
 	
-	this->tokenizer->wrapAndSend(temp ,tok.data, *new_cx, corId);
+	this->tokenizer->wrapAndSend(temp ,tok.data, *new_cx, corId, corId);
 
 	return corId;
 }
@@ -248,7 +341,8 @@ void ContextManager::restore(Token_Type &tok)
 	*/	
 	// first check if the core id field in the context object matches this core
 	short crID = this->tokenizer->core->coreID;
-	if(tok.tag->conx.coreId == crID)
+	short cxCoreId = tok.tag->conx.coreId;
+	if(cxCoreId == crID)
 	{
 		long conxId = tok.tag->conx.conxId;
 		RestoreArgs resArgs = restoreMap[conxId];
@@ -263,7 +357,8 @@ void ContextManager::restore(Token_Type &tok)
 		else if(resArgs.port == -1)
 			temp.push_back(make_tuple(index, tok.tag->port));
 
-		this->tokenizer->wrapAndSend(temp, tok.data, old_cx, crID);
+		short exe_CorId = tok.tag->token_executor_coreID;
+		this->tokenizer->wrapAndSend(temp, tok.data, old_cx,crID, exe_CorId);
 
 		// if restore value is one, then we no longer need to save this entry
 		if(resArgs.restores <= 1)
@@ -285,8 +380,13 @@ void ContextManager::restore(Token_Type &tok)
 	// means that this tken was sent to us from other core id, then 
 	// just for now TODO, sent it back to it's original core queue
 	{
-		Tag *newTag = new Tag(tok.tag->conx, tok.tag->port, tok.tag->instAdd);		
+		Vector_Tuple tempDest;
+		tempDest.push_back(make_tuple(tok.tag->instAdd, tok.tag->port));
+		this->tokenizer->wrapAndSend(tempDest, tok.data, tok.tag->conx, cxCoreId, cxCoreId);
+		/*
+		Tag *newTag = new Tag(tok.tag->conx, tok.tag->port, tok.tag->instAdd, cxCoreId);		
 		Token_Type* external_token = new Token_Type(tok.data, newTag);
-		this->tokenizer->coreList[tok.tag->conx.coreId]->insertToken(external_token);
+		this->tokenizer->coreList[cxCoreId]->insertToken(external_token);
+		*/
 	}
 }

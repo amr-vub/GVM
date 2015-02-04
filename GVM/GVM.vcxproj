@@ -52,7 +52,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>E:\DropBoxTrash\GPS\boost_1_57_0;C:\Users\Amr\Dropbox\GPS\Masters\Thesis\MycodeRep\GVM;C:\Users\Amr\Dropbox\GPS\Masters\Thesis\MycodeRep\GVM\Helper-Classes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\DropBoxTrash\GPS\boost_1_57_0;C:\Users\Amr\Dropbox\GPS\Masters\Thesis\MyCodeRepo-W-\GVM\GVM\Helper-Classes;C:\Users\Amr\Dropbox\GPS\Masters\Thesis\MyCodeRepo-W-\GVM\GVM;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -84,6 +84,7 @@
     <ClInclude Include="Context.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="Datum.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="Helper-Classes\Create_Structure_stmt.h" />
     <ClInclude Include="Helper-Classes\parser.h" />
     <ClInclude Include="IMemory.h" />

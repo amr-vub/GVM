@@ -12,6 +12,8 @@
 #include "IMemory.h"
 #include "Tokenizer.h"
 #include "Token_Type.h"
+#include "Globals.h"
+#include <list>
 
 #include <queue>
 #include<boost\thread\thread.hpp>
@@ -49,10 +51,10 @@ public:
 	void insertToken(Token_Type* tok);
 	
 	// erase tokens into the core's queue
-	void eraseToken();
+	list<Token_Type*>::iterator eraseToken(list<Token_Type*>::iterator index);
 
-	// get the last element of the queue and erase it afterwards
-	Token_Type* getLastElement();
+	// get the schedualed element of the queue and erase it afterwards
+	Token_Type* getScheduleElement();
 
 	// fields part (for simplicity, I will make them public)
 	TokenDispatcher dispatcher;
@@ -68,16 +70,25 @@ public:
 	ContextCreater conxObj;
 
 	// core id
-	short coreID;
+	short coreID;	
 
+	// list of direct neigboor Ids
+	short nieghborList[NIEGHBOORS];
+
+	// activate/ deactivate
 	bool active;
 
+	// some profiling data
+	unsigned long long Idle_Counter;
+
 	// Token queue
-	queue<Token_Type*> inbox;
+	list<Token_Type*> inbox;
+
+	boost::mutex c_mutex;
 
 private:
 	// the thread that will run this core
 	boost::thread c_thread;
-	boost::mutex c_mutex;
+	
 };
 

@@ -95,7 +95,7 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 			tuple<short, Datum> temp = inst->literals.front();
 			short port = get<0>(temp);
 			Datum value = get<1>(temp);
-			Tag *tag = new Tag(tok->tag->conx, port, tok->tag->instAdd);
+			Tag *tag = new Tag(tok->tag->conx, port, tok->tag->instAdd, this->core->coreID);
 			Token_Type *tok2 = new Token_Type(value, tag);
 			
 			Token_Type* tokenPacket[2];
