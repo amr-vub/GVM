@@ -458,7 +458,7 @@ void Split::doSplitWork(Token_Type* tok, Token_Type** tokens, short portIdx, Cor
 		Vector_Tuple dest;
 		dest.push_back(make_tuple(this->todest,tokens[i]->tag->port));
 		// TODO, change the core id		
-		core->tokenizer.wrapAndSend(dest, tokens[i]->data, *new_cx, crID, tokens[i]->tag->token_executor_coreID);
+		core->tokenizer.wrapAndSend(dest, tokens[i]->data, *new_cx, crID, crID);
 	}
 }
 

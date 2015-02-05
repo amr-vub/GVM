@@ -49,23 +49,36 @@ void Tokenizer::wrapAndSend(Vector_Tuple &distList, Datum &res, Context &cx, sho
 
 		// construct the new Token
 		Tag *newTag = new Tag(cx, port, instAdd, token_executor_coreID);
-		Token_Type* newTok = new Token_Type(res, newTag);
-		
+		Token_Type* newTok = new Token_Type(res, newTag);				
+
+		// check if the new instruction is also independant
+		Instruction *inst = this->core->memory.get(instAdd);
+
+		if(instAdd[0] == 0 && instAdd[1] == 0)
+			instAdd[0] = 0;
+
 		// Send to the core's queue 
 		if(coreId != token_executor_coreID)
 		{
 			// this was a stolen token
-			// check if the new instruction is also independant
-			Instruction *inst = this->core->memory.get(instAdd);
 			if(inst->isINDependant())
-				// then we can also constinue exectuting the stolen token
-				this->coreList[coreId]->insertToken(newTok);	
+				// then we can also continue exectuting the stolen token
+				this->coreList[coreId]->insertToken_InIndInbox(newTok);	
 			else
 				// else return it to it's owner
 				this->coreList[token_executor_coreID]->insertToken(newTok);		
 		}
 		else // that is not a stolen token
-			this->coreList[coreId]->insertToken(newTok);		
+		{
+			if(inst->isINDependant())
+			{
+				this->coreList[coreId]->insertToken_InIndInbox(newTok);		
+			}
+			else
+			{
+				this->coreList[coreId]->insertToken(newTok);		
+			}
+		}
 	}	
 }
 
@@ -74,13 +87,13 @@ void Tokenizer::wrapAndSend(Vector_Tuple &distList, Datum &res, Context &cx, sho
 short Tokenizer::loadDistrubuter()
 {
 	int MIN = numeric_limits<int>::max();
-	short coreID=0;
+	short coreID=this->core->coreID;
 	// initially, we will use a naive load distrubuter technique based on the min size of core's queue
 	for(auto cr : coreList)
 	{
-		if(cr->inbox.size()<MIN)
+		if(cr->inbox.size() + cr->ind_Inbox.size()<MIN)
 		{
-			MIN = cr->inbox.size();
+			MIN = cr->inbox.size() + cr->ind_Inbox.size();
 			coreID = cr->coreID;
 		}
 	}
@@ -94,6 +107,8 @@ short Tokenizer::loadDistrubuter()
 // as the underloaded core steals work from direct neighbor overloaded cores.
 void Tokenizer::loadBalancer()
 {
+	if(this->core->coreID == 0)
+		return;
 	// first get the most overloaded core from the neighbors
 	short victim = myMax(this->core->nieghborList, this->core);
 
@@ -101,45 +116,33 @@ void Tokenizer::loadBalancer()
 	// if there exist a core with load value over the THRESHOLD
 	if(victim != -1)
 	{
-		boost::lock_guard<boost::mutex> guard(this->coreList[victim]->c_mutex);	
-		if(this->coreList[victim]->inbox.size() < THRESHOLD)
+		boost::lock_guard<boost::mutex> guard(this->coreList[victim]->ind_c_mutex);	
+		if(this->coreList[victim]->ind_Inbox.size() < THRESHOLD)
 			return;
-		int victim_InboxSize = this->coreList[victim]->inbox.size();	
-		const int victim_InboxSize_const = victim_InboxSize;		
-		int i = 0;
+		//int victim_InboxSize = this->coreList[victim]->ind_Inbox.size();	
+		const int victim_InboxSize_const = this->coreList[victim]->ind_Inbox.size();				
 		// begin work stealing!!
-		// 1- loop through the victim's inbox, and for every token in it
-		//    check if it's a independant instruction
-		// 2- If so, acquire the lock for this inbox and steal the token
-		// 3- this process will continue till we either loop throught the
-		//    whole inbox, or stole more than or equal to victim's inbox size
+		// loop through the victim's inbox, and steal half of it
 		/**/									
-		for (list<Token_Type*>::iterator it = this->coreList[victim]->inbox.begin();
-			it!=this->coreList[victim]->inbox.end();++it)
+		for (list<Token_Type*>::iterator it = this->coreList[victim]->ind_Inbox.begin();
+			it!=this->coreList[victim]->ind_Inbox.end();++it)
 		{
 			// (2)							
-			Token_Type *stolenToken = (*it);		
-			Instruction* inst = this->core->memory.get(stolenToken->tag->instAdd);
-			i++;
-			if(inst->isINDependant())
-			{				
-				this->core->inbox.push_back(stolenToken);		
-				it = this->coreList[victim]->inbox.erase(it);
-				//it = list<Token_Type*>::reverse_iterator();
-				stolenTokensCount++;
-				this->core->Idle_Counter++;
-				/*
-				cout<< "Token is stolen from core: " << this->coreList[victim]->coreID << 
-					" to core: " << this->core->coreID << " and Idle counter is: " << this->core->Idle_Counter<< endl;
-				*/	
-				if(victim_InboxSize_const / 2 <= stolenTokensCount)
-					break;
-			}
-			if(i >= victim_InboxSize_const)
+			Token_Type *stolenToken = (*it);									
+			this->core->insertToken_InIndInbox(stolenToken);		
+			it = this->coreList[victim]->ind_Inbox.erase(it);
+			//it = list<Token_Type*>::reverse_iterator();
+			stolenTokensCount++;
+			this->core->Idle_Counter++;
+			/*
+			cout<< "Token is stolen from core: " << this->coreList[victim]->coreID << 
+				" to core: " << this->core->coreID << " and Idle counter is: " << this->core->Idle_Counter<< endl;
+			*/	
+			if(victim_InboxSize_const / 2 <= stolenTokensCount)
+				break;		
+			if(it == this->coreList[victim]->ind_Inbox.end())
 				break;
-			if(it == this->coreList[victim]->inbox.end())
-				break;
-			victim_InboxSize = this->coreList[victim]->inbox.size();
+			//victim_InboxSize = this->coreList[victim]->ind_Inbox.size();
 		}
 		
 	}
@@ -153,8 +156,8 @@ short myMax(short list[NIEGHBOORS], Core *core)
 	for (int i = 0; i < NIEGHBOORS; i++)
 	{
 		short coreIDx = core->nieghborList[i];
-		int inbxSize = core->tokenizer.coreList[coreIDx]->inbox.size();
-		if(core->tokenizer.coreList[coreIDx]->inbox.size() > MAX)
+		int inbxSize = core->tokenizer.coreList[coreIDx]->ind_Inbox.size();
+		if(core->tokenizer.coreList[coreIDx]->ind_Inbox.size() > MAX)
 		{
 			MAX = inbxSize;
 			victim = coreIDx;
@@ -168,8 +171,11 @@ void Tokenizer::sendStop(Token_Type *tok)
 {
 	this->core->insertToken(tok);
 	// deactivate all of the other cores
+	this->core->active = false;
+	/*
 	for(auto cr: coreList)
 		cr->active = false;
+		*/
 }
 
 Switcher::Switcher()
