@@ -53,8 +53,22 @@ public:
 
 	Vector_token getAllElement(long &cx, long &instAdd);
 
+	// store the selected dest recieved by tokens with port == 0,
+	// in case there still exist tokens to come
+	void storeDest(Token_Type *tok, short remainingInputs, int* indx);
+
+	// update and do garbage collection if needed in the savedDestinations
+	tuple<short, int*> updateStoredDest(Token_Type *tok);
+
+	// check if port 0 token has already been recieved 
+	bool alreadyExists(Token_Type *tok);
+
 	// a storage map for switch instruction tokens	
 	map<pair<long,long>, Vector_token> switchStorage;
+
+	// s storage that hold selected dest recieved by tokens with port == 0
+	// to be saved for further tokens with same pair<long,long>
+	map<pair<long,long>, tuple<short,int*>> savedDestinations;
 
 	// Forward tokens to the tokenizer queue
 	void sendToTokinzer(Vector_Tuple &dest, Vector_token &tokV);

@@ -46,6 +46,11 @@ public:
 	//generate unique instIdx
 	void generateUniqueIdx();
 
+	// returns true if this is a switch instruction
+	// just for identifying the dynamic number of expected inputs
+	// for SWI to be used in garbage collection purposes
+	virtual bool isSwitch();
+
 	/*	fields	*/
 
 	// which chunk of memory this instruction is stored
@@ -147,6 +152,11 @@ public:
 
 	// overriding the super method
 	void execute(Token_Type **tokens, Core *core);
+
+	// returns true if this is a switch instruction
+	// just for identifying the dynamic number of expected inputs
+	// for SWI to be used in garbage collection purposes
+	bool isSwitch();
 
 	/*	fields	*/	
 	vector<int> destinationList;

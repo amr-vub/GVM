@@ -51,7 +51,8 @@ void Create_Structure_stmt::createSwitch(vector<string> &strTokns)
 
 	// create the SWI instruction	
 	Switch *swi = new Switch(_CHUNK_GLOBAL, instIdx);
-
+	// we will us the inputs field as an indicator for SWI expected number of inputs
+	swi->inputs = 0;
 	short ch;
 	int idx;
 	// loop through the <destination list>

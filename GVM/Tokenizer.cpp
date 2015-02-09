@@ -64,6 +64,40 @@ Switcher::Switcher()
 Switcher::~Switcher()
 {
 }
+// save the dest add and number of remaining inputs for the given (cx,insAdd) combination
+void Switcher::storeDest(Token_Type *tok, short remainingInputs, int* indx)
+{
+	long cx = tok->tag->conx.conxId;	
+	long instAdd = tok->tag->instIdx;
+	int* destAdd = new int[2];
+	destAdd[0] = indx[0];
+	destAdd[1] = indx[1];
+	this->savedDestinations[make_pair(cx, instAdd)] = make_tuple(remainingInputs, destAdd);
+}
+
+// update and do garbage collection if needed in the savedDestinations
+tuple<short, int*>  Switcher::updateStoredDest(Token_Type *tok)
+{
+	long cx = tok->tag->conx.conxId;	
+	long instAdd = tok->tag->instIdx;
+	tuple<short, int*> temp = this->savedDestinations[make_pair(cx, instAdd)];
+	short remaining_inputs = get<0>(temp) - 1;
+	if(remaining_inputs <= 0)
+		this->savedDestinations.erase(make_pair(cx, instAdd));
+	else
+		this->savedDestinations[make_pair(cx, instAdd)] = make_tuple(remaining_inputs, get<1>(temp));
+	return temp;
+}
+// checks if there is a stored dest for this token
+bool Switcher::alreadyExists(Token_Type *tok)
+{
+	long cx = tok->tag->conx.conxId;	
+	long instAdd = tok->tag->instIdx;
+	if(this->savedDestinations.find(make_pair(cx, instAdd)) != this->savedDestinations.end())
+		return true;
+	return false;
+}
+
 // add an element to the map
 void Switcher::addSwitchStorageElement(Token_Type* tok)
 {

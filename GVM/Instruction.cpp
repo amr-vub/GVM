@@ -57,12 +57,12 @@ void Instruction::generateUniqueIdx()
 	temp = this->idx[1];
 	this->InstInx |= temp;
 }
-/*
-void Instruction::execute2(Token_Type *tokens, Core *core)
-{
 
+bool Instruction::isSwitch()
+{
+	return false;
 }
-*/
+
 /*********************** Operation Part ******************************/
 
 Operation::Operation()
@@ -189,6 +189,13 @@ Switch::Switch()
 Switch::~Switch()
 {	
 }
+// returns true if this is a switch instruction
+// just for identifying the dynamic number of expected inputs
+// for SWI to be used in garbage collection purposes
+bool Switch::isSwitch()
+{
+	return true;
+}
 /*
 Switch instruction execution
 - The switch instruction has list of destination, and a condition input.
@@ -204,7 +211,7 @@ void Switch::execute(Token_Type **tokens, Core *core)
 		// the condition token has arrived
 		// use it to index the destination list
 		// and send all stored tokens recieved before
-		// with the same context
+		// with the same context.
 
 		// first get all of the stored tokens
 		
@@ -221,6 +228,12 @@ void Switch::execute(Token_Type **tokens, Core *core)
 		// valide index
 		if(this->destinationList.size() > destIdx)
 		{					
+			// check if all of the expected inputs have been rec
+			if(toksV.size() < this->inputs)
+			{
+				short remainingInputs = this->inputs - toksV.size();
+				core->tokenizer.swicther.storeDest(tokens[0], remainingInputs, indx);
+			}
 			// loop through the saved existing tokens, for each 
 			// determine the destination address and the port num
 			// based on the recieved index and SWITCH <destination LIST>
@@ -234,8 +247,17 @@ void Switch::execute(Token_Type **tokens, Core *core)
 		// freeing memory
 		delete tokens[0];
 	}
-	else
+	else if(core->tokenizer.swicther.alreadyExists(tokens[0]))
 	{
+		// this token is mapped to an already selected dest, as it arrives after the port 0 token!
+		int* indx = get<1>(core->tokenizer.swicther.updateStoredDest(tokens[0]));
+		Vector_Tuple dest;
+		short port = tokens[0]->tag->port;
+		dest.push_back(make_tuple(indx, port));
+		core->tokenizer.wrapAndSend(dest, tokens[0]->data, tokens[0]->tag->conx);
+	}
+	else
+	{		
 		// store this token till we recieve the condition token to specify it's dest
 		core->tokenizer.swicther.addSwitchStorageElement(*tokens);
 	}	

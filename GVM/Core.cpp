@@ -6,6 +6,7 @@
 
 #include "stdafx.h"
 #include "Core.h"
+#include <iostream>
 
 // constructor
 Core::Core(int corid)
@@ -36,9 +37,14 @@ void Core::start()
 	{			
 		if(!this->inbox.empty()){
 			Token_Type *tok = this->inbox.front();
-			//this->inbox.pop_back();			
+			Tag tag = *tok->tag;
+			//this->inbox.pop_back();	
+			if(tag.instAdd[0] == 0 && (tag.instAdd[1] == 16))
+				std::cout<< "" <<endl;
 			this->dispatcher.dispatch(tok);
-			this->inbox.erase(this->inbox.begin());			
+			if(this->inbox.size() == 1)
+				std::cout<< "" <<endl;
+			this->inbox.erase(this->inbox.begin());						
 		}
 		else
 			break;
