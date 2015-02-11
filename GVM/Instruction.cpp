@@ -142,7 +142,7 @@ void Operation::execute(Token_Type **tokens, Core *core)
 
 	// send the res to tokenizer
 	core->tokenizer.wrapAndSend((this->distList[0]), res, tokens[0][0].tag->conx, core->coreID, 
-		tokens[0][0].tag->token_executor_coreID);
+		core->coreID);
 }
 // OPR is very tedious to be stealed, as it requires
 // at least the sharing of the token tables
@@ -174,8 +174,7 @@ void Sink::execute(Token_Type **tokens, Core *core)
 	short crID = core->coreID;	
 	// send the res to this core tokenizer
 	core->tokenizer.wrapAndSend((this->distList[tokens[0][0].tag->port]), tokens[0][0].data, 
-		tokens[0][0].tag->conx, crID , ex_CoreId);
-		//this is a stolen token, send it back to it's original core						
+		tokens[0][0].tag->conx, crID , ex_CoreId);							
 	// freeing memory
 	delete tokens[0];
 }
@@ -246,7 +245,7 @@ void Switch::execute(Token_Type **tokens, Core *core)
 				short port = tok->tag->port;
 				dest.push_back(make_tuple(indx, port));
 				core->tokenizer.wrapAndSend(dest, tok->data, tok->tag->conx, core->coreID
-					,tokens[0][0].tag->token_executor_coreID);
+					,core->coreID);
 			}
 		}
 		// freeing memory
@@ -457,7 +456,7 @@ void Split::doSplitWork(Token_Type* tok, Token_Type** tokens, short portIdx, Cor
 	{
 		Vector_Tuple dest;
 		dest.push_back(make_tuple(this->todest,tokens[i]->tag->port));
-		// TODO, change the core id		
+		// TODO, change the core id				
 		core->tokenizer.wrapAndSend(dest, tokens[i]->data, *new_cx, crID, crID);
 	}
 }

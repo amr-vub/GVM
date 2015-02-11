@@ -54,9 +54,9 @@ void Core::start()
 		if(this->coreID == 0)
 			fake++;
 		if(this->inbox.size() != 0){
-			/**/
+			/*
 			if(this->Idle_Counter < this->inbox.size())
-				this->Idle_Counter = this->inbox.size();
+				this->Idle_Counter = this->inbox.size();*/
 			// StartUp_Done is true now as the inbox got at least one element from master core
 			StartUp_Done = true;
 			Token_Type *tok = this->getScheduleElement();//this->inbox.front();
@@ -66,10 +66,10 @@ void Core::start()
 		}
 		else if(this->ind_Inbox.size() != 0)
 		{
-			/**/
+			/*
 			if(this->Idle_Counter < this->ind_Inbox.size())
 				this->Idle_Counter = this->ind_Inbox.size();
-				
+			*/	
 			// StartUp_Done is true now as the inbox got at least one element from master core
 			StartUp_Done = true;
 			Token_Type *tok = this->getScheduleElement_IndInbox();//this->inbox.front();

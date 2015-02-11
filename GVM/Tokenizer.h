@@ -44,6 +44,8 @@ struct RestoreArgs{
 	Context *cx;
 	// number of expected return values
 	short restores;
+	// field to save the ex_coreID
+	short ex_coreID;
 };
 
 /*
