@@ -85,7 +85,7 @@ void Core::start()
 			{
 				// now this core is idle after getting intial work from the master core
 				// then load balancing has to be started
-				//this->tokenizer.loadBalancer();
+				this->tokenizer.loadBalancer();
 				//fake++;
 			}
 			//boost::this_thread::sleep(boost::posix_time::milliseconds(1));

@@ -146,12 +146,15 @@ void Operation::execute(Token_Type **tokens, Core *core)
 
 	// send the res to tokenizer
 	core->tokenizer.wrapAndSend((this->distList[0]), res, tokens[0][0].tag->conx, core->coreID, 
-		core->coreID);
+		tokens[0][0].tag->token_executor_coreID);
 }
 // OPR is very tedious to be stealed, as it requires
-// at least the sharing of the token tables
+// at least the sharing of the token tables, but in case of one token input,
+// it is an independant instruction
 bool Operation::isINDependant()
 {
+	if(this->tokenInputs == 1)
+		return true;
 	return false;
 }
 
