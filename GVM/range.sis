@@ -1,0 +1,5 @@
+function test(a, b: integer returns array[integer])
+	for el in a, b
+		returns array of el + a + b
+	end for
+end function

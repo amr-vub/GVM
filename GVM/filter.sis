@@ -1,0 +1,5 @@
+function main(arr: array[integer] returns array[integer])
+	for el in arr
+		returns array of el + 1 when el < 10
+		end for
+end function

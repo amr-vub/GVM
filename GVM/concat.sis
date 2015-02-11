@@ -1,0 +1,3 @@
+function main(arrL, arrR : array[integer] returns array[integer])
+	arrL || arrR
+end function
