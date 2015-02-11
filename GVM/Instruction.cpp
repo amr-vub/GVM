@@ -57,6 +57,10 @@ void Instruction::generateUniqueIdx()
 	temp = this->idx[1];
 	this->InstInx |= temp;
 }
+bool Instruction::isSwitch()
+{
+	return false;
+}
 /*
 void Instruction::execute2(Token_Type *tokens, Core *core)
 {
@@ -205,6 +209,13 @@ Switch::Switch()
 Switch::~Switch()
 {	
 }
+// returns true if this is a switch instruction
+// just for identifying the dynamic number of expected inputs
+// for SWI to be used in garbage collection purposes
+bool Switch::isSwitch()
+{
+	return true;
+}
 /*
 Switch instruction execution
 - The switch instruction has list of destination, and a condition input.
@@ -236,7 +247,13 @@ void Switch::execute(Token_Type **tokens, Core *core)
 
 		// valide index
 		if(this->destinationList.size() > destIdx)
-		{					
+		{			
+			// check if all of the expected inputs have been rec
+			if(toksV.size() < this->inputs)
+			{
+				short remainingInputs = this->inputs - toksV.size();
+				core->tokenizer.swicther.storeDest(tokens[0], remainingInputs, indx);
+			}
 			// loop through the saved existing tokens, for each 
 			// determine the destination address and the port num
 			// based on the recieved index and SWITCH <destination LIST>
@@ -250,6 +267,15 @@ void Switch::execute(Token_Type **tokens, Core *core)
 		}
 		// freeing memory
 		delete tokens[0];
+	}
+	else if(core->tokenizer.swicther.alreadyExists(tokens[0]))
+	{
+		// this token is mapped to an already selected dest, as it arrives after the port 0 token!
+		int* indx = get<1>(core->tokenizer.swicther.updateStoredDest(tokens[0]));
+		Vector_Tuple dest;
+		short port = tokens[0]->tag->port;
+		dest.push_back(make_tuple(indx, port));
+		core->tokenizer.wrapAndSend(dest, tokens[0]->data, tokens[0]->tag->conx, core->coreID, core->coreID);
 	}
 	else
 	{
@@ -445,7 +471,7 @@ void Split::doSplitWork(Token_Type* tok, Token_Type** tokens, short portIdx, Cor
 {
 	*tok->tag = *tokens[0]->tag;
 	// change the port to match the element index
-	tok->tag->port = portIdx;
+	//tok->tag->port = portIdx;
 	// generate new context
 	Context *new_cx = core->conxObj.getUniqueCx(core->coreID);
 	// send each element in the array to the same instruction instance

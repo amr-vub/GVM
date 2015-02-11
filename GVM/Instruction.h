@@ -51,6 +51,11 @@ public:
 	//generate unique instIdx
 	void generateUniqueIdx();
 
+	// returns true if this is a switch instruction
+	// just for identifying the dynamic number of expected inputs
+	// for SWI to be used in garbage collection purposes
+	virtual bool isSwitch();
+
 	/*	fields	*/
 
 	// which chunk of memory this instruction is stored
@@ -164,6 +169,11 @@ public:
 	// check if this instruction can be doesn't have local data need and
 	// can be executed independantly!	
 	bool isINDependant();
+
+	// returns true if this is a switch instruction
+	// just for identifying the dynamic number of expected inputs
+	// for SWI to be used in garbage collection purposes
+	bool isSwitch();
 
 	/*	fields	*/	
 	vector<int> destinationList;

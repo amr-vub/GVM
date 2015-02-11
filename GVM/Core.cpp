@@ -61,6 +61,8 @@ void Core::start()
 			StartUp_Done = true;
 			Token_Type *tok = this->getScheduleElement();//this->inbox.front();
 			//this->inbox.pop_back();			
+			if(tok->tag->instAdd[0] == 1 && tok->tag->instAdd[1] == 13)
+				cout<< "";
 			this->dispatcher.dispatch(tok);
 			//this->eraseToken();			
 		}
@@ -138,8 +140,8 @@ Token_Type* Core::getScheduleElement()
 {	
 	boost::lock_guard<boost::mutex> guard(c_mutex);
 	
-	Token_Type* temp = this->inbox.back();
-	this->inbox.pop_back();
+	Token_Type* temp = this->inbox.front();
+	this->inbox.pop_front();
 
 	return temp;
 }
@@ -150,8 +152,8 @@ Token_Type* Core::getScheduleElement_IndInbox()
 {	
 	boost::lock_guard<boost::mutex> guard(ind_c_mutex);
 	
-	Token_Type* temp = this->ind_Inbox.back();
-	this->ind_Inbox.pop_back();
+	Token_Type* temp = this->ind_Inbox.front();
+	this->ind_Inbox.pop_front();
 
 	return temp;
 }
