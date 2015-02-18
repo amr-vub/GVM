@@ -1,0 +1,37 @@
+% sort.sis
+% Mathijs Saey
+% DVM tests
+
+% This file contains an implementation of a combined sorting algorithm in sisal.
+% The algorithm will sort using quicksort until the remaining array to sort has
+% reached a cutoff point, once this happens, insertion sort is called on the
+% nodes that remain.
+
+% The main purpose of this file is to produce some IF1 code to use in testing.
+
+define	Main
+
+type IntArr = array[integer]
+
+% Inserts an element in at the correct spot in the sorted part of the array
+function insert_el(arr: IntArr; el :integer returns IntArr)
+	let L, M, R := 
+	for E in arr
+		returns 
+			array of E when E < el
+			array of E when E = el
+			array of E when E > el
+	end for
+	in 
+		if array_size(arr) = 0 then
+			array [0: el]
+		else
+			L || M || array [0: el] || R
+		end if
+	end let
+end function
+
+
+function main (arr : IntArr; el :integer returns IntArr)
+	insert_el(arr, el)
+end function

@@ -25,6 +25,8 @@
 
 short globalNum_ips;
 
+short CORENUMBERS=4;
+
 using namespace std;
 
 bool isLegalLine(string &line);
@@ -38,6 +40,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	// open the instrucion file to parse
 	fstream instFile;
 	instFile.open(argv[1]);
+
+	if(argc==3)
+		CORENUMBERS = atoi((char* )argv[2]);
 
 	string line;
 

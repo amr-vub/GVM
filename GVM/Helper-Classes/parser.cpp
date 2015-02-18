@@ -126,6 +126,15 @@ void parser:: parseLink(vector<string> &stmtToks)
 
 	// query the memory for the source instruction to add destination address to it
 	Instruction *inst= IMemory::get(add1);
+	Instruction *dest_inst= IMemory::get(add2);
+	// an added code to attach the number of expected inputs for SWI
+	// to help us in the garbage collections of saved dest
+	if(dest_inst != NULL)
+		if(dest_inst->isSwitch())
+		{
+			dest_inst->inputs++;
+			IMemory::put(add2[0], add2[1], dest_inst);
+		}
 	inst->distList[port1].push_back(make_tuple(add2,port2));
 	IMemory::put(add1[0], add1[1], inst);
 }

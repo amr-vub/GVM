@@ -1,3 +1,3 @@
-const short CORENUMBERS = 4;
+extern short CORENUMBERS;
 const short NIEGHBOORS = 2;
 const short THRESHOLD = 2;
