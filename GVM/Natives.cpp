@@ -60,16 +60,16 @@ Datum Natives::intNative(vector<Datum> args)
 	// here we should check the original type for the input datum
 	if(args[0].token_Type == Datum::FLOAT)
 	{
-		args[0].iValue = args[0].fValue;		
+		args[0].uLValue = args[0].fValue;		
 	}
 	else if(args[0].token_Type == Datum::BOOLEAN)
 	{
-		args[0].iValue = args[0].bValue;
+		args[0].uLValue = args[0].bValue;
 
 	}
 	// TODO; else parts
 
-	args[0].token_Type = Datum::INT;
+	args[0].token_Type = Datum::ULONG_LONG;
 
 	return args[0];
 }

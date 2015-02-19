@@ -18,6 +18,7 @@ class Datum
 public:
 	enum Type{
 		INT,
+		ULONG_LONG,
 		FLOAT,
 		CHAR,
 		BOOLEAN,
@@ -27,7 +28,7 @@ public:
 		B_VECTOR
 	} token_Type;
 
-	Datum(int iValue = -1,float fValue = -1, char cValue = -1, const string& sValue = " ");	
+	Datum( unsigned long long uLValue = 0, int iValue = -1, float fValue = -1, char cValue = -1, const string& sValue = " ");	
 	~Datum();
 
 	//changing the type
@@ -55,6 +56,7 @@ public:
 
 	/*	Fields	*/
 	int iValue;
+	unsigned long long uLValue;
 	float fValue;
 	char cValue;
 	bool bValue;

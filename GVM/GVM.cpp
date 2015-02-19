@@ -82,8 +82,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		Tag * tag = new Tag(*firstCx, i, indxStrAdd, core->coreID);
 		if(strToks.size() == 1)
 		{			
-			Datum datum = Datum(atoi(strToks[0].c_str()));
-			datum.token_Type = Datum::INT;
+			Datum datum = Datum((unsigned long long)atol(strToks[0].c_str()));
+			datum.token_Type = Datum::ULONG_LONG;
 			Token_Type *tok = new Token_Type(datum, tag);
 			core->inbox.push_back(tok);
 		}
@@ -148,7 +148,7 @@ void printResult(Token_Type* tok)
 		}
 		break;
 	default:
-		cout<< tok->data.iValue;
+		cout<< tok->data.uLValue;
 	}
 }
 

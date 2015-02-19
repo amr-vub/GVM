@@ -243,7 +243,7 @@ void Switch::execute(Token_Type **tokens, Core *core)
 		// NEW: Switch has to forward all of its recieved tokens
 		toksV.push_back(tokens[0]);
 		// then determine thier dest based on the recieved token's data
-		int destIdx = tokens[0][0].data.iValue * 2;
+		int destIdx = tokens[0][0].data.uLValue * 2;
 		int *indx = new int[2];
 		indx[0] = this->destinationList[destIdx];
 		indx[1] = this->destinationList[destIdx+1];		
