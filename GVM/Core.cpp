@@ -39,7 +39,7 @@ void Core::start()
 			Token_Type *tok = this->inbox.front();
 			Tag tag = *tok->tag;
 			//this->inbox.pop_back();	
-			if(tag.instAdd[0] == 0 && (tag.instAdd[1] == 16))
+			if(tag.instAdd[0] == 1 && (tag.instAdd[1] == 11 || tag.instAdd[1]== 16 || tag.instAdd[1] == 22))
 				std::cout<< "" <<endl;
 			this->dispatcher.dispatch(tok);
 			if(this->inbox.size() == 1)

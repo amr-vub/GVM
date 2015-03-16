@@ -68,6 +68,9 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 		// check first if the dest inst has literals
 		Instruction* inst = IMemory::get(tok->tag->instAdd);		
 
+		if(tok->tag->instAdd[1] == 18)
+			inst->chunk = inst->chunk;
+
 		Token_Type** tokensArr;
 
 		if(inst->tokenInputs == inst->inputs && inst->inputs == 1)

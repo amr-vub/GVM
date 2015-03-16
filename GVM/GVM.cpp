@@ -27,6 +27,7 @@ short globalNum_ips;
 using namespace std;
 
 bool isLegalLine(string &line);
+void printResult(Token_Type* tok);
 
 int _tmain(int argc, _TCHAR* argv[])
 {	
@@ -64,7 +65,14 @@ int _tmain(int argc, _TCHAR* argv[])
 		getline(cin,input);
 		parser::Tokenize(input,strToks);
 		Tag * tag = new Tag(*firstCx, i, indxStrAdd);
-		if(strToks.size() == 1)
+		if(strToks[0]=="[]")
+		{
+			Datum datum = Datum();
+			datum.token_Type = Datum::I_VECTOR;					
+			Token_Type *tok = new Token_Type(datum, tag);
+			core.inbox.push_back(tok);
+		}
+		else if(strToks.size() == 1)
 		{			
 			Datum datum = Datum(atoi(strToks[0].c_str()));
 			datum.token_Type = Datum::INT;
@@ -95,13 +103,35 @@ int _tmain(int argc, _TCHAR* argv[])
 	// will be the program result
 	Token_Type *tok = core.inbox.front();
 	cout<< "the result is : \n";
-	cout<< tok->data.iValue;
+	printResult(tok);
 	core.inbox.clear();
 
 	// freeing memory
 	delete tok;
 
 	return 0;
+}
+
+// function to print the result
+void printResult(Token_Type* tok)
+{
+	switch (tok->data.token_Type)
+	{
+	case Datum::I_VECTOR:
+		{
+			cout<< "[";
+			for (int i = 0; i < tok->data.iValue_v.size(); i++)
+			{
+				cout<< tok->data.iValue_v[i] ;
+				if(i + 1 != tok->data.iValue_v.size())
+					cout<< ", " ;
+			}
+			cout<< "]";
+		}
+		break;
+	default:
+		cout<< tok->data.iValue;
+	}
 }
 
 /* Function to parse the line and skip if it starts with '$'

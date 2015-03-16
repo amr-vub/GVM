@@ -67,7 +67,7 @@ public:
 	map<pair<long,long>, Vector_token> switchStorage;
 
 	// s storage that hold selected dest recieved by tokens with port == 0
-	// to be saved for further tokens with same pair<long,long>
+	// to be saved for further tokens with same pair<cx,InsAdd>
 	map<pair<long,long>, tuple<short,int*>> savedDestinations;
 
 	// Forward tokens to the tokenizer queue

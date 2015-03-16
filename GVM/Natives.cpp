@@ -299,6 +299,47 @@ Datum Natives::vecLengthNative(vector<Datum> args)
 
 }
 
+// Retruns a subset of the array
+Datum Natives::vecSubNative(vector<Datum> args)
+{
+		Datum ret;
+	ret.token_Type = args[0].token_Type;
+	int idx = 0;
+	// check the tokendata type and make the pruning
+	switch(args[0].token_Type)
+	{		
+	case Datum::I_VECTOR:
+		{
+			for(int i=args[1].iValue ; i<args[2].iValue;i++)
+			{				
+				ret.iValue_v.push_back(args[0].iValue_v[i]);			
+			}
+
+		}
+		break;
+	case Datum::F_VECTOR:	
+		{			
+			for(int i=args[1].iValue ; i<args[2].iValue;i++)
+			{				
+				ret.fValue_v.push_back(args[0].fValue_v[i]);			
+			}
+		}
+		break;
+	case Datum::B_VECTOR:	
+		{			
+			for(int i=args[1].iValue ; i<args[2].iValue;i++)
+			{				
+				ret.bValue_v.push_back(args[0].bValue_v[i]);			
+			}
+		}
+		break;
+	default:
+		printf("_____ERORR_____ vecSubNative\n");
+	}
+
+	return ret;
+}
+
 // static function to intialize the map 
 map<string, MyFuncPtrType> Natives::generateMap()
 {
@@ -318,6 +359,7 @@ map<string, MyFuncPtrType> Natives::generateMap()
 	temp["arrLen"] = &Natives::vecLengthNative;
 	temp["arrGet"] = &Natives::vecGetNative;
 	temp["arrBound"] = &Natives::vecBoundNative;
+	temp["arrSub"] = &Natives::vecSubNative;	
 
 	return temp;
 }

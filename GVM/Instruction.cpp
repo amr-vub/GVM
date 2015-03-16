@@ -101,17 +101,19 @@ vector<Datum> Operation::createArgsList(Token_Type** toks)
 		retArgs.push_back(get<1>(*it));							
 		}
 		*/				
-		// one literal and one token
-		if(toks[0]->tag->port < get<0>(literals.front()))
-		{
-			retArgs.push_back(toks[0]->data);
-			retArgs.push_back(get<1>(literals.front()));
-		}
+		// one literal and one token		
+		//if(toks[0]->tag->port < get<0>(literals.front()))
+		//{
+		retArgs.push_back(toks[0]->data);
+		retArgs.push_back(toks[1]->data);
+		//}
+		/*
 		else
 		{
 			retArgs.push_back(get<1>(literals.front()));
 			retArgs.push_back(toks[0]->data);
 		}
+		*/
 
 
 	}

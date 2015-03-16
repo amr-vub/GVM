@@ -189,7 +189,7 @@ void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short
 		// generate new context
 		new_cx = this->tokenizer->core->conxObj.getUniqueCx(this->tokenizer->core->coreID);
 		// just changing the cx of one token, no further to come
-		bind_send(tok, destAdd, tok.tag->port, tok.tag->port, retAdd, rest, new_cx);
+		bind_send(tok, destAdd, -1, tok.tag->port, retAdd, rest, new_cx);
 	}
 }
 

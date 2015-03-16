@@ -76,7 +76,7 @@ Context* ContextCreater::getUniqueCx(short &corId)
 		return cx;
 	}
 	else
-		new Context(corId, ++this->conxCounter);
+		return new Context(corId, ++this->conxCounter);
 }
 
 // free an already created context and add it to the avaliable vector
