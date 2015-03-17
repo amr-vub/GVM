@@ -8,13 +8,12 @@
 #include "Tag.h"
 
 // constructor
-Tag::Tag(Context &cx, short prt, int *instAdd, short token_executor_coreID)
+Tag::Tag(Context &cx, short prt, int *instAdd)
 {
 	this->conx = cx;
 	this->port = prt;
 	this->instAdd[0] = instAdd[0];
-	this->instAdd[1] = instAdd[1];
-	this->token_executor_coreID = token_executor_coreID;
+	this->instAdd[1] = instAdd[1];	
 	this->instIdx = 0;
 	this->tokenID = 0;
 	generateUniqeInstIdx();

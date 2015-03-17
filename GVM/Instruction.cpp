@@ -157,8 +157,7 @@ void Operation::execute(Token_Type **tokens, Core *core)
 
 
 	// send the res to tokenizer
-	core->tokenizer.wrapAndSend((this->distList[0]), res, tokens[0][0].tag->conx, core->coreID, 
-		tokens[0][0].tag->token_executor_coreID);
+	core->tokenizer.wrapAndSend((this->distList[0]), res, tokens[0][0].tag->conx, core->coreID);
 }
 // OPR is very tedious to be stealed, as it requires
 // at least the sharing of the token tables, but in case of one token input,
@@ -187,13 +186,11 @@ Sink::~Sink()
 Sink instruction simply forwad it's inputs to thier dest
 */
 void Sink::execute(Token_Type **tokens, Core *core)
-{
-	//std::cout<< core.dispatcher;
-	short ex_CoreId = tokens[0][0].tag->token_executor_coreID;
+{		
 	short crID = core->coreID;	
 	// send the res to this core tokenizer
 	core->tokenizer.wrapAndSend((this->distList[tokens[0][0].tag->port]), tokens[0][0].data, 
-		tokens[0][0].tag->conx, crID , ex_CoreId);							
+		tokens[0][0].tag->conx, crID);							
 	// freeing memory
 	delete tokens[0];
 }
@@ -276,8 +273,7 @@ void Switch::execute(Token_Type **tokens, Core *core)
 				Vector_Tuple dest;
 				short port = tok->tag->port;
 				dest.push_back(make_tuple(indx, port));
-				core->tokenizer.wrapAndSend(dest, tok->data, tok->tag->conx, core->coreID
-					,core->coreID);
+				core->tokenizer.wrapAndSend(dest, tok->data, tok->tag->conx, core->coreID);
 			}
 		}
 		// freeing memory
@@ -290,7 +286,7 @@ void Switch::execute(Token_Type **tokens, Core *core)
 		Vector_Tuple dest;
 		short port = tokens[0]->tag->port;
 		dest.push_back(make_tuple(indx, port));
-		core->tokenizer.wrapAndSend(dest, tokens[0]->data, tokens[0]->tag->conx, core->coreID, core->coreID);
+		core->tokenizer.wrapAndSend(dest, tokens[0]->data, tokens[0]->tag->conx, core->coreID);
 	}
 	else
 	{
@@ -350,7 +346,7 @@ void ContextChange::execute(Token_Type **tokens, Core *core)
 			// prepare the literal as a token			
 			short port = get<0>(lit);
 			Datum value = get<1>(lit);
-			Tag *tag = new Tag(tokens[0]->tag->conx, port, tokens[0]->tag->instAdd, core->coreID);
+			Tag *tag = new Tag(tokens[0]->tag->conx, port, tokens[0]->tag->instAdd);
 			Token_Type tok2 =  Token_Type(value, tag);
 			// then send delegate
 			core->tokenizer.contextManager.bind_save(tok2, this->todest, this->retDest, 
@@ -509,7 +505,7 @@ void Split::doSplitWork(Token_Type* tok, Token_Type** tokens, short portIdx, Cor
 		Vector_Tuple dest;
 		dest.push_back(make_tuple(this->todest,tokens[i]->tag->port));
 		// TODO, change the core id				
-		core->tokenizer.wrapAndSend(dest, tokens[i]->data, *new_cx, crID, crID);
+		core->tokenizer.wrapAndSend(dest, tokens[i]->data, *new_cx, crID);
 	}
 }
 

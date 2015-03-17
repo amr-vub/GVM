@@ -44,8 +44,6 @@ struct RestoreArgs{
 	Context *cx;
 	// number of expected return values
 	short restores;
-	// field to save the ex_coreID
-	short ex_coreID;
 };
 
 /*
@@ -134,7 +132,7 @@ public:
 	Tokenizer();
 	~Tokenizer(void);	
 	// create a new token and send it to the token queue
-	void wrapAndSend(Vector_Tuple &distList, Datum &res, Context &cx, short &coreId, short token_executor_coreID);
+	void wrapAndSend(Vector_Tuple &distList, Datum &res, Context &cx, short &coreId);
 
 	// The load distrubuter handler function
 	short loadDistrubuter();

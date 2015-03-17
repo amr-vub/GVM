@@ -79,7 +79,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		vector<string> strToks;
 		getline(cin,input);
 		parser::Tokenize(input,strToks);
-		Tag * tag = new Tag(*firstCx, i, indxStrAdd, core->coreID);
+		Tag * tag = new Tag(*firstCx, i, indxStrAdd);
 		if(strToks.size() == 1)
 		{			
 			Datum datum = Datum(atoi(strToks[0].c_str()));

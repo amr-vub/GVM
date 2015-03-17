@@ -335,7 +335,7 @@ void Constant<T>::execute(Token_Type **tokens, Core *core)
 	Context cx = tokens[0]->tag->conx;
 
 	if(0 == port)
-		core->tokenizer.wrapAndSend(this->distList[port], this->value, cx, core->coreID, tokens[0]->tag->token_executor_coreID);
+		core->tokenizer.wrapAndSend(this->distList[port], this->value, cx, core->coreID);
 	// freeing memory
 	delete tokens[0];
 }

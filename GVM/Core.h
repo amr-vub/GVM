@@ -49,18 +49,12 @@ public:
 
 	// insert tokens into the core's queue
 	void insertToken(Token_Type* tok);
-
-	// insert tokens into the core's Independant queue
-	void insertToken_InIndInbox(Token_Type* tok);
 	
 	// erase tokens into the core's queue
 	list<Token_Type*>::iterator eraseToken(list<Token_Type*>::iterator index);
 
 	// get the schedualed element of the queue and erase it afterwards
 	Token_Type* getScheduleElement();
-
-	// get the schedualed element of the indep queue and erase it afterwards
-	Token_Type* getScheduleElement_IndInbox();
 
 	// fields part (for simplicity, I will make them public)
 	TokenDispatcher dispatcher;
@@ -89,9 +83,6 @@ public:
 
 	// Token queue
 	list<Token_Type*> inbox;
-	
-	// Independant tokens queue
-	list<Token_Type*> ind_Inbox;
 
 	boost::mutex c_mutex;
 
