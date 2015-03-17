@@ -12,6 +12,9 @@
 #include "IMemory.h"
 #include "Tokenizer.h"
 #include "Token_Type.h"
+#include <iostream>
+
+extern bool DEBUG;
 
 /** 
 * This class defines the Core.
@@ -57,3 +60,4 @@ public:
 
 };
 
+void LOG(string outString);

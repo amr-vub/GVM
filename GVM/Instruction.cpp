@@ -132,6 +132,9 @@ void Operation::addLiterals(short &port, Datum &value)
 
 void Operation::execute(Token_Type **tokens, Core *core)
 {
+	// login some info for debugging
+	LOG( "Operation::execute Token with Context " +to_string(tokens[0]->tag->conx.conxId)  + 
+		" operation  [" + this->opCode + "] \n");
 	// get the conceret function to be implemented based on the opcode of this objs
 	MyFuncPtrType op_func_pointer = Natives::opcodes_pointers[this->opCode];
 
@@ -164,7 +167,9 @@ Sink instruction simply forwad it's inputs to thier dest
 */
 void Sink::execute(Token_Type **tokens, Core *core)
 {
-	//std::cout<< core.dispatcher;
+	// login some info for debugging
+	LOG( "Sink::execute Token with Context " +to_string(tokens[0]->tag->conx.conxId)  + 
+		"\n");
 	// send the res to tokenizer
 	core->tokenizer.wrapAndSend((this->distList[tokens[0][0].tag->port]), tokens[0][0].data, tokens[0][0].tag->conx);
 	// freeing memory
@@ -210,6 +215,9 @@ void Switch::execute(Token_Type **tokens, Core *core)
 	short port = tokens[0][0].tag->port;
 	if(port == 0)
 	{
+		// login some info for debugging
+		LOG( "SWITCH:execute Token with Context " +to_string(tokens[0]->tag->conx.conxId)  + 
+		"-- zero recieved!");
 		// the condition token has arrived
 		// use it to index the destination list
 		// and send all stored tokens recieved before
@@ -226,7 +234,8 @@ void Switch::execute(Token_Type **tokens, Core *core)
 		int *indx = new int[2];
 		indx[0] = this->destinationList[destIdx];
 		indx[1] = this->destinationList[destIdx+1];		
-
+		// login some info for debugging
+		LOG( " dest add: [" + to_string(indx[0])  + "," + to_string(indx[1]) + "]");
 		// valide index
 		if(this->destinationList.size() > destIdx)
 		{					
@@ -234,6 +243,8 @@ void Switch::execute(Token_Type **tokens, Core *core)
 			if(toksV.size() < this->inputs)
 			{
 				short remainingInputs = this->inputs - toksV.size();
+				// login some info for debugging
+				LOG( " remainingInputs: " + to_string(remainingInputs) + "\n");
 				core->tokenizer.swicther.storeDest(tokens[0], remainingInputs, indx);
 			}
 			// loop through the saved existing tokens, for each 
@@ -251,6 +262,8 @@ void Switch::execute(Token_Type **tokens, Core *core)
 	}
 	else if(core->tokenizer.swicther.alreadyExists(tokens[0]))
 	{
+		LOG("SWITCH: This token " + to_string(tokens[0]->tag->conx.conxId) + " port: " + to_string(tokens[0]->tag->port)
+			+  "is mapped to an already selected dest, as it arrives after the port 0 token! \n");
 		// this token is mapped to an already selected dest, as it arrives after the port 0 token!
 		int* indx = get<1>(core->tokenizer.swicther.updateStoredDest(tokens[0]));
 		Vector_Tuple dest;
@@ -260,6 +273,8 @@ void Switch::execute(Token_Type **tokens, Core *core)
 	}
 	else
 	{		
+		LOG("SWITCH: Store this token with context " + to_string(tokens[0]->tag->conx.conxId) + " port: " + to_string(tokens[0]->tag->port)
+			+  " till we recieve the condition token to specify it's dest \n");
 		// store this token till we recieve the condition token to specify it's dest
 		core->tokenizer.swicther.addSwitchStorageElement(*tokens);
 	}	
@@ -299,11 +314,15 @@ void ContextChange::execute(Token_Type **tokens, Core *core)
 {
 	// Checks is the instruction already has literals or not
 	if(this->literals.empty())
+	{
+		LOG("ContextChange: No literals! -- ");
 		// delegate to the context manger obj to handel the context change execution details
-			core->tokenizer.contextManager.bind_save(tokens[0][0], this->todest, this->retDest, 
+		core->tokenizer.contextManager.bind_save(tokens[0][0], this->todest, this->retDest, 
 			this->binds, this->restores, this->InstInx);
+	}
 	else
 	{
+		LOG("ContextChange: at least one literal! -- Send it --");
 		// means that there exist at least one literal, then compare the binds to the literals size
 		for(auto lit : this->literals)
 		{
@@ -317,6 +336,7 @@ void ContextChange::execute(Token_Type **tokens, Core *core)
 				this->binds, this->restores, this->InstInx);			
 		}
 		this->literals.clear();
+		LOG(" Then send the original token \n");
 		core->tokenizer.contextManager.bind_save(tokens[0][0], this->todest, this->retDest, 
 			this->binds, this->restores, this->InstInx);
 	}
@@ -372,7 +392,8 @@ void Split::execute(Token_Type **tokens, Core *core)
 	Token_Type *tok = new Token_Type();
 	tok->tag = new Tag();
 	int portIdx= 0;
-
+		// login some info for debugging
+	LOG( "SPLIT::execute Token with Context " +to_string(tokens[0]->tag->conx.conxId) + " -- ");
 	switch(tokens[0][0].data.token_Type)
 	{
 	case Datum::I_VECTOR:
@@ -433,6 +454,7 @@ void Split::doSplitWork(Token_Type* tok, Token_Type** tokens, short portIdx, Cor
 	tok->tag->port = portIdx;
 	// generate new context
 	Context *new_cx = core->conxObj.getUniqueCx(core->coreID);
+	LOG( " doSplitWork -- \n");
 	// send each element in the array to the same instruction instance
 	core->tokenizer.contextManager.bind_send(*tok, this->todest, portIdx, 0, this->mergeDest, 1, new_cx);
 	// then send the args
@@ -456,5 +478,6 @@ Stop::~Stop()
 
 void Stop::execute(Token_Type **tokens, Core *core)
 {
+	LOG("\n----------------------STOP---------------------------------/n");
 	core->tokenizer.sendStop(*tokens);
 }

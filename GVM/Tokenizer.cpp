@@ -44,6 +44,10 @@ void Tokenizer::wrapAndSend(Vector_Tuple &distList, Datum &res, Context &cx)
 		Tag *newTag = new Tag(cx, port, instAdd);
 		Token_Type* newTok = new Token_Type(res, newTag);
 		
+		LOG("Wrapping Token with data type " + to_string(res.token_Type) + " and data value "
+			+ to_string(res.iValue) + " context " + to_string(cx.conxId) + " and instruction address ["
+			+  to_string(instAdd[0]) + "," + to_string(instAdd[1])+ "] \n");
+
 		// TODO, send to the queue
 		this->core->inbox.push_back(newTok);
 	}	
@@ -155,12 +159,15 @@ void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short
 	Context old_cx = tok.tag->conx;
 	Context *new_cx = NULL;
 	short bds;
+	LOG("ContextManager::bind_save -- Token with context " + to_string(old_cx.conxId) + " --");
 	// check if we need to store the new generated cx for other incoming toks
 	if(binds > 1)
-	{
+	{	
+		LOG(" Bind > 1 --");
 		// if no element already exists for that tok. i.e the first argument to arrive
 		if(this->contextMap.find(make_pair(old_cx.conxId, instIdx)) == contextMap.end())
 		{
+			LOG(" Generate new context -- \n");
 			// generate new context
 			new_cx = this->tokenizer->core->conxObj.getUniqueCx(this->tokenizer->core->coreID);
 			// update the context map, cause we have still binds-1 toks to come
@@ -169,23 +176,31 @@ void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short
 		}
 		else
 		{
+			LOG(" NO need to create a new context --");
 			// then no need to create a new context, just get the already created on
 			// for the same old context Id
 			new_cx = get<1>(this->contextMap[make_pair(old_cx.conxId, instIdx)]);
 			bds = get<0>(this->contextMap[make_pair(old_cx.conxId, instIdx)]);
 			// check if the stored binds is == 1. i.e. all of the expected toks have arrived
 			if(bds == 1)
+			{
+				LOG(" Delete the entry from the context map -- \n");
 				// delete the entry from the context map
 				this->contextMap.erase(make_pair(old_cx.conxId, instIdx));
+			}
 			else
+			{
+				LOG(" Still have tokens to come: " + to_string(bds-1) + " -- \n");
 				// update the context map, cause we have still binds-1 toks to come
 				this->contextMap[make_pair(old_cx.conxId, instIdx)] = make_tuple(bds-1, new_cx);	
+			}
 		}
 		// bind and send the recieved tok
 		bind_send(tok, destAdd, -1, tok.tag->port, retAdd, rest, new_cx);
 	}
 	else
 	{
+		LOG(" ELSE PART: Generate new context -- \n");
 		// generate new context
 		new_cx = this->tokenizer->core->conxObj.getUniqueCx(this->tokenizer->core->coreID);
 		// just changing the cx of one token, no further to come
@@ -241,6 +256,9 @@ void ContextManager::restore(Token_Type &tok)
 	long conxId = tok.tag->conx.conxId;
 	RestoreArgs resArgs = restoreMap[conxId];
 	Context old_cx = *resArgs.cx;
+
+	LOG("RESTORING: token with cx: " + to_string(conxId) + " and old_cx: " + to_string(old_cx.conxId) + 
+		" Dest inst: [" + to_string(resArgs.chunk) + "," + to_string(resArgs.idx) + "] \n");
 
 	// send the tok to the tokenizer
 	Vector_Tuple temp;

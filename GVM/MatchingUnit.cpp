@@ -36,6 +36,10 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 	// get the token dist instruction address
 	long instIdx = tok->tag->instIdx;
 
+	// login some info for debugging
+	LOG( "MatchingUnit: Token with Context " +to_string(tok->tag->conx.conxId)  + 
+		" instruction address [" + to_string(tok->tag->instAdd[0]) + "," + to_string(tok->tag->instAdd[1])+ "] \n" );
+
 	// query the local table to see if a token already exists
 	// TODO : Replace Make pair (or not?)
 	TokenTableType::iterator tokenIt = 
@@ -47,6 +51,7 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 					
 		if(tokenIt->second.Indx + 1 == tokenIt->second.inputs)
 		{
+			LOG("There is a match for the recieved token. No more inputs to come! \n");
 			// fetch and send them to the schedualer
 			tokenIt->second.tokenArr[tok->tag->port] = tok;
 			core->sch.executeTwo(tokenIt->second.tokenArr);
@@ -58,6 +63,7 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 		{
 			// still more inputs to come , i.e only in the case of array operation,
 			// then update the tokentable
+			LOG("Still more inputs to come, then update the tokentable \n");
 			tokenIt->second.Indx++;
 			tokenIt->second.tokenArr[tok->tag->port] = tok;			
 			tokenTable[make_pair(cx.conxId, instIdx)] = tokenIt->second;
@@ -68,6 +74,8 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 		// check first if the dest inst has literals
 		Instruction* inst = IMemory::get(tok->tag->instAdd);		
 
+		LOG("There is no match for the recieved token, check it's inst \n");
+
 		if(tok->tag->instAdd[1] == 18)
 			inst->chunk = inst->chunk;
 
@@ -75,12 +83,14 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 
 		if(inst->tokenInputs == inst->inputs && inst->inputs == 1)
 		{
-			//send it to the sch			
+			//send it to the sch	
+			LOG("only one input. Send it to the sch! \n");
 			this->core->sch.executeTwo(&tok);
 			delete tok;			
 		}
 		else if(inst->literals.empty())
 		{
+			LOG("First time to get a token with this indx. No literals. Saving \n");
 			// First time to get a token with this indx
 			// save the token in the token table, and wait for the rest			
 			tokensArr = new Token_Type*[inst->inputs];
@@ -94,6 +104,7 @@ void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 		}
 		else
 		{
+			LOG("There are literals. Prepare the literal as a token. \n");
 			// prepare the literal as a token
 			tuple<short, Datum> temp = inst->literals.front();
 			short port = get<0>(temp);

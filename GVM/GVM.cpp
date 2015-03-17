@@ -22,6 +22,8 @@
 #include <cstdio>
 #include <ctime>
 
+bool DEBUG = false;
+
 short globalNum_ips;
 
 using namespace std;
@@ -33,6 +35,14 @@ int _tmain(int argc, _TCHAR* argv[])
 {	
 	clock_t start;
     double duration;		
+
+	// check for debug flag in the input args
+	if(argc >= 2)
+	{
+		string temp = (char*)argv[2];
+		if( temp == "T")
+			DEBUG = true;
+	}
 
 	// open the instrucion file to parse
 	fstream instFile;
