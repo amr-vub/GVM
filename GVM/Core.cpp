@@ -45,30 +45,13 @@ Core::~Core(void)
 // Entry point for starting the core work
 void Core::start()
 {
-	//this->active = true;
-	int fake= 0;
-	bool StartUp_Done = false;
-
 	while(this->active)
 	{			
-		if(this->coreID == 0)
-			fake++;
-		if(this->inbox.size() != 0){
-			/*
-			if(this->Idle_Counter < this->inbox.size())
-				this->Idle_Counter = this->inbox.size();*/						
-			Token_Type *tok = this->getScheduleElement();//this->inbox.front();
-			//this->inbox.pop_back();			
-			if(tok->tag->instAdd[0] == 1 && tok->tag->instAdd[1] == 13)
-				cout<< "";
-			this->dispatcher.dispatch(tok);
-			//this->eraseToken();			
+		if(this->inbox.size() != 0){							
+			Token_Type *tok = this->getScheduleElement_LIFO();						
+			this->dispatcher.dispatch(tok);			
 		}
 	}
-	/*
-	boost::lock_guard<boost::mutex> guard(s_mutex);
-	cout << "core number: " << this->coreID << " was idle: " << fake << endl;
-	*/
 }
 
 // spawn the thread
@@ -101,7 +84,18 @@ list<Token_Type*>::iterator Core::eraseToken(list<Token_Type*>::iterator index)
 
 // get the schedualed element of the queue and erase it afterwards
 // TODO
-Token_Type* Core::getScheduleElement()
+Token_Type* Core::getScheduleElement_LIFO()
+{	
+	boost::lock_guard<boost::mutex> guard(c_mutex);
+	
+	Token_Type* temp = this->inbox.back();
+	this->inbox.pop_back();
+
+	return temp;
+}
+
+// get the schedualed element of the queue and erase it afterwards
+Token_Type* Core::getScheduleElement_FIFO()
 {	
 	boost::lock_guard<boost::mutex> guard(c_mutex);
 	

@@ -54,7 +54,10 @@ public:
 	list<Token_Type*>::iterator eraseToken(list<Token_Type*>::iterator index);
 
 	// get the schedualed element of the queue and erase it afterwards
-	Token_Type* getScheduleElement();
+	Token_Type* getScheduleElement_FIFO();
+	
+	// get the schedualed element of the queue and erase it afterwards
+	Token_Type* getScheduleElement_LIFO();
 
 	// fields part (for simplicity, I will make them public)
 	TokenDispatcher dispatcher;
@@ -85,8 +88,6 @@ public:
 	list<Token_Type*> inbox;
 
 	boost::mutex c_mutex;
-
-	boost::mutex ind_c_mutex;
 
 	static boost::mutex s_mutex;
 
