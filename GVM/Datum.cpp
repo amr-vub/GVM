@@ -12,12 +12,11 @@ Datum::~Datum()
 {
 }
 
-Datum::Datum(unsigned long long uLValue, int iValue, float fValue, char cValue,const string& sValue) {
+Datum::Datum(int iValue,float fValue, char cValue,const string& sValue) {
 	this->iValue = iValue;
 	this->fValue = fValue;
 	this->cValue = cValue;
 	this->sValue = sValue;
-	this->uLValue = uLValue;
 }
 
 //changing the type
@@ -35,18 +34,10 @@ Datum Datum::operator==(const Datum& b)
 	// setting the token type for the new created Datum
 	retrn.token_Type = BOOLEAN;
 	// silly way for checking the datum type and act accordingly
-	switch(this->token_Type)
-	{
-	case INT:
+	if(this->token_Type == INT)
 		retrn.bValue = this->iValue == b.iValue; 
-		break;
-	case FLOAT:
+	else if(this->token_Type == FLOAT)
 		retrn.bValue = this->fValue == b.fValue; 
-		break;
-	case ULONG_LONG:
-		retrn.bValue = this->uLValue == b.uLValue; 
-		break;
-	}	
 
 	return retrn;
 }
@@ -63,9 +54,6 @@ Datum Datum::operator+(const Datum& b)
 	{
 	case INT:
 		retrn.iValue = this->iValue + b.iValue; 
-		break;
-	case ULONG_LONG:
-		retrn.uLValue = this->uLValue + b.uLValue; 
 		break;
 	case FLOAT:
 		retrn.fValue = this->fValue + b.fValue; 
@@ -87,9 +75,6 @@ Datum Datum::operator-(const Datum& b)
 	case INT:
 		retrn.iValue = this->iValue - b.iValue; 
 		break;
-	case ULONG_LONG:
-		retrn.uLValue = this->uLValue - b.uLValue; 
-		break;
 	case FLOAT:
 		retrn.fValue = this->fValue - b.fValue; 
 		break;
@@ -109,9 +94,6 @@ Datum Datum::operator*(const Datum& b)
 	{
 	case INT:
 		retrn.iValue = this->iValue * b.iValue; 
-		break;
-	case ULONG_LONG:
-		retrn.uLValue = this->uLValue * b.uLValue; 
 		break;
 	case FLOAT:
 		retrn.fValue = this->fValue * b.fValue; 
@@ -134,9 +116,6 @@ Datum Datum::operator/(const Datum& b)
 	case INT:
 		retrn.iValue = this->iValue / b.iValue; 
 		break;
-	case ULONG_LONG:
-		retrn.uLValue = this->uLValue / b.uLValue; 
-		break;
 	case FLOAT:
 		retrn.fValue = this->fValue / b.fValue; 
 		break;
@@ -157,9 +136,6 @@ Datum Datum::operator>(const Datum& b)
 	{
 	case INT:
 		retrn.bValue = this->iValue > b.iValue; 
-		break;
-	case ULONG_LONG:
-		retrn.bValue = this->uLValue > b.uLValue; 
 		break;
 	case FLOAT:
 		retrn.bValue = this->fValue > b.fValue; 
@@ -182,9 +158,6 @@ Datum Datum::operator>=(const Datum& b)
 	{
 	case INT:
 		retrn.bValue = this->iValue >= b.iValue; 
-		break;
-	case ULONG_LONG:
-		retrn.bValue = this->uLValue >= b.uLValue; 
 		break;
 	case FLOAT:
 		retrn.bValue = this->fValue >= b.fValue; 
@@ -214,9 +187,6 @@ Datum Datum::operator<(const Datum& b)
 	{
 	case INT:
 		retrn.bValue = this->iValue < b.iValue; 
-		break;
-	case ULONG_LONG:
-		retrn.bValue = this->uLValue < b.uLValue; 
 		break;
 	case FLOAT:
 		retrn.bValue = this->fValue < b.fValue; 

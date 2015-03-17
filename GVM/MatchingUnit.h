@@ -45,5 +45,7 @@ public:
 	// The local tokens table that reflects the existing tokens
 	// in the matching units that are waiting for thier pairs
 	TokenTableType tokenTable;
+
+	unordered_map<unsigned long long, short> arrayInputsStore;
 };
 

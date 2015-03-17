@@ -102,12 +102,12 @@ void Create_Structure_stmt::createConstant(vector<string> &strTokns)
 	// get the idx
 	int indx[2] = {_CHUNK_GLOBAL, atoi(strTokns[2].c_str())};
 	// TODO 
-	unsigned long long value = atol(strTokns[4].c_str());	
+	int value = atoi(strTokns[4].c_str());	
 
 	// create the constant inst
 	// TODO 
-	Datum dat = Datum((unsigned long long)value);
-	dat.token_Type = Datum::ULONG_LONG;
+	Datum dat = Datum(value);
+	dat.token_Type = Datum::INT;
 	Constant<Datum> *constant = new Constant<Datum>(_CHUNK_GLOBAL, indx, dat);
 
 	// add to the memory

@@ -108,7 +108,7 @@ public:
 	bool isINDependant();
 
 	// preparing the args list
-	vector<Datum> createArgsList(Token_Type** toks);
+	vector<Datum> createArgsList(Token_Type** toks, short ips);
 
 	// add literals to this inst
 	void addLiterals(short &port, Datum &value);

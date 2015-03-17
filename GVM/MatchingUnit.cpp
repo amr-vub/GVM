@@ -30,6 +30,10 @@ MatchingUnit::~MatchingUnit(void)
 */
 void MatchingUnit::executeOrUpdateTable(Token_Type *tok)
 {
+	/*
+	if(tok->tag->instAdd[1]==12)
+		printf("ada");
+		*/
 	// get the token context
 	Context cx = tok->tag->conx;
 
