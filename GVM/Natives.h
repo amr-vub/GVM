@@ -77,6 +77,9 @@ public:
 	// Retruns the length of the array
 	static Datum Natives::vecLengthNative(vector<Datum> args);
 
+	// Retruns a subset of the array
+	static Datum Natives::vecSubNative(vector<Datum> args);
+
 	/*	fields	*/
 	// global map as a table for native ops function pointers
 	static map<string, MyFuncPtrType> opcodes_pointers;

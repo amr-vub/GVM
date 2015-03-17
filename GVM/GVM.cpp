@@ -80,7 +80,14 @@ int _tmain(int argc, _TCHAR* argv[])
 		getline(cin,input);
 		parser::Tokenize(input,strToks);
 		Tag * tag = new Tag(*firstCx, i, indxStrAdd);
-		if(strToks.size() == 1)
+				if(strToks[0]=="[]")
+		{
+			Datum datum = Datum();
+			datum.token_Type = Datum::I_VECTOR;					
+			Token_Type *tok = new Token_Type(datum, tag);
+			core->inbox.push_back(tok);
+		}
+		else if(strToks.size() == 1)
 		{			
 			Datum datum = Datum(atoi(strToks[0].c_str()));
 			datum.token_Type = Datum::INT;
