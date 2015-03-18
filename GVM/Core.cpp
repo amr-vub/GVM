@@ -45,56 +45,29 @@ Core::~Core(void)
 // Entry point for starting the core work
 void Core::start()
 {
-	//this->active = true;
-	int fake= 0;
 	bool StartUp_Done = false;
 
 	while(this->active)
 	{			
-		if(this->coreID == 0)
-			fake++;
-		if(this->inbox.size() != 0){
-			/*
-			if(this->Idle_Counter < this->inbox.size())
-				this->Idle_Counter = this->inbox.size();*/
+		if(this->inbox.size() != 0){			
 			// StartUp_Done is true now as the inbox got at least one element from master core
 			StartUp_Done = true;
-			Token_Type *tok = this->getScheduleElement();//this->inbox.front();
-			//this->inbox.pop_back();			
-			if(tok->tag->instAdd[0] == 1 && tok->tag->instAdd[1] == 13)
-				cout<< "";
-			this->dispatcher.dispatch(tok);
-			//this->eraseToken();			
+			Token_Type *tok = this->getScheduleElement();
+			this->dispatcher.dispatch(tok);		
 		}
 		else if(this->ind_Inbox.size() != 0)
 		{
-			/*
-			if(this->Idle_Counter < this->ind_Inbox.size())
-				this->Idle_Counter = this->ind_Inbox.size();
-			*/	
 			// StartUp_Done is true now as the inbox got at least one element from master core
 			StartUp_Done = true;
-			Token_Type *tok = this->getScheduleElement_IndInbox();//this->inbox.front();
-			//this->inbox.pop_back();			
+			Token_Type *tok = this->getScheduleElement_IndInbox();//this->inbox.front();				
 			this->dispatcher.dispatch(tok);
-		}
-		else
-		{			
-			// check if this idleness is not becasue of the startup
-			if(StartUp_Done)
-			{
-				// now this core is idle after getting intial work from the master core
-				// then load balancing has to be started
-				this->tokenizer.loadBalancer();
-				//fake++;
-			}
-			//boost::this_thread::sleep(boost::posix_time::milliseconds(1));
-		}
+		}			
+		// check if this idleness is not becasue of the startup
+		if(StartUp_Done)		
+			// now this core is idle after getting intial work from the master core
+			// then load balancing has to be started
+			this->tokenizer.loadBalancer();									
 	}
-	/*
-	boost::lock_guard<boost::mutex> guard(s_mutex);
-	cout << "core number: " << this->coreID << " was idle: " << fake << endl;
-	*/
 }
 
 // spawn the thread

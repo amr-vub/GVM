@@ -12,8 +12,8 @@
 
 vector<Core*> Tokenizer::coreList;
 
-// helper function to get the MAX loaded neighbor core id
-short selectVictim(short list[NIEGHBOORS], Core *core);
+// helper function to check for load blalncing initiation conditions
+short initiateLoadBalancing(short list[NIEGHBOORS], Core *core);
 
 Tokenizer::Tokenizer() 
 {
@@ -110,65 +110,54 @@ short Tokenizer::loadDistrubuter()
 
 // The load balanacer handler function
 // This is different than the load distrubuter function,
-// as the underloaded core steals work from direct neighbor overloaded cores.
+// as the overloaded core monitor its niehgbor cores, and initiaite 
+// work sharing if it notice load value under a certain threshold
 void Tokenizer::loadBalancer()
 {
+	if(this->core->ind_Inbox.size() <= THRESHOLD)
+		return;
 	// first get the most overloaded core from the neighbors
-	short victim = selectVictim(this->core->nieghborList, this->core);
+	short needy = initiateLoadBalancing(this->core->nieghborList, this->core);
 
-	int stolenTokensCount= 0;
-	// if there exist a core with load value over the THRESHOLD
-	if(victim != -1)
-	{
-		//boost::lock_guard<boost::mutex> localGuard(this->core->ind_c_mutex);	
-		boost::lock_guard<boost::mutex> guard(this->coreList[victim]->ind_c_mutex);	
-		if(this->coreList[victim]->ind_Inbox.size() < THRESHOLD)
-			return;
-		//int victim_InboxSize = this->coreList[victim]->ind_Inbox.size();	
-		const int victim_InboxSize_const = this->coreList[victim]->ind_Inbox.size();				
-		// begin work stealing!!
-		// loop through the victim's inbox, and steal half of it
-		/**/									
-		for (list<Token_Type*>::iterator it = this->coreList[victim]->ind_Inbox.begin();
-			it!=this->coreList[victim]->ind_Inbox.end();++it)
+	int sharedTokensCount= 0;
+	// if there exist a core with load value under the THRESHOLD
+	if(needy != -1)
+	{		
+		boost::lock_guard<boost::mutex> guard(this->core->ind_c_mutex);	
+		if(this->coreList[needy]->ind_Inbox.size() > THRESHOLD)
+			return;		
+		const int InboxSize_const = this->core->ind_Inbox.size();				
+		// begin work sharing!!
+		// loop through the victim's inbox, and insert half of your work
+		/**/							
+		while(sharedTokensCount < (InboxSize_const/2) )
 		{
 			// (2)							
-			Token_Type *stolenToken = (*it);									
-			this->core->insertToken_InIndInbox(stolenToken);//ind_Inbox.push_back(stolenToken);		
-			it = this->coreList[victim]->ind_Inbox.erase(it);
-			//it = list<Token_Type*>::reverse_iterator();
-			stolenTokensCount++;
-			this->core->Idle_Counter++;
-				
-			if(victim_InboxSize_const / 2 <= stolenTokensCount)
-				break;		
-			if(it == this->coreList[victim]->ind_Inbox.end())
-				break;
-			//victim_InboxSize = this->coreList[victim]->ind_Inbox.size();
+			Token_Type *sharedToken = this->core->ind_Inbox.back();	
+			this->core->ind_Inbox.pop_back();
+			this->coreList[needy]->insertToken_InIndInbox(sharedToken);
+			sharedTokensCount++;
+			this->core->Idle_Counter++;						
 		}
-		/*
-		cout<< "Token is stolen from core: " << this->coreList[victim]->coreID << 
-			" to core: " << this->core->coreID << " and Idle counter is: " << this->core->Idle_Counter<< endl;
-		*/
 	}
 	//cout<< ""<<endl;
 }
-// helper function to get the MAX loaded neighbor core id
-short selectVictim(short list[NIEGHBOORS], Core *core)
+// helper function to check for load blalncing initiation conditions
+short initiateLoadBalancing(short list[NIEGHBOORS], Core *core)
 {
-	short MAX = THRESHOLD;
-	short victim = -1;
+	short MIN = THRESHOLD;
+	short needy = -1;
 	for (int i = 0; i < NIEGHBOORS; i++)
 	{
 		short coreIDx = core->nieghborList[i];
 		int inbxSize = core->tokenizer.coreList[coreIDx]->ind_Inbox.size();
-		if(inbxSize > MAX)
+		if(inbxSize < MIN)
 		{
-			MAX = inbxSize;
-			victim = coreIDx;
+			MIN = inbxSize;
+			needy = coreIDx;
 		}
 	}
-	return victim;
+	return needy;
 }
 
 // propogate the stop token
