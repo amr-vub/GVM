@@ -318,27 +318,15 @@ void ContextChange::execute(Token_Type **tokens, Core *core)
 		LOG("ContextChange: No literals! -- ");
 		// delegate to the context manger obj to handel the context change execution details
 		core->tokenizer.contextManager.bind_save(tokens[0][0], this->todest, this->retDest, 
-			this->binds, this->restores, this->InstInx);
+			this->binds, this->restores, this->InstInx, this->literals);
 	}
 	else
 	{
-		LOG("ContextChange: at least one literal! -- Send it --");
-		// means that there exist at least one literal, then compare the binds to the literals size
-		for(auto lit : this->literals)
-		{
-			// prepare the literal as a token			
-			short port = get<0>(lit);
-			Datum value = get<1>(lit);
-			Tag *tag = new Tag(tokens[0]->tag->conx, port, tokens[0]->tag->instAdd);
-			Token_Type tok2 =  Token_Type(value, tag);
-			// then send delegate
-			core->tokenizer.contextManager.bind_save(tok2, this->todest, this->retDest, 
-				this->binds, this->restores, this->InstInx);			
-		}
-		this->literals.clear();
+		LOG("ContextChange: at least one literal! -- Send it --");		
+		//this->literals.clear();
 		LOG(" Then send the original token \n");
 		core->tokenizer.contextManager.bind_save(tokens[0][0], this->todest, this->retDest, 
-			this->binds, this->restores, this->InstInx);
+			this->binds, this->restores, this->InstInx, this->literals);
 	}
 	// freeing memory
 	delete tokens[0];

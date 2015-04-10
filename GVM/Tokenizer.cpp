@@ -154,7 +154,8 @@ ContextManager::~ContextManager()
 	\param: rest
 		how many return arguments I expect from this call	
 */
-void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short rest, long &instIdx)
+void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short rest, 
+							   long &instIdx, vector<tuple<short, Datum>> literals)
 {
 	Context old_cx = tok.tag->conx;
 	Context *new_cx = NULL;
@@ -170,6 +171,21 @@ void ContextManager::bind_save(Token_Type &tok, int* destAdd, int* retAdd, short
 			LOG(" Generate new context -- \n");
 			// generate new context
 			new_cx = this->tokenizer->core->conxObj.getUniqueCx(this->tokenizer->core->coreID);
+
+			// means that there exist at least one literal, then compare the binds to the literals size
+			if(!literals.empty())
+				for(auto lit : literals)
+				{
+					// prepare the literal as a token			
+					short port = get<0>(lit);
+					Datum value = get<1>(lit);
+					Tag *tag = new Tag(tok.tag->conx, port, tok.tag->instAdd);
+					Token_Type tok2 =  Token_Type(value, tag);
+					// then send delegate
+					bind_send(tok2, destAdd, -1, port, retAdd, rest, new_cx);
+					LOG("Sending literak with port : [" + to_string(port)+ "] \n");
+				}
+
 			// update the context map, cause we have still binds-1 toks to come
 			this->contextMap[make_pair(old_cx.conxId, instIdx)] = make_tuple(binds-1, new_cx);			
 

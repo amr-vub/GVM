@@ -88,7 +88,8 @@ public:
 	~ContextManager();
 
 	// 
-	void bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short rest, long &instIdx);
+	void bind_save(Token_Type &tok, int* destAdd, int* retAdd, short &binds, short rest, 
+		long &instIdx, vector<tuple<short, Datum>> literals);
 
 	void bind_send(Token_Type &tok, int* destAdd, short destPort
 		, short sentPort, int* retAdd, short rest, Context* cx);	
